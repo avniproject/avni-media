@@ -1,0 +1,13 @@
+{
+  "name": "thumbnail-creator",
+  "version": "1.0.0",
+  "description": "Lambda function for thumbnail creation",
+  "dependencies": {
+    "aws-sdk": "^2.1333.0",
+    "sharp": "^0.31.3"
+  },
+  "scripts": {
+    "install-sharp": "npm install --arch=x64 --platform=linux sharp",
+    "start": "node index.js"
+  }
+}
