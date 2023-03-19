@@ -1,70 +1,87 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { ArrowNarrowLeftIcon, ArrowNarrowRightIcon } from '@heroicons/react/solid'
+import Link from 'next/link';
+import { useState ,useEffect } from 'react';
 
-export default function Example() {
+interface Props{
+  showperpage:number;
+  pagechange: (startValue:number, endValue :number)=> void;
+  total :number;
+}
+
+const pagination = ({showperpage, pagechange, total} : Props)=> {
+  const[counter , setCounter] = useState(1)
+
+  const page = Math.ceil(total/showperpage)
+  
+  console.log("pahehhe",page)
+  // const [pageNumber , setPagenumber] = useState(page);
+  
+  useEffect(() => {
+    const value = showperpage * (counter - 1)
+    //  if(counter == 1) {
+    //   pagechange(value, value + showperpage)
+    //  } else {
+      pagechange(value  , value + showperpage)
+    //  }
+    
+
+  },[counter])
+
+  const onButtonclick = (type:string) => {
+     if(type == "previous"){
+        if(counter == 1) {
+          setCounter(1);
+        }
+        else {
+          setCounter(counter - 1);
+        }
+     }
+     else if (type == "next"){
+         if(Math.ceil(total/showperpage) === counter) {
+          setCounter(counter)
+         }
+         else {
+          setCounter(counter + 1);
+         }
+     }
+  }
   return (
-    <nav className="border-t border-gray-200 px-4 flex items-center justify-between sm:px-0">
-      <div className="mt-px w-0 flex-1 flex">
-        <a
-          href="#"
-          className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          <ArrowNarrowLeftIcon className="mr-3 h-5 w-5 text-gray-400" aria-hidden="true" />
+    <nav className="border-t border-gray-200 px-4 flex items-center justify-between sm:px-0 -mt-10">
+      <div className="mt-px w-0 flex-1 flex justify-end">
+        <button
+          onClick={() => onButtonclick("previous")}
+          className="border-t-2 border-transparent pt-1 pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 ">
+          <ArrowNarrowLeftIcon className="mr-3 h-5 w-5" aria-hidden="true" />
           Previous
-        </a>
+        </button>
       </div>
-      <div className="hidden md:-mt-px md:flex">
-        <a
-          href="#"
-          className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
+      {/* <div className="hidden md:-mt-px md:flex pt-"> */}
+        {
+          new Array(Math.ceil(total/showperpage)).fill("").map((page,index)=>(
+            <div className="pagination"  onClick={() => setCounter(index + 1)} >
+           <a
+          key={index}
+          className={`page-link ${index+1 === counter ? "active active-page" : ""}`}
+         href="#"
         >
-          1
+          {index+1}
         </a>
+    </div>
+          ))
+        }
+       
         {/* Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
-        <a
-          href="#"
-          className="border-indigo-500 text-indigo-600 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-          aria-current="page"
-        >
-          2
-        </a>
-        <a
-          href="#"
-          className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-        >
-          3
-        </a>
-        <span className="border-transparent text-gray-500 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium">
-          ...
-        </span>
-        <a
-          href="#"
-          className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-        >
-          8
-        </a>
-        <a
-          href="#"
-          className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-        >
-          9
-        </a>
-        <a
-          href="#"
-          className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium"
-        >
-          10
-        </a>
-      </div>
-      <div className="-mt-px w-0 flex-1 flex justify-end">
-        <a
-          href="#"
-          className="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+
+      <div className="-mt-px w-0 flex-1 flex justify-start">
+        <button
+        onClick={()=>onButtonclick("next") }
+          className="border-t-2 border-transparent pt-1 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
         >
           Next
           <ArrowNarrowRightIcon className="ml-3 h-5 w-5 text-gray-400" aria-hidden="true" />
-        </a>
+        </button>
       </div>
     </nav>
   )
 }
+export default  pagination

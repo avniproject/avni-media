@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.active-page {
+    color: red;
+  }
+  .pagination {
+    margin-right: 10px;
+  margin-left: 10px;
+  }
+  img{
+    width: 200px;
+    height: 200px;
+  }

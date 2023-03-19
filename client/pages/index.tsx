@@ -6,7 +6,7 @@ import { Card, Checkbox, Grid } from '@nextui-org/react';
 import ImageList from '@/components/ImageList'
 import Navbar from '@/components/Navbar';
 import Pagination from '@/components/Pagination';
-import Dropdown from '@/components/FilterComponent/LocationHierarchy'
+// import Dropdown from '@/components/FilterComponent-old/LocationHierarchy'
 import Filter from '@/components/FilterComponent/Filter';
 
 
@@ -14,27 +14,12 @@ import Filter from '@/components/FilterComponent/Filter';
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const img = [
-    {
-        images : "./images/download (1).jpeg"
-    },
-    {
-        images : "./images/download (2).jpeg"
-    },
-    {
-        images : "./images/download (3).jpeg"
-    },
-    {
-        images : "./images/download (4).jpeg"
-    }
-
-]
   return (
     <>
     <Navbar />
     <Filter />
     <ImageList />
-    <Pagination />
+
      {/* {img.map((item, index) => (
      <div className='flex'>
        <Card css={{ p: "$6", mw: "400px" }}>
