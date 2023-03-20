@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-/* This example requires Tailwind CSS v2.0+ */
 export default function Buttons() {
     return (
       <>

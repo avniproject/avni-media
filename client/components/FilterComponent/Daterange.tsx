@@ -1,15 +1,15 @@
-import { DatePicker } from 'antd'
-import { useState } from 'react'
-import { Menu } from '@headlessui/react'
-const { RangePicker } = DatePicker
+import { DatePicker } from 'antd';
+import { useState } from 'react';
+import { Menu } from '@headlessui/react';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+const { RangePicker } = DatePicker
 dayjs.extend(customParseFormat);
 const dateFormat = 'DD/MM/YYYY';
 
 
-import 'react-date-range/dist/styles.css'
-import 'react-date-range/dist/theme/default.css'
-import dayjs from 'dayjs'
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import dayjs from 'dayjs';
 const DateRangeComp = () => {
 
   // date state

@@ -8,14 +8,11 @@ export default function ImageList() {
 
   useEffect(() => {
     async function fetchImages() {
-
-
       try {
-        const response = await fetch('http://localhost:8021/image');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const data = await response.json();
         setImageList(data);
       } catch (error) {

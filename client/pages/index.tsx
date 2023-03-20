@@ -18,29 +18,7 @@ export default function Home() {
     <>
     <Navbar />
     <Filter />
-    <ImageList />
-
-     {/* {img.map((item, index) => (
-     <div className='flex'>
-       <Card css={{ p: "$6", mw: "400px" }}>
-       <Card.Header>
-  
-       < img  key={index} src={item.images} alt="image"   width={500}
-       height={500} />
-       </Card.Header>
-   <Card.Body>
-    Image name  
-   </Card.Body>
-   <Card.Footer>
-   <Checkbox><select name=" " id=""></select> select Image </Checkbox>
-   </Card.Footer>
-
-   </Card>
-   </div>
-     ))} */}
-
-
-  
+    <ImageList />  
     </>
   )
 }
