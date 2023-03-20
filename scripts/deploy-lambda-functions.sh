@@ -17,7 +17,7 @@ ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lambda-execution-role"
 
 FUNCTION_NAME="generate-thumbnails-instantly"
 FUNCTION_NAME_BULK="generate-thumbnails-bulk"
-FUNCTION_ARN="arn:aws:lambda:ap-south-1:023004991146:function:generate-thumbnails-instantly"
+FUNCTION_ARN="arn:aws:lambda:ap-south-1:${ACCOUNT_ID}:function:generate-thumbnails-instantly"
 HANDLER="index.handler"
 MEMORY_SIZE="128"
 TIMEOUT="10"
