@@ -1,6 +1,5 @@
-import { ArrowNarrowLeftIcon, ArrowNarrowRightIcon } from '@heroicons/react/solid'
-import Link from 'next/link';
-import { useState ,useEffect } from 'react';
+import { ArrowNarrowLeftIcon, ArrowNarrowRightIcon } from '@heroicons/react/solid';
+import { useState, useEffect } from 'react';
 
 interface Props{
   showperpage:number;
@@ -13,18 +12,9 @@ const pagination = ({showperpage, pagechange, total} : Props)=> {
 
   const page = Math.ceil(total/showperpage)
   
-  console.log("pahehhe",page)
-  // const [pageNumber , setPagenumber] = useState(page);
-  
   useEffect(() => {
     const value = showperpage * (counter - 1)
-    //  if(counter == 1) {
-    //   pagechange(value, value + showperpage)
-    //  } else {
       pagechange(value  , value + showperpage)
-    //  }
-    
-
   },[counter])
 
   const onButtonclick = (type:string) => {
@@ -55,7 +45,6 @@ const pagination = ({showperpage, pagechange, total} : Props)=> {
           Previous
         </button>
       </div>
-      {/* <div className="hidden md:-mt-px md:flex pt-"> */}
         {
           new Array(Math.ceil(total/showperpage)).fill("").map((page,index)=>(
             <div className="pagination"  onClick={() => setCounter(index + 1)} >
@@ -69,9 +58,6 @@ const pagination = ({showperpage, pagechange, total} : Props)=> {
     </div>
           ))
         }
-       
-        {/* Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
-
       <div className="-mt-px w-0 flex-1 flex justify-start">
         <button
         onClick={()=>onButtonclick("next") }

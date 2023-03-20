@@ -1,84 +1,38 @@
-
-import { useEffect, useRef, useState } from 'react'
-import { DateRange } from 'react-date-range'
+import { DatePicker } from 'antd'
+import { useState } from 'react'
 import { Menu } from '@headlessui/react'
+const { RangePicker } = DatePicker
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+const dateFormat = 'DD/MM/YYYY';
 
-import format from 'date-fns/format'
-import { addDays } from 'date-fns'
 
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
-
+import dayjs from 'dayjs'
 const DateRangeComp = () => {
 
   // date state
-  const [range, setRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: addDays(new Date(), 7),
-      key: 'selection'
-    }
-  ])
-
-  // open close
-  const [open, setOpen] = useState(false)
-
-  // get the target element to toggle 
-  const refOne = useRef(null)
-
-  useEffect(() => {
-    // event listeners
-    document.addEventListener("keydown", hideOnEscape, true)
-    document.addEventListener("click", hideOnClickOutside, true)
-  }, [])
-
-  // hide dropdown on ESC press
-  const hideOnEscape = (e) => {
-    // console.log(e.key)
-    if( e.key === "Escape" ) {
-      setOpen(false)
-    }
-  }
-
-  // Hide on outside click
-  const hideOnClickOutside = (e) => {
-    // console.log(refOne.current)
-    // console.log(e.target)
-    if( refOne.current && !refOne.current.contains(e.target) ) {
-      setOpen(false)
-    }
-  }
+  const [date, setDate] = useState<null | string[]>(null)
+  console.log(date)
 
   return (
     <>
-    <Menu as="div" className="relative inline-block text-left -ml-2 pr-8 mt-5 z-10">
+      <Menu as="div" className="relative inline-block text-left -ml-4 pr-0 mt-5 z-10 inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-0 py-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+        <RangePicker
+        format={dateFormat}
+          onChange={(dateValue) => {
+            if (dateValue) { // check if dateValue is not null
+              setDate(dateValue.map(selectedDte => {
+                return dayjs(selectedDte).format("YYYY-MM-DD")
 
-    <div className="calendarWrap rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm">
+              }))
 
-      <input
-        value={`${format(range[0].startDate, "MM/dd/yyyy")} to ${format(range[0].endDate, "MM/dd/yyyy")}`}
-        readOnly
-        className="inputBox"
-        placeholder="Date Range"
-        onClick={ () => setOpen(open => !open) }
-      />
+            }
 
-      <div ref={refOne}>
-        {open && 
-          <DateRange
-            onChange={item => setRange([item.selection])}
-            editableDateInputs={true}
-            moveRangeOnFirstSelection={false}
-            ranges={range}
-            months={1}
-            direction="horizontal"
-            className="calendarElement"
-          />
-        }
-      </div>
-
-    </div>
-    </Menu>
+          }}
+        />
+      </Menu>
     </>
   )
 }

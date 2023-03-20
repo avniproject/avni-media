@@ -26,7 +26,7 @@ export default function Program() {
   }
 
   return (
-    <Menu as="div" className="relative inline-block text-left -ml-6 pr-7 mt-5 z-10">
+    <Menu as="div" className="relative inline-block text-left -ml-4 pr-4 mt-5 z-10">
       <div>
         <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
           <span>{selectedOptions.length > 0 ? selectedOptions.length + ' selected' : 'Program'}</span>
