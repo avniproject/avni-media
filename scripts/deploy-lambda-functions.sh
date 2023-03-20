@@ -62,16 +62,8 @@ else
     --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Sid": "","Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}' || { echo "Failed to create an IAM role for the Lambda function"; exit 1; }
 fi
 
-# Poll the status of the role creation process every 10 seconds until it is complete
-# while [ "$role_status" != "ACTIVE" ]
-# do
-#     sleep 10
-#     role_info="$(aws iam get-role --role-name "$ROLE_NAME")"
-#     role_status="$(echo "$role_info" | jq -r '.Role.Status')"
-# done
 sleep 15
 
-# Once the role is active, proceed with the next step in the script
 echo "Role creation process complete, proceeding with next step"
 
 echo "Attaching a policy to the role that allows access to S3"
@@ -156,7 +148,6 @@ if ! aws events put-targets \
   exit 1
 fi
 
-# Check if the permission already exists
 EXISTING_PERMISSION=$(aws lambda get-policy --function-name $FUNCTION_NAME --output text --query 'Policy' 2>/dev/null | grep -q $STATEMENT_ID && echo "yes" || echo "no")
 
 if [[ $EXISTING_PERMISSION == "yes" ]]; then
