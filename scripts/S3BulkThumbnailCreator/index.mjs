@@ -11,14 +11,15 @@ export const handler = async (event, context) => {
 
     for (const object of objects.Contents) {
       if (object.Key.match(/\.(jpe?g|png)$/i)) { 
+        const [organisationName, fileName] = object.Key.split('/');
         const s3Object = await s3.getObject({ Bucket: bucketName, Key: object.Key }).promise();
         const thumbnail = await sharp(s3Object.Body).resize(200, 200).toBuffer();
-        // const thumbnailKey = `${object.Key}_thumbnail.jpg`;
 
-        // await s3.putObject({ Bucket: bucketName, Key: thumbnailKey, Body: image }).promise();
-
-        const thumbnailKey = `thumb-${object.Key}`
-        if (!object.Key.includes('thumb-')) {
+        // const thumbnailKey = `thumb-${object.Key}`
+        const thumbnailKey = `${organisationName}/thumbnails/${fileName}`;
+        
+        // if (!object.Key.includes('thumb-')) {
+        if (!thumbnailKey.includes(object.Key)) {  
             const thumbnailParams = {
                 Bucket: bucketName,
                 Key: thumbnailKey,
