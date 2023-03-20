@@ -15,10 +15,8 @@ export const handler = async (event, context) => {
         const s3Object = await s3.getObject({ Bucket: bucketName, Key: object.Key }).promise();
         const thumbnail = await sharp(s3Object.Body).resize(200, 200).toBuffer();
 
-        // const thumbnailKey = `thumb-${object.Key}`
         const thumbnailKey = `${organisationName}/thumbnails/${fileName}`;
-        
-        // if (!object.Key.includes('thumb-')) {
+
         if (!thumbnailKey.includes(object.Key)) {  
             const thumbnailParams = {
                 Bucket: bucketName,
