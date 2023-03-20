@@ -13,11 +13,11 @@ fi
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 AWS_REGION="ap-south-1"
 ROLE_NAME="lambda-execution-role"
-ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lambda-execution-role"
+ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
 
 FUNCTION_NAME="generate-thumbnails-instantly"
 FUNCTION_NAME_BULK="generate-thumbnails-bulk"
-FUNCTION_ARN="arn:aws:lambda:ap-south-1:${ACCOUNT_ID}:function:generate-thumbnails-instantly"
+FUNCTION_ARN="arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}"
 HANDLER="index.handler"
 MEMORY_SIZE="128"
 TIMEOUT="10"
@@ -78,9 +78,6 @@ aws iam attach-role-policy \
 aws iam attach-role-policy \
   --role-name "${ROLE_NAME}" \
   --policy-arn "arn:aws:iam::aws:policy/service-role/AWSLambdaRole" || { echo "Failed to attach the AWSLambdaRole policy to the IAM role"; exit 1; }
-
-
-
 
 echo "Creating / updating the Lambda function..."
 if aws lambda get-function --function-name "${FUNCTION_NAME}" >/dev/null 2>&1; then
@@ -171,7 +168,7 @@ if ! aws s3api put-bucket-notification-configuration \
   --notification-configuration '{
     "LambdaFunctionConfigurations": [
       {
-        "LambdaFunctionArn": "arn:aws:lambda:ap-south-1:023004991146:function:generate-thumbnails-instantly",
+        "LambdaFunctionArn": "arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}",
         "Events": [
             "s3:ObjectCreated:*"
         ]
