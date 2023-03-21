@@ -25,14 +25,18 @@
     "moment": "^2.29.4",
     "next": "13.2.4",
     "react": "^18.2.0",
+    "react-carousel-responsive": "^0.0.31",
     "react-date-range": "^1.4.0",
     "react-datepicker": "^4.10.0",
     "react-dom": "18.2.0",
+    "react-responsive-carousel": "^3.2.23",
+    "react-slick": "^0.29.0",
     "typescript": "4.9.5"
   },
   "devDependencies": {
     "@types/react-date-range": "^1.4.4",
     "@types/react-datepicker": "^4.10.0",
+    "@types/react-slick": "^0.23.10",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.7"

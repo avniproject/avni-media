@@ -1,6 +1,6 @@
 
 /* This example requires Tailwind CSS v2.0+ */
-const people = [
+const folder = [
     { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
     // More people...
   ]
@@ -32,15 +32,15 @@ const people = [
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {people.map((person) => (
-                      <tr key={person.email} className="divide-x divide-gray-200">
+                    {folder.map((files) => (
+                      <tr key={files.email} className="divide-x divide-gray-200">
                         <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
-                          {person.name}
+                          {files.name}
                         </td>
-                        <td className="whitespace-nowrap p-4 text-sm text-gray-500">{person.title}</td>
+                        <td className="whitespace-nowrap p-4 text-sm text-gray-500">{files.title}</td>
                         <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
                           <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Download<span className="sr-only">, {person.name}</span>
+                          Download<span className="sr-only">, {files.name}</span>
                           </a>
                         </td>
                       </tr>

@@ -1,6 +1,7 @@
-import CheckButton from "./CheckButton"
-import React, { useState, useEffect } from 'react';
+import CheckButton from "./CheckButton";
+import { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
+import ImageCarousel from "./ImageCarousel";
 
 export default function ImageList() {
   const [imageList, setImageList] = useState([]);
@@ -17,8 +18,7 @@ export default function ImageList() {
         setImageList(data);
       } catch (error) {
         console.error(error);
-       
-        // TODO: Add error message to UI
+
       }
     }
     fetchImages();
@@ -28,6 +28,9 @@ export default function ImageList() {
     start_index: 0,
     end_index: 10
   });
+  const [selectedImage, setSelectedImage] = useState();
+
+
 
   const pagechange = (startValue: number, endValue: number) => {
     setPagination({ start_index: startValue, end_index: endValue })
@@ -41,11 +44,14 @@ export default function ImageList() {
             <div key={image.id}>
               <div className="relative">
                 <div className="relative w-full h-50 rounded-lg overflow-hidden">
-                  <img
-                    src={image.path}
-                    alt={image.name}
-                    className="w-100 h-200 object-center object-cover"
-                  />
+                  <button>
+                    <img
+                      src={image.thumbsrc}
+                      alt={image.name}
+                      onClick={() => setSelectedImage(image)}
+                      className="thumb"
+                    />
+                  </button>
                 </div>
                 <CheckButton />
               </div>
@@ -53,6 +59,13 @@ export default function ImageList() {
           ))}
         </div>
       </div>
+      {selectedImage && (
+        <ImageCarousel
+          image={imageList}
+          selectedImage={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
       <Pagination showperpage={showPerpage} pagechange={pagechange} total={imageList.length} />
     </div>
   )
