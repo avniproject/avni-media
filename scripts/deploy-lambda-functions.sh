@@ -46,7 +46,7 @@ rm -f "${FUNCTION_NAME_BULK}.zip"
 zip -r "${FUNCTION_NAME}.zip" ./S3ThumbnailCreator/index.mjs -j 'S3ThumbnailCreator/*' || { echo "Failed to zip the function code for ${FUNCTION_NAME}"; exit 1; }
 zip -r "${FUNCTION_NAME}.zip" node_modules/ || { echo "Failed to zip the node_modules for ${FUNCTION_NAME}"; exit 1; }
 
-zip -r "${FUNCTION_NAME_BULK}.zip" ./S3BulkThumbnailCreator/index.mjs -j 'S3ThumbnailCreator/*' || { echo "Failed to zip the function code for ${FUNCTION_NAME_BULK}"; exit 1; }
+zip -r "${FUNCTION_NAME_BULK}.zip" ./S3BulkThumbnailCreator/index.mjs -j 'S3BulkThumbnailCreator/*' || { echo "Failed to zip the function code for ${FUNCTION_NAME_BULK}"; exit 1; }
 zip -r "${FUNCTION_NAME_BULK}.zip" node_modules/ || { echo "Failed to zip the nod_modules for ${FUNCTION_NAME_BULK}"; exit 1; }
 
 echo "Uploading the function code to S3"
