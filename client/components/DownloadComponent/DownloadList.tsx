@@ -1,8 +1,6 @@
 
-/* This example requires Tailwind CSS v2.0+ */
 const folder = [
     { name: '23', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
-    // More people...
   ]
   
   export default function Download() {
