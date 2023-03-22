@@ -1,11 +1,11 @@
 
 /* This example requires Tailwind CSS v2.0+ */
 const folder = [
-    { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
+    { name: '23', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
     // More people...
   ]
   
-  export default function Example() {
+  export default function Download() {
     return (
       <div className="px-4 sm:px-6 lg:px-8 mt-5">
         <div className="sm:flex sm:items-center">
@@ -24,7 +24,7 @@ const folder = [
                         Size Of Download
                       </th>
                       <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        Download Initiated On
+                        File Name 
                       </th>
                       <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Status

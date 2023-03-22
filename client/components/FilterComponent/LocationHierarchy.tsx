@@ -37,7 +37,7 @@ export default function LocationHierarchy() {
                     'block px-4 py-2 text-sm'
                   )}
                 >
-                  Ranchi
+                  Chennai
                 </a>
               )}
             </Menu.Item>
@@ -50,7 +50,7 @@ export default function LocationHierarchy() {
                     'block px-4 py-2 text-sm'
                   )}
                 >
-                  Patna
+                  Pune
                 </a>
               )}
             </Menu.Item>
@@ -77,7 +77,7 @@ export default function LocationHierarchy() {
                       'block w-full text-left px-4 py-2 text-sm'
                     )}
                   >
-                    Bihar
+                  Hyderabad
                   </button>
                 )}
               </Menu.Item>
