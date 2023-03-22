@@ -63,6 +63,7 @@ export default function ImageList() {
         <ImageCarousel
           image={imageList}
           selectedImage={selectedImage}
+          pagination ={pagination}
           onClose={() => setSelectedImage(null)}
         />
       )}
