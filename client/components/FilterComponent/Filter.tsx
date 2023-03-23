@@ -10,7 +10,7 @@ import SubjectType from "./SubjectType"
   export default function Filter() {
     return (
       <>
-        <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900 ml-32">Filters</h3>
+        <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900 ml-8">Filters</h3>
         <dl className="mt-2 grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0">
           <LocationHierarchy />
           <Daterange/>

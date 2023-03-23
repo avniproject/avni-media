@@ -1,6 +1,6 @@
 
 const folder = [
-    { name: '23', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
+    { name: '23', title: '23-03-2023 10:25:35.zip', size: '45 MB' },
   ]
   
   export default function Download() {
@@ -37,9 +37,9 @@ const folder = [
                         </td>
                         <td className="whitespace-nowrap p-4 text-sm text-gray-500">{files.title}</td>
                         <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
-                          <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Download<span className="sr-only">, {files.name}</span>
-                          </a>
+                          <a href="#" className="text-indigo-600 hover:text-indigo-900">Download</a>
+                          <br/>
+                          <span>{files.size}</span>
                         </td>
                       </tr>
                     ))}
