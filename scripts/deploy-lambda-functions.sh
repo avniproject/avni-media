@@ -89,7 +89,7 @@ elif ! aws lambda create-function \
   --memory-size "${MEMORY_SIZE}" \
   --timeout "${TIMEOUT}" \
   --role "${ROLE_ARN}" \
-  --code "S3Bucket=${CODE_DEPLOY_BUCKET_NAME},S3Key=${S3_KEY_BULK}"; then
+  --code "S3Bucket=${CODE_DEPLOY_BUCKET_NAME},S3Key=${S3_KEY}"; then
   echo "Error creating Lambda function  for instant thumbnail creation."
   exit 1
 fi
@@ -98,7 +98,7 @@ echo "Updating the function code..."
 if ! aws lambda update-function-code \
   --function-name "${FUNCTION_NAME}" \
   --s3-bucket "${CODE_DEPLOY_BUCKET_NAME}" \
-  --s3-key "${S3_KEY_BULK}"; then
+  --s3-key "${S3_KEY}"; then
   echo "Error updating the function code for instant thumbnail creation."
   exit 1
 fi
@@ -163,9 +163,8 @@ else
   echo "Permission successfully added to Lambda function ${FUNCTION_NAME}."
 fi
 
-if ! aws s3api put-bucket-notification-configuration \
-  --bucket "${BUCKET_NAME}" \
-  --notification-configuration '{
+NOTIFICATION_CONFIG=$(cat <<EOF
+{
     "LambdaFunctionConfigurations": [
       {
         "LambdaFunctionArn": "arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}",
@@ -174,7 +173,13 @@ if ! aws s3api put-bucket-notification-configuration \
         ]
       }
     ]
-}' >/dev/null 2>&1; then
+}
+EOF
+)
+
+if ! aws s3api put-bucket-notification-configuration \
+--bucket $BUCKET_NAME \
+--notification-configuration "$NOTIFICATION_CONFIG" >/dev/null 2>&1; then
   echo "Error: Failed to configure bucket notifications for ${BUCKET_NAME}. Please check your AWS credentials and try again."
   exit 1
 else
