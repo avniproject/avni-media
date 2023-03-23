@@ -27,19 +27,19 @@ const ImageCarousel = ({ image, selectedImage, onClose, pagination }: Props) => 
           
           <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="inline-block  bg-red rounded-lg">
-          <button className="absolute top-0 right-3 z-50 bg-gray-700" onClick={onClose}>
+          <button className="absolute top-0 right-3 z-50" onClick={onClose}>
               <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             </div>
-            <div className="relative w-full h-82">
-              <Carousel className='carousel' selectedItem={index} showArrows={true}>
-                {image.slice(pagination.start_index, pagination.end_index).map((img) => (
+            <div className="flex  w-full h-900">
+              <Carousel className='carousel' selectedItem={index} showArrows={true} showThumbs={false} showIndicators={false}>
+                {image.map((img) => (
                   <div key={img.id}>
                     <img src={img.path} className="carousel-image" />
                     <div className="absolute top-300 left-10 bg-white z-10 ">
-                      <CheckButton />
+                      <CheckButton name={img.name}/>
                     </div>
                   </div>
                 ))}

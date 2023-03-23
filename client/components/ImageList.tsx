@@ -6,7 +6,7 @@ import ImageCarousel from "./ImageCarousel";
 export default function ImageList() {
   const [imageList, setImageList] = useState([]);
 
-
+   
   useEffect(() => {
     async function fetchImages() {
       try {
@@ -23,6 +23,7 @@ export default function ImageList() {
     }
     fetchImages();
   }, []);
+  console.log(imageList)
   const [showPerpage, setShowPerpage] = useState(10);
   const [pagination, setPagination] = useState({
     start_index: 0,
@@ -53,7 +54,7 @@ export default function ImageList() {
                     />
                   </button>
                 </div>
-                <CheckButton />
+                <CheckButton name={image.name} id ={image.id}/>
               </div>
             </div>
           ))}
