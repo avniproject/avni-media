@@ -7,7 +7,7 @@ interface Props {
   total: number;
 }
 
-const pagination = ({ showperpage, pagechange, total }: Props) => {
+const Pagination = ({ showperpage, pagechange, total }: Props) => {
   const [counter, setCounter] = useState(1)
 
   const page = Math.ceil(total / showperpage)
@@ -70,4 +70,4 @@ const pagination = ({ showperpage, pagechange, total }: Props) => {
     </nav>
   )
 }
-export default pagination
+export default Pagination
