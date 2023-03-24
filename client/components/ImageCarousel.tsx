@@ -3,15 +3,15 @@ import { Carousel } from 'react-responsive-carousel';
 import CheckButton from "./CheckButton";
 
 interface Props {
-  selectedImage: any
+  carouselImage: any
   image: any
   onClose: () => void;
   pagination: (startValue: number, endValue: number) => void;
 
 }
 
-const ImageCarousel = ({ image, selectedImage, onClose, pagination }: Props) => {
-  const index = image.indexOf(selectedImage);
+const ImageCarousel = ({ image, carouselImage, onClose, pagination }: Props) => {
+  const index = image.indexOf(carouselImage);
   const previousImage = image[(index + image.length - 1) % image.length];
   const nextImage = image[(index + 1) % image.length];
   console.log("pagination", pagination)
