@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 interface Props {
   showperpage: number;
   pagechange: (startValue: number, endValue: number) => void;
+  pagination: {
+    start_index: number;
+    end_index: number;
+  },
   total: number;
 }
 

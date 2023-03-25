@@ -4,39 +4,55 @@ import Pagination from '@/components/Pagination';
 import ImageCarousel from "./ImageCarousel";
 
 export default function ImageList() {
+
   const [imageList, setImageList] = useState([]);
 
-   
   useEffect(() => {
     async function fetchImages() {
       try {
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}`);
         if (!response.ok) {
+
           throw new Error(`HTTP error! Status: ${response.status}`);
+
         }
         const data = await response.json();
         setImageList(data);
-      } catch (error) {
-        console.error(error);
 
+      } catch (error) {
+
+        console.error(error);
+        
       }
     }
     fetchImages();
   }, []);
-  console.log(imageList)
-  const [showPerpage, setShowPerpage] = useState(10);
+
+  const [showPerpage] = useState(10);
+
   const [pagination, setPagination] = useState({
     start_index: 0,
     end_index: 10
   });
-  const [selectedImage, setSelectedImage] = useState();
 
+  const [carouselImage, setCarouselImage] = useState();
 
+  const [checkedImage, setCheckedImage] = useState<string[]>([]);
 
+  const onSelectImage = (value: string, checked: boolean) => {
+    if (checked) {
+      setCheckedImage(prevCheckedImage => {
+        const updatedCheckedImage = [...prevCheckedImage, value];
+        return updatedCheckedImage;
+      });
+    } else {
+      setCheckedImage(prevCheckedImage => prevCheckedImage.filter(item => item !== value));
+    }
+  };
   const pagechange = (startValue: number, endValue: number) => {
     setPagination({ start_index: startValue, end_index: endValue })
   };
-
   return (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -49,26 +65,34 @@ export default function ImageList() {
                     <img
                       src={image.thumbsrc}
                       alt={image.name}
-                      onClick={() => setSelectedImage(image)}
+                      onClick={() => setCarouselImage(image)}
                       className="thumb"
                     />
                   </button>
                 </div>
-                <CheckButton name={image.name} id ={image.id}/>
+                <CheckButton name={image.name} id={image.id} onSelectImage={onSelectImage} checkedImage={checkedImage} flag="list" onSelectImageCarousel={function (): void {
+                  throw new Error("Function not implemented.");
+                }} />
               </div>
             </div>
           ))}
         </div>
       </div>
-      {selectedImage && (
+
+      {carouselImage && (
         <ImageCarousel
           image={imageList}
-          selectedImage={selectedImage}
-          pagination ={pagination}
-          onClose={() => setSelectedImage(null)}
+          carouselImage={carouselImage}
+          pagination={pagination}
+          onClose={() => setCarouselImage(null)}
+          onSelectImage={onSelectImage}
+          checkedImage={checkedImage}
         />
       )}
-      <Pagination showperpage={showPerpage} pagechange={pagechange} total={imageList.length} />
+      <Pagination showperpage={showPerpage} pagechange={pagechange} total={imageList.length} pagination={{
+        start_index: 0,
+        end_index: 0
+      }} />
     </div>
   )
 }
