@@ -22,23 +22,23 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
     }
   }
 
-  const isChecked = checkedImage.toString().includes(id);
+  const isChecked = checkedImage.map(String).includes(String(id));
 
   return (
     <fieldset className="space-y-5">
       <legend className="sr-only">Notifications</legend>
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
-          <input
-            id={id}
-            value={id}
-            aria-describedby="comments-description"
-            name="comments"
-            type="checkbox"
-            checked={isChecked}
-            className="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
-            onChange={(e) => handleChecked(e)}
-          />
+        <input
+          id={id.toString()}
+          value={id.toString()}
+          aria-describedby="comments-description"
+          name="comments"
+          type="checkbox"
+          checked={isChecked}
+          className="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
+          onChange={(e) => handleChecked(e)}
+        />
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="comments" className="font-medium text-gray-700">

@@ -30,9 +30,9 @@ const folder = [
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {folder.map((files) => (
-                      <tr key={files.email} className="divide-x divide-gray-200">
-                        <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
+                    {folder.map((files,index) => (
+                      <tr key={index}  className="divide-x divide-gray-200">
+                        <td  className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
                           {files.name}
                         </td>
                         <td className="whitespace-nowrap p-4 text-sm text-gray-500">{files.title}</td>

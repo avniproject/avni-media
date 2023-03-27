@@ -1,12 +1,21 @@
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import CheckButton from "./CheckButton";
+interface imageList {
+  id: string;
+  path: string;
+  name: string;
+}
 
 interface Props {
-  image: any
+  imageList: {
+    id: string;
+    path: string;
+    name: string;
+  }[];
+img: imageList[]
   carouselImage: any
   onClose: () => void;
-  pagination: (startValue: number, endValue: number) => void;
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
@@ -14,14 +23,14 @@ interface Props {
 }
 
 const ImageCarousel = ({
-  image,
+  imageList,
   carouselImage,
   onClose,
   onSelectImage,
   checkedImage
 
 }: Props) => {
-  const index = image.indexOf(carouselImage);
+  const index = imageList.indexOf(carouselImage);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
     
@@ -44,7 +53,7 @@ const ImageCarousel = ({
             </div>
             <div className="flex  w-full h-900">
               <Carousel className='carousel' selectedItem={index} showArrows={true} showThumbs={false} showIndicators={false}>
-                {image.map((img) => (
+                {imageList.map((img) => (
                   <div key={img.id}>
                     <img src={img.path} className="carousel-image" />
                     <div className="absolute top-300 left-10 bg-white z-10 ">

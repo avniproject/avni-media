@@ -1,8 +1,12 @@
 import { Fragment, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/solid';
+interface Option {
+  id: number;
+  name: string;
+}
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -15,9 +19,9 @@ const options = [
 ];
 
 export default function EncounterType() {
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
 
-  function handleOptionClick(option) {
+  function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option));
     } else {
@@ -26,10 +30,10 @@ export default function EncounterType() {
   }
 
   return (
-    <Menu as="div" className="relative inline-block text-left -ml-4 pr-4 mt-5 z-10">
+    <Menu as="div" className="relative inline-block text-left -ml-4 pr-6 mt-5 z-10">
       <div>
         <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-          <span>{selectedOptions.length > 0 ? selectedOptions.length + ' selected' : 'Encounter Type'}</span>
+          <span>{selectedOptions.length > 0 ? selectedOptions.length + ' selected' : 'EncounterType'}</span>
           <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </Menu.Button>
       </div>
@@ -57,7 +61,7 @@ export default function EncounterType() {
                   >
                     {option.name}
                     {selectedOptions.includes(option) ? (
-                      <CheckIcon className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                      <CheckIcon className="h-5 w-5 text-teal-500" aria-hidden="true" />
                     ) : null}
                   </button>
                 )}
