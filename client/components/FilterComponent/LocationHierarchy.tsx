@@ -3,10 +3,9 @@ import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
 }
-
 export default function LocationHierarchy() {
   return (
     <Menu as="div" className="relative inline-block text-left ml-8 pr-4 mt-5 z-10">

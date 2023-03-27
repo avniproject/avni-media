@@ -1,6 +1,10 @@
 import { Fragment, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/solid';
+interface Option {
+  id: number;
+  name: string;
+}
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -15,9 +19,9 @@ const options = [
 ];
 
 export default function Accounts() {
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
 
-  function handleOptionClick(option) {
+  function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option));
     } else {
