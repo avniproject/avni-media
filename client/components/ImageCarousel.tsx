@@ -3,7 +3,7 @@ import { Carousel } from 'react-responsive-carousel';
 import CheckButton from "./CheckButton";
 
 interface Props {
-  image: any
+  imageList: any
   carouselImage: any
   onClose: () => void;
   pagination: (startValue: number, endValue: number) => void;
@@ -14,14 +14,14 @@ interface Props {
 }
 
 const ImageCarousel = ({
-  image,
+  imageList,
   carouselImage,
   onClose,
   onSelectImage,
   checkedImage
 
 }: Props) => {
-  const index = image.indexOf(carouselImage);
+  const index = imageList.indexOf(carouselImage);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
     
@@ -42,12 +42,12 @@ const ImageCarousel = ({
                 </svg>
               </button>
             </div>
-            <div className="flex  w-full h-900">
-              <Carousel className='carousel' selectedItem={index} showArrows={true} showThumbs={false} showIndicators={false}>
-                {image.map((img) => (
+            <div className="flex  w-full h-full">
+              <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
+                {imageList.map((img) => (
                   <div key={img.id}>
-                    <img src={img.path} className="carousel-image" />
-                    <div className="absolute top-300 left-10 bg-white z-10 ">
+                    <img src={img.path}  className = "carousel-image" />
+                    <div className="checkbox">
                       <CheckButton name={img.name} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
                       }} checkedImage={checkedImage} />
