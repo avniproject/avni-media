@@ -47,8 +47,6 @@ export default function ImageList() {
 
   const [carouselImage, setCarouselImage] = useState<{ id: string, thumbsrc: string, name: string } | null>(null);
 
- 
-
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
 
   const onSelectImage = (value: string, checked: boolean) => {

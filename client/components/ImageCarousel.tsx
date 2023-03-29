@@ -24,7 +24,7 @@ const ImageCarousel = ({
   const index = imageList.indexOf(carouselImage);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
-    
+
     onSelectImage(value, checked)
   };
   return (
@@ -46,7 +46,7 @@ const ImageCarousel = ({
               <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
                 {imageList.map((img) => (
                   <div key={img.id}>
-                    <img src={img.path}  className = "carousel-image" />
+                    <img src={img.path} className="carousel-image" />
                     <div className="checkbox">
                       <CheckButton name={img.name} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");

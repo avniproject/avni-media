@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react"
-
-
 interface prop {
   name: string,
   id: string,
