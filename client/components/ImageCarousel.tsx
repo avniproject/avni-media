@@ -30,7 +30,6 @@ const ImageCarousel = ({
 }: Props) => {
   const index = imageList.indexOf(carouselImage);
 
-
   const onSelectImageCarousel = (value: string, checked: boolean) => {
 
     onSelectImage(value, checked)
@@ -57,7 +56,6 @@ const ImageCarousel = ({
                   <div key={img.id}>
                     <img src={img.path} className="carousel-image" />
                     <div className="checkbox">
-n
                       <CheckButton name={img.name} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
                       }} checkedImage={checkedImage} />

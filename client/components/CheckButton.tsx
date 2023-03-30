@@ -23,7 +23,6 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
 
   const isChecked = checkedImage.toString().includes(id);
 
-
   return (
     <fieldset className="space-y-5">
       <legend className="sr-only">Notifications</legend>
@@ -40,7 +39,6 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
             className="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
             onChange={(e) => handleChecked(e)}
           />
-
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="comments" className="font-medium text-gray-700">
@@ -50,6 +48,4 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
       </div>
     </fieldset>
   )
-
 }
-
