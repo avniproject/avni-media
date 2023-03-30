@@ -14,7 +14,6 @@ const DateRangeComp = () => {
 
   // date state
   const [date, setDate] = useState<null | string[]>(null)
-  console.log(date)
 
   return (
     <>

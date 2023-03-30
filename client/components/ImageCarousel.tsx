@@ -8,14 +8,12 @@ interface imageList {
 }
 
 interface Props {
-  imageList: {
-    id: string;
-    path: string;
-    name: string;
-  }[];
-img: imageList[]
+
+  imageList: any
   carouselImage: any
   onClose: () => void;
+  pagination: (startValue: number, endValue: number) => void;
+
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
@@ -32,8 +30,9 @@ const ImageCarousel = ({
 }: Props) => {
   const index = imageList.indexOf(carouselImage);
 
+
   const onSelectImageCarousel = (value: string, checked: boolean) => {
-    
+
     onSelectImage(value, checked)
   };
   return (
@@ -51,12 +50,14 @@ const ImageCarousel = ({
                 </svg>
               </button>
             </div>
-            <div className="flex  w-full h-900">
-              <Carousel className='carousel' selectedItem={index} showArrows={true} showThumbs={false} showIndicators={false}>
+
+            <div className="flex  w-full h-full">
+              <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
                 {imageList.map((img) => (
                   <div key={img.id}>
                     <img src={img.path} className="carousel-image" />
-                    <div className="absolute top-300 left-10 bg-white z-10 ">
+                    <div className="checkbox">
+n
                       <CheckButton name={img.name} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
                       }} checkedImage={checkedImage} />
