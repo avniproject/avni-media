@@ -5,10 +5,14 @@ interface Props {
   showperpage: number;
   pagechange: (startValue: number, endValue: number) => void;
   pagination: {
+
     start_index: number;
     end_index: number;
   },
+
+
   total: number;
+
 }
 
 const Pagination = ({ showperpage, pagechange, total }: Props) => {
@@ -51,9 +55,8 @@ const Pagination = ({ showperpage, pagechange, total }: Props) => {
       </div>
       {
         new Array(Math.ceil(total / showperpage)).fill("").map((page, index) => (
-          <div className="pagination" onClick={() => setCounter(index + 1)} >
+          <div key={index}  className="pagination" onClick={() => setCounter(index + 1)} >
             <a
-              key={index}
               className={`page-link ${index + 1 === counter ? "active active-page" : ""}`}
               href="#"
             >
