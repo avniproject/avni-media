@@ -1,7 +1,6 @@
 import { ArrowNarrowLeftIcon, ArrowNarrowRightIcon } from '@heroicons/react/solid';
 import { useState, useEffect } from 'react';
 
-
 interface Props {
   showperpage: number;
   pagechange: (startValue: number, endValue: number) => void;
@@ -12,7 +11,6 @@ interface Props {
   total: number;
 
 }
-
 const Pagination = ({ showperpage, pagechange }: Props) => {
   const [counter, setCounter] = useState(1)
 
@@ -75,7 +73,7 @@ const Pagination = ({ showperpage, pagechange }: Props) => {
         </button>
       </div>
       {
-        new Array(Math.ceil(total_response / showperpage)).fill("").map((page, index) => (
+        new Array(Math.ceil(total_response / showperpage)).fill("").map((_page, index) => (
           <div key={index} className="pagination" onClick={() => setCounter(index + 1)} >
             <a
               className={`page-link ${index + 1 === counter ? "active active-page" : ""}`}

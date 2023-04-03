@@ -15,7 +15,7 @@ type Props = {
 
 export default function ImageList() {
 
-  const [imageList, setImageList] = useState<{ id: string, thumbsrc: string, path: string; name: string }[]>([]);
+  const [imageList, setImageList] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
   const [pagination, setPagination] = useState({
     start_index: 0,
     end_index: 10
@@ -30,7 +30,7 @@ export default function ImageList() {
           throw new Error(`HTTP error! Status: ${response.status}`);
 
         }
-        const data = await response.json();
+        const data = await response.json();     
         setImageList(data);
 
       } catch (error) {
@@ -38,9 +38,11 @@ export default function ImageList() {
 
       }
     }
+    
     fetchImages();
+   
   }, [pagination]);
-
+ 
   const [showPerpage] = useState(10);
 
   const [carouselImage, setCarouselImage] = useState<{ id: string, thumbsrc: string, name: string } | null>(null);
@@ -91,6 +93,7 @@ export default function ImageList() {
           carouselImage={carouselImage}
           onClose={() => setCarouselImage(null)}
           onSelectImage={onSelectImage}
+          pagination={pagination}
           checkedImage={checkedImage} img={[]} setCheckedImage={[]} carouselx={function (val: string): void {
             throw new Error("Function not implemented.");
           }} />
