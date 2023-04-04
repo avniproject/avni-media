@@ -30,7 +30,12 @@ else
   BUCKET_NAME=$1
 fi
 
-CODE_DEPLOY_BUCKET_NAME="lambda-bucket-thumb"
+if [ -z "$2" ]; then
+  CODE_DEPLOY_BUCKET_NAME="avni-staging-lambda"
+else
+  CODE_DEPLOY_BUCKET_NAME=$2
+fi
+
 S3_KEY="generate-thumbnails.zip"
 S3_KEY_BULK="generate-thumbnails-bulk.zip"
 
