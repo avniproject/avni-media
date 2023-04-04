@@ -1,27 +1,25 @@
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import CheckButton from "./CheckButton";
-interface imageList {
-  id: string;
-  path: string;
-  name: string;
-}
+import { useEffect, useState } from "react";
 
 interface Props {
 
   imageList: any
   carouselImage: any
   onClose: () => void;
-  pagination: (startValue: number, endValue: number) => void;
-
+  pagination: {
+    start_index: number;
+    end_index: number;
+  },
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
-  carouselx: (val: string) => void;
 }
 
 const ImageCarousel = ({
   imageList,
+  pagination,
   carouselImage,
   onClose,
   onSelectImage,
@@ -29,6 +27,40 @@ const ImageCarousel = ({
 
 }: Props) => {
   const index = imageList.indexOf(carouselImage);
+  const [imageCarousel, setImageCarousel] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
+  useEffect(() => {
+    const fetchTotalResponse = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_TOTAL_RECORD}`);
+        const total_record = await response.json();
+        return total_record;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    async function fetchImages() {
+      const total_record = await fetchTotalResponse();
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?offset=${pagination.start_index}&limit=${total_record}`);
+        if (!response.ok) {
+
+          throw new Error(`HTTP error! Status: ${response.status}`);
+
+        }
+        const data = await response.json();
+
+        setImageCarousel(data);
+
+      } catch (error) {
+        console.error(error);
+
+      }
+    }
+
+    fetchImages();
+
+  }, []);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
 
@@ -45,20 +77,23 @@ const ImageCarousel = ({
             <div className="inline-block  bg-red rounded-lg">
               <button className="absolute top-0 right-3 z-50" onClick={onClose}>
                 <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-
             <div className="flex  w-full h-full">
               <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
-                {imageList.map((img) => (
+                {imageCarousel.map((img) => (
                   <div key={img.id}>
-                    <img src={img.path} className="carousel-image" />
+                    <img src={img.thumbsrc} className="carousel-image" />
                     <div className="checkbox">
-                      <CheckButton name={img.name} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
+                      <CheckButton name={img.subjectName} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
                       }} checkedImage={checkedImage} />
+                    </div>
+                    <div className="name-size">
+                      <p  >Subject Type : type</p>
+                      <p>Date: date</p>
                     </div>
                   </div>
                 ))}

@@ -5,25 +5,44 @@ interface Props {
   showperpage: number;
   pagechange: (startValue: number, endValue: number) => void;
   pagination: {
-
     start_index: number;
     end_index: number;
   },
-
-
   total: number;
 
 }
-
-const Pagination = ({ showperpage, pagechange, total }: Props) => {
+const Pagination = ({ showperpage, pagechange }: Props) => {
   const [counter, setCounter] = useState(1)
 
-  const page = Math.ceil(total / showperpage)
+  const [totalResponse, setTotalResponse] = useState(0);
+
+  const fetchTotalResponse = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_TOTAL_RECORD}`);
+      const TotalRecord = await response.json();
+      setTotalResponse(TotalRecord);
+      return TotalRecord;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
+    fetchTotalResponse();
+  }, []);
+
+  const page = Math.ceil(totalResponse / showperpage)
+  useEffect(() => {
     const value = showperpage * (counter - 1)
-    pagechange(value, value + showperpage)
+    if (counter == page) {
+      pagechange(value, value + (totalResponse % showperpage))
+
+    }
+    else {
+      pagechange(value, value + showperpage)
+    }
   }, [counter])
+
 
   const onButtonclick = (type: string) => {
     if (type == "previous") {
@@ -35,7 +54,7 @@ const Pagination = ({ showperpage, pagechange, total }: Props) => {
       }
     }
     else if (type == "next") {
-      if (Math.ceil(total / showperpage) === counter) {
+      if (Math.ceil(totalResponse / showperpage) === counter) {
         setCounter(counter)
       }
       else {
@@ -54,8 +73,8 @@ const Pagination = ({ showperpage, pagechange, total }: Props) => {
         </button>
       </div>
       {
-        new Array(Math.ceil(total / showperpage)).fill("").map((page, index) => (
-          <div key={index}  className="pagination" onClick={() => setCounter(index + 1)} >
+        new Array(Math.ceil(totalResponse / showperpage)).fill("").map((page, index) => (
+          <div key={index} className="pagination" onClick={() => setCounter(index + 1)} >
             <a
               className={`page-link ${index + 1 === counter ? "active active-page" : ""}`}
               href="#"

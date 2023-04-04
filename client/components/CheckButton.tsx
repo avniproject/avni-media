@@ -1,9 +1,9 @@
 interface prop {
   name: string,
   id: string,
-  onSelectImage: (value: string, checked: boolean) => void,
+  onSelectImage: (value: number, checked: boolean) => void,
   checkedImage: string[],
-  onSelectImageCarousel: (value: string, checked: boolean) => void,
+  onSelectImageCarousel: (value: number, checked: boolean) => void,
   flag: string
 }
 
@@ -21,7 +21,7 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
     }
   }
 
-  const isChecked = checkedImage.toString().includes(id);
+  const isChecked = checkedImage.includes(id.toString());
 
   return (
     <fieldset className="space-y-5">
@@ -30,10 +30,9 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
         <div className="flex items-center h-5">
 
           <input
-            id={id}
+            id={id.toString()}
             value={id}
             aria-describedby="comments-description"
-            name="comments"
             type="checkbox"
             checked={isChecked}
             className="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
