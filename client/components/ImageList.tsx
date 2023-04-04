@@ -2,16 +2,6 @@ import CheckButton from "./CheckButton";
 import { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import ImageCarousel from "./ImageCarousel";
-type Props = {
-  showperpage: number;
-  pagechange: (startValue: number, endValue: number) => void;
-  total: number;
-  pagination: {
-    start_index: number;
-    end_index: number;
-  };
-}
-
 
 export default function ImageList() {
 
@@ -94,9 +84,7 @@ export default function ImageList() {
           onClose={() => setCarouselImage(null)}
           onSelectImage={onSelectImage}
           pagination={pagination}
-          checkedImage={checkedImage} img={[]} setCheckedImage={[]} carouselx={function (val: string): void {
-            throw new Error("Function not implemented.");
-          }} />
+          checkedImage={checkedImage} img={[]} setCheckedImage={[]}/>
       )}
       <Pagination
         showperpage={showPerpage}

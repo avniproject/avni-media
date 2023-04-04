@@ -7,7 +7,7 @@ interface prop {
   flag: string
 }
 
-export default function CheckButton({  name,id, onSelectImage, checkedImage, onSelectImageCarousel, flag }: prop) {
+export default function CheckButton({ name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag }: prop) {
   const handleChecked = (e: any) => {
     const { value, checked } = e.target;
     if (flag == 'list') {

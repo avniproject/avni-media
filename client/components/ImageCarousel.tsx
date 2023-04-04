@@ -15,7 +15,6 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
-  carouselx: (val: string) => void;
 }
 
 const ImageCarousel = ({
@@ -28,14 +27,12 @@ const ImageCarousel = ({
 
 }: Props) => {
   const index = imageList.indexOf(carouselImage);
-  const [imageCarousel, setImageCaeousel] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
-  const [, setTotalResponse] = useState();
+  const [imageCarousel, setImageCarousel] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
   useEffect(() => {
     const fetchTotalResponse = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_TOTAL_RECORD}`);
         const total_record = await response.json();
-        setTotalResponse(total_record);
         return total_record;
       } catch (error) {
         console.log(error);
@@ -53,7 +50,7 @@ const ImageCarousel = ({
         }
         const data = await response.json();
 
-        setImageCaeousel(data);
+        setImageCarousel(data);
 
       } catch (error) {
         console.error(error);
