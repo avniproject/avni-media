@@ -14,14 +14,14 @@ interface Props {
 const Pagination = ({ showperpage, pagechange }: Props) => {
   const [counter, setCounter] = useState(1)
 
-  const [total_response, setTotalResponse] = useState(0);
+  const [totalResponse, setTotalResponse] = useState(0);
 
   const fetchTotalResponse = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_TOTAL_RECORD}`);
-      const total_record = await response.json();
-      setTotalResponse(total_record);
-      return total_record;
+      const TotalRecord = await response.json();
+      setTotalResponse(TotalRecord);
+      return TotalRecord;
     } catch (error) {
       console.log(error);
     }
@@ -31,11 +31,11 @@ const Pagination = ({ showperpage, pagechange }: Props) => {
     fetchTotalResponse();
   }, []);
 
-  const page = Math.ceil(total_response / showperpage)
+  const page = Math.ceil(totalResponse / showperpage)
   useEffect(() => {
     const value = showperpage * (counter - 1)
     if (counter == page) {
-      pagechange(value, value + (total_response % showperpage))
+      pagechange(value, value + (totalResponse % showperpage))
 
     }
     else {
@@ -54,7 +54,7 @@ const Pagination = ({ showperpage, pagechange }: Props) => {
       }
     }
     else if (type == "next") {
-      if (Math.ceil(total_response / showperpage) === counter) {
+      if (Math.ceil(totalResponse / showperpage) === counter) {
         setCounter(counter)
       }
       else {
@@ -73,7 +73,7 @@ const Pagination = ({ showperpage, pagechange }: Props) => {
         </button>
       </div>
       {
-        new Array(Math.ceil(total_response / showperpage)).fill("").map((_page, index) => (
+        new Array(Math.ceil(totalResponse / showperpage)).fill("").map((page, index) => (
           <div key={index} className="pagination" onClick={() => setCounter(index + 1)} >
             <a
               className={`page-link ${index + 1 === counter ? "active active-page" : ""}`}
