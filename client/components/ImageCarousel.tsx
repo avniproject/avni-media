@@ -2,16 +2,13 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import CheckButton from "./CheckButton";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface Props {
-
-  imageList: any
+  imageList: object[]
+  totalRecords: any
   carouselImage: any
   onClose: () => void;
-  pagination: {
-    start_index: number;
-    end_index: number;
-  },
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
@@ -19,48 +16,23 @@ interface Props {
 
 const ImageCarousel = ({
   imageList,
-  pagination,
+  totalRecords,
   carouselImage,
   onClose,
   onSelectImage,
   checkedImage
-
 }: Props) => {
-  const index = imageList.indexOf(carouselImage);
-  const [imageCarousel, setImageCarousel] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
+  const ci = carouselImage as never
+  const index = imageList.indexOf(ci);
+  const [imageCarousel, setImageCarousel] = useState({ total: 0, page: 0, data: [] });
   useEffect(() => {
-    const fetchTotalResponse = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_TOTAL_RECORD}`);
-        const total_record = await response.json();
-        return total_record;
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    async function fetchImages() {
-      const total_record = await fetchTotalResponse();
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?offset=${pagination.start_index}&limit=${total_record}`);
-        if (!response.ok) {
-
-          throw new Error(`HTTP error! Status: ${response.status}`);
-
-        }
-        const data = await response.json();
-
-        setImageCarousel(data);
-
-      } catch (error) {
-        console.error(error);
-
-      }
+    const fetchImages = async () => {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?schemaName=rwb&db=rwb&page=0&size=${totalRecords}`);
+      setImageCarousel(response.data)
     }
+    fetchImages()
 
-    fetchImages();
-
-  }, []);
+  }, [totalRecords]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
 
@@ -83,17 +55,17 @@ const ImageCarousel = ({
             </div>
             <div className="flex  w-full h-full">
               <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
-                {imageCarousel.map((img) => (
-                  <div key={img.id}>
-                    <img src={img.thumbsrc} className="carousel-image" />
+                {imageCarousel.data.map((img:{url: string, uuid: string, subjectTypeName: string, createdDateTime: string}, index) => (
+                  <div key={index}>
+                    <img src={img.url} className="carousel-image" />
                     <div className="checkbox">
-                      <CheckButton name={img.subjectName} id={img.id} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
+                      <CheckButton name={img.subjectTypeName} id={img.uuid} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
                       }} checkedImage={checkedImage} />
                     </div>
                     <div className="name-size">
-                      <p  >Subject Type : type</p>
-                      <p>Date: date</p>
+                      <p>Subject Type: {img.subjectTypeName}</p>
+                      <p>Date: {img.createdDateTime}</p>
                     </div>
                   </div>
                 ))}
