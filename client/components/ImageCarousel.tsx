@@ -12,6 +12,7 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
+  orgUUID: string | string[] | undefined,
 }
 
 const ImageCarousel = ({
@@ -20,19 +21,21 @@ const ImageCarousel = ({
   carouselImage,
   onClose,
   onSelectImage,
-  checkedImage
+  checkedImage,
+  orgUUID,
 }: Props) => {
   const ci = carouselImage as never
   const index = imageList.indexOf(ci);
   const [imageCarousel, setImageCarousel] = useState({ total: 0, page: 0, data: [] });
+
   useEffect(() => {
     const fetchImages = async () => {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?schemaName=rwb&db=rwb&page=0&size=${totalRecords}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgUUID=${orgUUID}&page=0&size=${totalRecords}`);
       setImageCarousel(response.data)
     }
     fetchImages()
 
-  }, [totalRecords]);
+  }, [totalRecords, orgUUID]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
 

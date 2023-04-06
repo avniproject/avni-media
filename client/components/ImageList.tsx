@@ -3,26 +3,33 @@ import { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
-import { type } from "os";
-
+import { useRouter } from 'next/router';
 
 export default function ImageList() {
 
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
 
-  const schemaName = 'rwb'
-  const dbuser = 'rwb'
+  const [orgUUID, setOrgUUID] = useState<string | string[] | undefined> ();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if(router.isReady)
+      setOrgUUID(router.query.orgUUID);
+  }, [router.isReady, router.query.orgUUID])
 
   useEffect(() => {
     const fetchImages = async () => {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?schemaName=${schemaName}&db=${dbuser}&page=${pagination.page}&size=${pagination.size}`);
-      setImageList(response.data)
+      if(orgUUID) {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgUUID=${orgUUID}&page=${pagination.page}&size=${pagination.size}`);
+        setImageList(response.data)
+      }
     }
 
     fetchImages()
 
-  }, [pagination])
+  }, [pagination, orgUUID])
 
   const [showPerpage] = useState(10);
 
@@ -43,6 +50,7 @@ export default function ImageList() {
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page })
   };
+
   return (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -76,7 +84,9 @@ export default function ImageList() {
           onClose={() => setCarouselImage(null)}
           onSelectImage={onSelectImage}
           checkedImage={checkedImage} 
-          setCheckedImage={[]}/>
+          setCheckedImage={[]}
+          orgUUID={orgUUID}
+          />
       )}
       <Pagination
         showperpage={showPerpage}
