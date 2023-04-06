@@ -1,9 +1,9 @@
 interface prop {
   name: string,
   id: string,
-  onSelectImage: (value: number, checked: boolean) => void,
+  onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
-  onSelectImageCarousel: (value: number, checked: boolean) => void,
+  onSelectImageCarousel: (value: string, checked: boolean) => void,
   flag: string
 }
 

@@ -2,40 +2,38 @@ import CheckButton from "./CheckButton";
 import { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import ImageCarousel from "./ImageCarousel";
+import axios from "axios";
+import { useRouter } from 'next/router';
 
 export default function ImageList() {
 
-  const [imageList, setImageList] = useState<{ id: number, thumbsrc: string, path: string; name: string }[]>([]);
-  const [pagination, setPagination] = useState({
-    start_index: 0,
-    end_index: 10
-  });
+  const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
+  const [pagination, setPagination] = useState({ size: 10, page: 0 });
+
+  const [orgUUID, setOrgUUID] = useState<string | string[] | undefined> ();
+
+  const router = useRouter();
 
   useEffect(() => {
-    async function fetchImages() {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?offset=${pagination.start_index}&limit=${pagination.end_index}`);
-        if (!response.ok) {
+    if(router.isReady)
+      setOrgUUID(router.query.orgUUID);
+  }, [router.isReady, router.query.orgUUID])
 
-          throw new Error(`HTTP error! Status: ${response.status}`);
-
-        }
-        const data = await response.json();     
-        setImageList(data);
-
-      } catch (error) {
-        console.error(error);
-
+  useEffect(() => {
+    const fetchImages = async () => {
+      if(orgUUID) {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgUUID=${orgUUID}&page=${pagination.page}&size=${pagination.size}`);
+        setImageList(response.data)
       }
     }
-    
-    fetchImages();
-   
-  }, [pagination]);
- 
+
+    fetchImages()
+
+  }, [pagination, orgUUID])
+
   const [showPerpage] = useState(10);
 
-  const [carouselImage, setCarouselImage] = useState<{ id: string, thumbsrc: string, name: string } | null>(null);
+  const [carouselImage, setCarouselImage] = useState<{ uuid: string, url: string, thumbnailUrl: string, subjectTypeName: string } | null>(null);
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
 
@@ -49,27 +47,28 @@ export default function ImageList() {
       setCheckedImage(prevCheckedImage => prevCheckedImage.filter(item => item !== value));
     }
   };
-  const pagechange = (startValue: number, endValue: number) => {
-    setPagination({ start_index: startValue, end_index: endValue })
+  const pagechange = (size: number, page: number) => {
+    setPagination({ size: size, page: page })
   };
+
   return (
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
-          {imageList.map((image) => (
-            <div key={image.id}>
+          {imageList.data.map((image:{url: string, thumbnailUrl: string, uuid: string, subjectTypeName: string, createdDateTime: string}) => (
+            <div key={image.uuid}>
               <div className="relative">
                 <div className="relative w-full h-50 rounded-lg overflow-hidden">
                   <button>
                     <img
-                      src={image.thumbsrc}
-                      alt={image?.name}
+                      src={image.thumbnailUrl}
+                      alt={image?.subjectTypeName}
                       onClick={() => setCarouselImage(image)}
                       className="thumb"
                     />
                   </button>
                 </div>
-                <CheckButton name={image.name} id={image.id} onSelectImage={onSelectImage} checkedImage={checkedImage} flag="list" onSelectImageCarousel={function (): void {
+                <CheckButton name={image.subjectTypeName} id={image.uuid} onSelectImage={onSelectImage} checkedImage={checkedImage} flag="list" onSelectImageCarousel={function (): void {
                   throw new Error("Function not implemented.");
                 }} />
               </div>
@@ -79,17 +78,20 @@ export default function ImageList() {
       </div>
       {carouselImage && (
         <ImageCarousel
-          imageList={imageList}
+          imageList={imageList.data}
+          totalRecords={imageList.total}
           carouselImage={carouselImage}
           onClose={() => setCarouselImage(null)}
           onSelectImage={onSelectImage}
-          pagination={pagination}
-          checkedImage={checkedImage} img={[]} setCheckedImage={[]}/>
+          checkedImage={checkedImage} 
+          setCheckedImage={[]}
+          orgUUID={orgUUID}
+          />
       )}
       <Pagination
         showperpage={showPerpage}
         pagechange={pagechange}
-        pagination={pagination}
+        total={imageList.total}
       />
     </div>
   )
