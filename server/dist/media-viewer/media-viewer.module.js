@@ -12,25 +12,30 @@ const media_viewer_service_1 = require("./media-viewer.service");
 const media_viewer_controller_1 = require("./media-viewer.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const media_entity_1 = require("../entity/media.entity");
+const s3_Service_1 = require("../s3/s3.Service");
+const config_1 = require("@nestjs/config");
 let MediaViewerModule = class MediaViewerModule {
 };
 MediaViewerModule = __decorate([
     (0, common_1.Module)({
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: 'localhost',
+                type: "postgres",
+                host: "localhost",
                 port: 5432,
-                username: 'postgres',
-                password: '',
-                database: 'postgres',
+                username: "postgres",
+                password: "",
+                database: "postgres",
                 entities: [media_entity_1.DownloadJobs],
                 synchronize: true,
             }),
+            config_1.ConfigModule.forRoot({
+                envFilePath: [".env"],
+            }),
             typeorm_1.TypeOrmModule.forFeature([media_entity_1.DownloadJobs]),
         ],
-        providers: [media_viewer_service_1.MediaViewerService],
-        controllers: [media_viewer_controller_1.MediaViewerController]
+        providers: [media_viewer_service_1.MediaViewerService, s3_Service_1.S3Service],
+        controllers: [media_viewer_controller_1.MediaViewerController],
     })
 ], MediaViewerModule);
 exports.MediaViewerModule = MediaViewerModule;

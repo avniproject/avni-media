@@ -15,26 +15,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaViewerController = void 0;
 const common_1 = require("@nestjs/common");
 const media_viewer_service_1 = require("./media-viewer.service");
+const s3_Service_1 = require("../s3/s3.Service");
 let MediaViewerController = class MediaViewerController {
-    constructor(mediaservice) {
+    constructor(mediaservice, s3Service) {
         this.mediaservice = mediaservice;
+        this.s3Service = s3Service;
     }
     async postMedia(body) {
         console.log(body);
+        const presignedURL = await this.s3Service.generatePresignedUrl("goonj/IMG_0022.JPG");
+        console.log("should return presigned URL", presignedURL);
         const savedMedia = await this.mediaservice.saveMediaData(body);
         return body.data;
     }
 };
 __decorate([
-    (0, common_1.Post)('/media'),
+    (0, common_1.Post)("/media"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], MediaViewerController.prototype, "postMedia", null);
 MediaViewerController = __decorate([
-    (0, common_1.Controller)('media-viewer'),
-    __metadata("design:paramtypes", [media_viewer_service_1.MediaViewerService])
+    (0, common_1.Controller)("media-viewer"),
+    __metadata("design:paramtypes", [media_viewer_service_1.MediaViewerService,
+        s3_Service_1.S3Service])
 ], MediaViewerController);
 exports.MediaViewerController = MediaViewerController;
 //# sourceMappingURL=media-viewer.controller.js.map

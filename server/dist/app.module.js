@@ -15,9 +15,7 @@ let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            media_viewer_module_1.MediaViewerModule,
-        ],
+        imports: [media_viewer_module_1.MediaViewerModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

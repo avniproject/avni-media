@@ -1,32 +1,34 @@
 import { DateTime } from "aws-sdk/clients/devicefarm";
-import { Entity,Column,PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 enum Status {
-    Complete = 'complete',
-    Pending = 'pending',
-  }
+  Complete = "complete",
+  Pending = "pending",
+}
 @Entity()
-export class DownloadJobs{
-    @PrimaryGeneratedColumn()
-    id:number
-    @Column()
-    username: string
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    created_date_time: DateTime
+export class DownloadJobs {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    last_modified_date_time: DateTime
-    @Column('jsonb')
-    image_metadata: Record<string, any>;
- 
-    @Column()
-    zip_url: string
+  @Column()
+  username: string;
 
-   
-    @Column({
-        type: 'enum',
-        enum: Status,
-        default: Status.Pending,
-      })
-      status: Status;
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  created_date_time: DateTime;
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  last_modified_date_time: DateTime;
+
+  @Column("jsonb")
+  image_metadata: Record<string, any>;
+
+  @Column()
+  zip_url: string;
+
+  @Column({
+    type: "enum",
+    enum: Status,
+    default: Status.Pending,
+  })
+  status: Status;
 }
