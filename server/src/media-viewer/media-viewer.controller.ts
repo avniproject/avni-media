@@ -16,6 +16,11 @@ export class MediaViewerController {
       "goonj/IMG_0022.JPG"
     );
     console.log("should return presigned URL", presignedURL);
+
+    const path = "/tmp/server.zip";
+    const key = "upload_test1.zip";
+    const uploadFileToS3 = await this.s3Service.uploadFileToS3(path, key);
+    console.log("Upload file to S3", uploadFileToS3);
     const savedMedia = await this.mediaservice.saveMediaData(body);
     return body.data;
   }
