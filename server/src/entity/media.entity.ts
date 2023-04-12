@@ -1,10 +1,11 @@
 import { DateTime } from "aws-sdk/clients/devicefarm";
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {Status} from "src/media-viewer/status.enum";
 
-enum Status {
-  Complete = "complete",
-  Pending = "pending",
-}
+// enum Status {
+//   Complete = "complete",
+//   Pending = "pending",
+// }
 @Entity()
 export class DownloadJobs {
   @PrimaryGeneratedColumn()
