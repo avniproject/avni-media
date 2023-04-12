@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { MediaViewerService } from "./media-viewer.service";
 import { S3Service } from "src/s3/s3.Service";
 
@@ -23,5 +23,19 @@ export class MediaViewerController {
     console.log("Upload file to S3", uploadFileToS3);
     const savedMedia = await this.mediaservice.saveMediaData(body);
     return body.data;
+  }
+
+  @Get('/download')
+  async getData(){
+   const result= await this.mediaservice.getMediaData()
+  //  const json_data = JSON.stringify(result);
+  //  console.log(typeof(json_data))
+  //  const parsed_data = JSON.parse(json_data);
+  //  console.log("parse data",typeof(parsed_data))
+  //  console.log("len",parsed_data.length)
+  //  const id = parsed_data[0].id; // assuming the JSON data is an array of objects
+  //  console.log("id",id);
+   return result;
+   
   }
 }
