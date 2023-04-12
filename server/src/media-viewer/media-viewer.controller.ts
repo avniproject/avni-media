@@ -25,17 +25,16 @@ export class MediaViewerController {
     return body.data;
   }
 
-  @Get('/download')
-  async getData(){
-   const result= await this.mediaservice.getMediaData()
-  //  const json_data = JSON.stringify(result);
-  //  console.log(typeof(json_data))
-  //  const parsed_data = JSON.parse(json_data);
-  //  console.log("parse data",typeof(parsed_data))
-  //  console.log("len",parsed_data.length)
-  //  const id = parsed_data[0].id; // assuming the JSON data is an array of objects
-  //  console.log("id",id);
-   return result;
-   
+  @Get("/download")
+  async getData() {
+    const result = await this.mediaservice.getMediaData();
+    //  const json_data = JSON.stringify(result);
+    //  console.log(typeof(json_data))
+    //  const parsed_data = JSON.parse(json_data);
+    //  console.log("parse data",typeof(parsed_data))
+    //  console.log("len",parsed_data.length)
+    //  const id = parsed_data[0].id; // assuming the JSON data is an array of objects
+    //  console.log("id",id);
+    return result;
   }
 }
