@@ -10,30 +10,30 @@ export default function ImageList() {
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
 
-  const [orgUUID, setOrgUUID] = useState<string | string[] | undefined> ();
+  const [orgID, setOrgID] = useState<string | string[] | undefined> ();
 
   const router = useRouter();
 
   useEffect(() => {
     if(router.isReady)
-      setOrgUUID(router.query.orgUUID);
-  }, [router.isReady, router.query.orgUUID])
+      setOrgID(router.query.orgID);
+  }, [router.isReady, router.query.orgID])
 
   useEffect(() => {
     const fetchImages = async () => {
-      if(orgUUID) {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgUUID=${orgUUID}&page=${pagination.page}&size=${pagination.size}`);
+      if(orgID) {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`);
         setImageList(response.data)
       }
     }
 
     fetchImages()
 
-  }, [pagination, orgUUID])
+  }, [pagination, orgID])
 
   const [showPerpage] = useState(10);
 
-  const [carouselImage, setCarouselImage] = useState<{ uuid: string, url: string, thumbnailUrl: string, subjectTypeName: string } | null>(null);
+  const [carouselImage, setCarouselImage] = useState<{ uuid: string, signedUrl: string, signedThumbnailUrl: string, subjectTypeName: string } | null>(null);
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
 
@@ -55,13 +55,13 @@ export default function ImageList() {
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
-          {imageList.data.map((image:{url: string, thumbnailUrl: string, uuid: string, subjectTypeName: string, createdDateTime: string}) => (
+          {imageList.data.map((image:{signedUrl: string, signedThumbnailUrl: string, uuid: string, subjectTypeName: string, createdDateTime: string}) => (
             <div key={image.uuid}>
               <div className="relative">
                 <div className="relative w-full h-50 rounded-lg overflow-hidden">
                   <button>
                     <img
-                      src={image.thumbnailUrl}
+                      src={image.signedThumbnailUrl}
                       alt={image?.subjectTypeName}
                       onClick={() => setCarouselImage(image)}
                       className="thumb"
@@ -85,7 +85,7 @@ export default function ImageList() {
           onSelectImage={onSelectImage}
           checkedImage={checkedImage} 
           setCheckedImage={[]}
-          orgUUID={orgUUID}
+          orgID={orgID}
           />
       )}
       <Pagination

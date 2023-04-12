@@ -12,7 +12,7 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
-  orgUUID: string | string[] | undefined,
+  orgID: string | string[] | undefined,
 }
 
 const ImageCarousel = ({
@@ -22,7 +22,7 @@ const ImageCarousel = ({
   onClose,
   onSelectImage,
   checkedImage,
-  orgUUID,
+  orgID,
 }: Props) => {
   const ci = carouselImage as never
   const index = imageList.indexOf(ci);
@@ -30,12 +30,12 @@ const ImageCarousel = ({
 
   useEffect(() => {
     const fetchImages = async () => {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgUUID=${orgUUID}&page=0&size=${totalRecords}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=0&size=${totalRecords}`);
       setImageCarousel(response.data)
     }
     fetchImages()
 
-  }, [totalRecords, orgUUID]);
+  }, [totalRecords, orgID]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
 
@@ -58,9 +58,9 @@ const ImageCarousel = ({
             </div>
             <div className="flex  w-full h-full">
               <Carousel selectedItem={index} showArrows={true} showThumbs={false} width={500} showIndicators={false} dynamicHeight={false} useKeyboardArrows={true}>
-                {imageCarousel.data.map((img:{url: string, uuid: string, subjectTypeName: string, createdDateTime: string}, index) => (
+                {imageCarousel.data.map((img:{signedUrl: string, uuid: string, subjectTypeName: string, createdDateTime: string}, index) => (
                   <div key={index}>
-                    <img src={img.url} className="carousel-image" />
+                    <img src={img.signedUrl} className="carousel-image" />
                     <div className="checkbox">
                       <CheckButton name={img.subjectTypeName} id={img.uuid} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
