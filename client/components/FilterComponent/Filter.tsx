@@ -20,9 +20,9 @@ import SubjectType from "./SubjectType"
           <Concepts />
           <Accounts />
         </dl>
-        <div className="mt-5 w-32 pr-20 columns-3">
+        {/* <div className="mt-5 w-32 pr-20 columns-3">
             <Buttons />
-        </div>
+        </div> */}
         </>
     )
   }
