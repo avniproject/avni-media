@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
@@ -9,6 +10,7 @@ import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
 import * as fs from 'fs';
 // import path from "path";
+import * as path from 'path';
 
 @Injectable()
 export class MediaViewerService {
@@ -16,6 +18,7 @@ export class MediaViewerService {
     private readonly s3Service: S3Service,
     @InjectRepository(DownloadJobs)
     private readonly mediaRepository: Repository<DownloadJobs>,
+    private readonly configService: ConfigService,
   ) {}
 
   async getMediaData(): Promise<DownloadJobs[]> {
@@ -33,14 +36,21 @@ export class MediaViewerService {
         const imageUrl = parsedData[id].image_metadata[i].url;
         console.log('imageUrl--', imageUrl);
 
-        const parts = imageUrl.split('.com/');
+        const objectKey1 = path.basename(imageUrl);
+        console.log('Image objectKey 1--', objectKey1);
+
+        const splitOn =
+          '.com/' + this.configService.get('S3_BUCKET_NAME') + '/';
+        console.log('splitOn--', splitOn);
+
+        const parts = imageUrl.split(splitOn);
         const objectKey = parts[1];
 
         console.log('Image objectKey--', objectKey);
 
         console.log('Before presigned url', objectKey);
         const presignedURL = await this.s3Service.generatePresignedUrl(
-          imageUrl,
+          objectKey,
         );
 
         console.log('After presigned url--', presignedURL);
@@ -65,7 +75,7 @@ export class MediaViewerService {
       const timestamp = new Date().getTime();
       const filename = `${parsedData[id].username}${timestamp}.zip`;
 
-      console.log('__dirname, filename', __dirname + filename);
+      console.log('__dirname, filename', __dirname + '/' + filename);
       const filePath = __dirname + filename;
       fs.writeFileSync(filePath, content);
       const stats = fs.statSync(filePath);

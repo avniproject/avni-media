@@ -1,11 +1,7 @@
-import { DateTime } from "aws-sdk/clients/devicefarm";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { Status } from "src/media-viewer/status.enum";
+import { DateTime } from 'aws-sdk/clients/devicefarm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Status } from 'src/media-viewer/status.enum';
 
-// enum Status {
-//   Complete = "complete",
-//   Pending = "pending",
-// }
 @Entity()
 export class DownloadJobs {
   @PrimaryGeneratedColumn()
@@ -14,22 +10,31 @@ export class DownloadJobs {
   @Column()
   username: string;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_date_time: DateTime;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   last_modified_date_time: DateTime;
 
-  @Column("jsonb")
+  @Column('jsonb')
   image_metadata: Record<string, any>;
 
-  @Column()
+  @Column({ nullable: true })
   zip_url: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Status,
     default: Status.Pending,
   })
   status: Status;
+
+  @Column({ nullable: true })
+  file_size: string;
+
+  @Column({ nullable: true })
+  image_description: string;
+
+  @Column({ nullable: true })
+  image_count: number;
 }
