@@ -9,7 +9,7 @@ export default function Download() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}`
       );
-      console.log(response.data);
+
       setData(response.data);
     };
     fetchData();

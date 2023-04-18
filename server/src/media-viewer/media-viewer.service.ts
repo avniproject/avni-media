@@ -5,12 +5,9 @@ import { Repository } from 'typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
 import axios from 'axios';
-// import CircularJSON from "circular-json";
 import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
 import * as fs from 'fs';
-// import path from "path";
-import * as path from 'path';
 
 @Injectable()
 export class MediaViewerService {
@@ -30,33 +27,20 @@ export class MediaViewerService {
     const zip = new JSZip();
 
     for (const id in parsedData) {
-      // console.log("parsedData[i]--", parsedData[id]);
       let imageCount = 0;
       for (let i = 0; i < parsedData[id].image_metadata.length; i++) {
         const imageUrl = parsedData[id].image_metadata[i].url;
-        console.log('imageUrl--', imageUrl);
-
-        const objectKey1 = path.basename(imageUrl);
-        console.log('Image objectKey 1--', objectKey1);
-
-        const splitOn =
-          '.com/' + this.configService.get('S3_BUCKET_NAME') + '/';
-        console.log('splitOn--', splitOn);
-
-        const parts = imageUrl.split(splitOn);
-        const objectKey = parts[1];
-
-        console.log('Image objectKey--', objectKey);
-
-        console.log('Before presigned url', objectKey);
-        const presignedURL = await this.s3Service.generatePresignedUrl(
-          objectKey,
-        );
-
-        console.log('After presigned url--', presignedURL);
-
         try {
-          imageCount = imageCount + 1;
+          const splitOn =
+            '.com/' + this.configService.get('S3_BUCKET_NAME') + '/';
+
+          const parts = imageUrl.split(splitOn);
+          const objectKey = parts[1];
+
+          const presignedURL = await this.s3Service.generatePresignedUrl(
+            objectKey,
+          );
+
           const response = await axios.get(presignedURL, {
             responseType: 'arraybuffer',
           });
@@ -65,7 +49,7 @@ export class MediaViewerService {
             const filename = `image${[i]}.jpg`;
             zip.file(filename, response.data, { binary: true });
           }
-          // imageCount = imageCount + 1;
+          imageCount = imageCount + 1;
         } catch (error) {
           console.error(`Error downloading image from ${imageUrl}: ${error}`);
         }
@@ -73,83 +57,103 @@ export class MediaViewerService {
 
       const content = await zip.generateAsync({ type: 'nodebuffer' });
       const timestamp = new Date().getTime();
-      const filename = `${parsedData[id].username}${timestamp}.zip`;
+      const filename = `${parsedData[id].id}${timestamp}.zip`;
 
-      console.log('__dirname, filename', __dirname + '/' + filename);
       const filePath = __dirname + filename;
       fs.writeFileSync(filePath, content);
       const stats = fs.statSync(filePath);
       const fileSizeInBytes = stats.size;
 
-      const fileSizeInKB = fileSizeInBytes / 1024;
-      const fileSizeInMB = fileSizeInKB / 1024;
-      const fileSizeInGB = fileSizeInMB / 1024;
-
-      let size: string | number;
-      let unit: string;
-
-      if (fileSizeInBytes < 1024) {
-        size = fileSizeInBytes;
-        unit = 'bytes';
-      } else if (fileSizeInKB < 1024) {
-        size = fileSizeInKB.toFixed(2);
-        unit = 'KB';
-      } else if (fileSizeInMB < 1024) {
-        size = fileSizeInMB.toFixed(2);
-        unit = 'MB';
-      } else {
-        size = fileSizeInGB.toFixed(2);
-        unit = 'GB';
-      }
-
-      console.log(`Size of ${filename}:`);
-      console.log(`- ${size} ${unit}`);
+      const fileSizeLabel = this.getFileSizeText(fileSizeInBytes);
 
       const zipFileS3url = await this.s3Service.uploadFileToS3(
         filePath,
         filename,
       );
+
       const record = parsedData[id];
       const updatedRecord = {
         ...record,
         status: 'Complete',
         zip_url: zipFileS3url,
-        file_size: `${size} ${unit}`,
+        file_size: fileSizeLabel,
         image_count: imageCount,
       };
       await this.mediaRepository.update(record.id, updatedRecord);
+
+      fs.unlinkSync(filePath);
     }
-    return null;
+    return;
   }
 
   async saveMediaData(mediaData: any): Promise<DownloadJobs> {
-    const media = new DownloadJobs();
-    media.username = mediaData.username;
-    media.image_metadata = mediaData.data;
-    // media.zip_url = "https://s3.amazonaws.com/bucket-name/zip-file-name.zip";
-    return await this.mediaRepository.save(media);
+    const { username, data } = mediaData;
+
+    if (!username || typeof username !== 'string' || !data) {
+      throw new Error('Invalid media data');
+    }
+
+    try {
+      const media = new DownloadJobs();
+      media.username = username;
+      media.image_metadata = data;
+      const savedMedia = await this.mediaRepository.save(media);
+
+      return savedMedia;
+    } catch (error) {
+      console.error('Error while saving media data:', error);
+      throw new Error('Failed to save media data');
+    }
   }
 
   async getDownloadData(): Promise<DownloadJobs[]> {
     const allData = await this.mediaRepository.find();
-    const jsonData = JSON.stringify(allData);
-    const parsedData = JSON.parse(jsonData);
-    for (const id in parsedData) {
-      const zipUrl = parsedData[id].zip_url;
-      if (zipUrl) {
-        const parts = zipUrl.split('.com/');
-        const objectKey = parts[1];
+    const presignedUrls = await Promise.all(
+      allData.map(async (item) => {
+        if (item.zip_url) {
+          const parts = item.zip_url.split('.com/');
+          const objectKey = parts[1];
+          return this.s3Service.generatePresignedUrl(objectKey);
+        }
+        return null;
+      }),
+    );
 
-        console.log('objectKey--', objectKey);
-
-        const zipPresignedUrl = await this.s3Service.generatePresignedUrl(
-          objectKey,
-        );
-        console.log('s3 url', parsedData[id].zip_url);
-        console.log('zipPresignedUrl', zipPresignedUrl);
-        parsedData[id].zip_url = zipPresignedUrl;
+    const parsedData = allData.map((item, index) => {
+      if (item.zip_url) {
+        return { ...item, zip_url: presignedUrls[index] };
       }
-    }
+      return item;
+    });
     return parsedData;
+  }
+
+  getFileSizeText(fileSizeInBytes: number): string {
+    const BYTE_TO_KB = 1024;
+    const KB_TO_MB = 1024;
+    const MB_TO_GB = 1024;
+
+    if (!Number.isFinite(fileSizeInBytes) || fileSizeInBytes < 0) {
+      throw new Error('Invalid file size');
+    }
+
+    let size: string | number;
+    let unit: string;
+
+    if (fileSizeInBytes < BYTE_TO_KB) {
+      size = fileSizeInBytes;
+      unit = 'bytes';
+    } else if (fileSizeInBytes < BYTE_TO_KB * KB_TO_MB) {
+      size = (fileSizeInBytes / BYTE_TO_KB).toFixed(2);
+      unit = 'KB';
+    } else if (fileSizeInBytes < BYTE_TO_KB * KB_TO_MB * MB_TO_GB) {
+      size = (fileSizeInBytes / BYTE_TO_KB / KB_TO_MB).toFixed(2);
+      unit = 'MB';
+    } else {
+      size = (fileSizeInBytes / BYTE_TO_KB / KB_TO_MB / MB_TO_GB).toFixed(2);
+      unit = 'GB';
+    }
+
+    return `${size} ${unit}`;
   }
 }

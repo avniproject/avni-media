@@ -1,7 +1,7 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { MediaViewerController } from "./media-viewer.controller";
+import { Test, TestingModule } from '@nestjs/testing';
+import { MediaViewerController } from './media-viewer.controller';
 
-describe("MediaViewerController", () => {
+describe('MediaViewerController', () => {
   let controller: MediaViewerController;
 
   beforeEach(async () => {
@@ -11,7 +11,7 @@ describe("MediaViewerController", () => {
     controller = module.get<MediaViewerController>(MediaViewerController);
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 });

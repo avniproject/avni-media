@@ -40,8 +40,6 @@ const ImageCarousel = ({
   const onSelectImageCarousel = (value: string, checked: boolean) => {
     const base = imageCarousel.data;
     const selectedImageDetails = base.filter(obj => obj.uuid === value)[0];
-    // console.log("image caraousel ", base)
-    console.log("selected value--", selectedImageDetails);
     onSelectImage(value, checked, selectedImageDetails);
   };
 
