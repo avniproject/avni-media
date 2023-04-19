@@ -57,7 +57,7 @@ export class MediaViewerService {
 
       const content = await zip.generateAsync({ type: 'nodebuffer' });
       const timestamp = new Date().getTime();
-      const filename = `${parsedData[id].id}${timestamp}.zip`;
+      const filename = `media-zipped-files/${parsedData[id].id}${timestamp}.zip`;
 
       const filePath = __dirname + filename;
       fs.writeFileSync(filePath, content);
