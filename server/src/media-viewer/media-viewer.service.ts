@@ -57,18 +57,18 @@ export class MediaViewerService {
 
       const content = await zip.generateAsync({ type: 'nodebuffer' });
       const timestamp = new Date().getTime();
-      const filename = `media-zipped-files/${parsedData[id].id}${timestamp}.zip`;
-
+      const filename = `${parsedData[id].id}${timestamp}.zip`;
       const filePath = __dirname + filename;
       fs.writeFileSync(filePath, content);
       const stats = fs.statSync(filePath);
       const fileSizeInBytes = stats.size;
 
       const fileSizeLabel = this.getFileSizeText(fileSizeInBytes);
+      const s3FileName = 'media-zipped-files/' + filename;
 
       const zipFileS3url = await this.s3Service.uploadFileToS3(
         filePath,
-        filename,
+        s3FileName,
       );
 
       const record = parsedData[id];
