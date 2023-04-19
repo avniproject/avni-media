@@ -4,7 +4,8 @@ interface prop {
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   onSelectImageCarousel: (value: string, checked: boolean) => void,
-  flag: string
+  flag: string,
+  imageDetail: any
 }
 
 export default function CheckButton({ name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag }: prop) {
@@ -12,11 +13,8 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
     const { value, checked } = e.target;
     if (flag == 'list') {
       onSelectImage(value, checked)
-
-    }
-    else {
+    } else {
       const { value, checked } = e.target;
-
       onSelectImageCarousel(value, checked)
     }
   }
@@ -28,7 +26,6 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
       <legend className="sr-only">Notifications</legend>
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
-
           <input
             id={id.toString()}
             value={id}

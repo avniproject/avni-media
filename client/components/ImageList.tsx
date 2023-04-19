@@ -4,6 +4,7 @@ import Pagination from '@/components/Pagination';
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
 import { useRouter } from 'next/router';
+import Link from "next/link";
 
 export default function ImageList() {
 
@@ -11,13 +12,15 @@ export default function ImageList() {
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
 
   const [orgID, setOrgID] = useState<string | string[] | undefined> ();
+  const [userName, setUserName] = useState<string | string[] | undefined> ();
 
   const router = useRouter();
 
   useEffect(() => {
     if(router.isReady)
       setOrgID(router.query.orgID);
-  }, [router.isReady, router.query.orgID])
+      setUserName(router.query.username);
+  }, [router.isReady, router.query.orgID, router.query.username])
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -36,23 +39,45 @@ export default function ImageList() {
   const [carouselImage, setCarouselImage] = useState<{ uuid: string, signedUrl: string, signedThumbnailUrl: string, subjectTypeName: string } | null>(null);
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string[]>([]);
 
-  const onSelectImage = (value: string, checked: boolean) => {
+  const onSelectImage = (value: string, checked: boolean, selectedImageDetails: any) => {
     if (checked) {
       setCheckedImage(prevCheckedImage => {
         const updatedCheckedImage = [...prevCheckedImage, value];
         return updatedCheckedImage;
       });
+
+      setSelectedImage(prevSelectedImage => {
+        const updatedSelectedImage = [...prevSelectedImage, selectedImageDetails];
+        return updatedSelectedImage;
+      });
     } else {
       setCheckedImage(prevCheckedImage => prevCheckedImage.filter(item => item !== value));
+
+      setSelectedImage(prevSelectedImage => prevSelectedImage.filter(item => item !== selectedImageDetails));
     }
   };
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page })
   };
 
+  const handleSendSelectedImages = async () => {
+    alert("We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.");
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`, {"username": userName, "data": selectedImage});
+  }
+
   return (
     <div className="bg-white">
+      <div className="flex justify-center mt-10">
+          <button className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2">Apply Filter</button>
+
+          <button onClick={handleSendSelectedImages} className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2">Download</button>
+          
+          <Link href="./downloadList">
+          <button className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2">Available Downloads</button>
+          </Link>
+      </div>
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
           {imageList.data.map((image:{signedUrl: string, signedThumbnailUrl: string, uuid: string, subjectTypeName: string, createdDateTime: string}) => (
@@ -68,7 +93,7 @@ export default function ImageList() {
                     />
                   </button>
                 </div>
-                <CheckButton name={image.subjectTypeName} id={image.uuid} onSelectImage={onSelectImage} checkedImage={checkedImage} flag="list" onSelectImageCarousel={function (): void {
+                <CheckButton name={image.subjectTypeName} id={image.uuid} onSelectImage={onSelectImage} checkedImage={checkedImage} imageDetail={image} flag="list" onSelectImageCarousel={function (): void {
                   throw new Error("Function not implemented.");
                 }} />
               </div>
