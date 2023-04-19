@@ -11,13 +11,13 @@ then
 fi
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION="ap-south-1"
+AVNI_MEDIA_AWS_REGION="ap-south-1"
 ROLE_NAME="lambda-execution-role"
 ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
 
 FUNCTION_NAME="generate-thumbnails-instantly"
 FUNCTION_NAME_BULK="generate-thumbnails-bulk"
-FUNCTION_ARN="arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}"
+FUNCTION_ARN="arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}"
 HANDLER="index.handler"
 MEMORY_SIZE="128"
 TIMEOUT="10"
@@ -145,7 +145,7 @@ fi
 echo "Adding a target to the rule..."
 if ! aws events put-targets \
   --rule "daily-thumbnails" \
-  --targets "Id"="1","Arn"="arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME_BULK}"; then
+  --targets "Id"="1","Arn"="arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME_BULK}"; then
   echo "Error adding a target to the rule."
   exit 1
 fi
@@ -161,7 +161,7 @@ elif ! aws lambda add-permission \
   --principal s3.amazonaws.com \
   --source-arn "arn:aws:s3:::${BUCKET_NAME}" \
   --source-account "${ACCOUNT_ID}" \
-  --region "${AWS_REGION}" >/dev/null 2>&1; then
+  --region "${AVNI_MEDIA_AWS_REGION}" >/dev/null 2>&1; then
   echo "Error: Failed to add permission to Lambda function ${FUNCTION_NAME} for bucket ${BUCKET_NAME}. Please check your AWS credentials and try again."
   exit 1
 else
@@ -172,7 +172,7 @@ NOTIFICATION_CONFIG=$(cat <<EOF
 {
     "LambdaFunctionConfigurations": [
       {
-        "LambdaFunctionArn": "arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}",
+        "LambdaFunctionArn": "arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}",
         "Events": [
             "s3:ObjectCreated:*"
         ]

@@ -32,7 +32,7 @@ export class MediaViewerService {
         const imageUrl = parsedData[id].image_metadata[i].url;
         try {
           const splitOn =
-            '.com/' + this.configService.get('S3_BUCKET_NAME') + '/';
+            '.com/' + this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') + '/';
 
           const parts = imageUrl.split(splitOn);
           const objectKey = parts[1];

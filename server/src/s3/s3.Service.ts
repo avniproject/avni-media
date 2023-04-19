@@ -12,13 +12,13 @@ export class S3Service {
   constructor(private readonly configService: ConfigService) {
     this.s3 = new S3({
       signatureVersion: 'v4',
-      accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-      region: this.configService.get('AWS_REGION'),
+      accessKeyId: this.configService.get('AVNI_MEDIA_AWS_ACCESS_KEY_ID'),
+      secretAccessKey: this.configService.get('AVNI_MEDIA_AWS_SECRET_ACCESS_KEY'),
+      region: this.configService.get('AVNI_MEDIA_AWS_REGION'),
     });
-    this.bucketName = this.configService.get('S3_BUCKET_NAME');
+    this.bucketName = this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME');
     this.zipUploadBucketName = this.configService.get(
-      'S3_ZIP_UPLOAD_BUCKET_NAME',
+      'AVNI_MEDIA_S3_ZIP_UPLOAD_BUCKET_NAME',
     );
   }
 
