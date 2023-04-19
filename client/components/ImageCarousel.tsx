@@ -38,9 +38,11 @@ const ImageCarousel = ({
   }, [totalRecords, orgID]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
-
-    onSelectImage(value, checked)
+    const base = imageCarousel.data;
+    const selectedImageDetails = base.filter(obj => obj.uuid === value)[0];
+    onSelectImage(value, checked, selectedImageDetails);
   };
+
   return (
     <>
       <div className="fixed z-10 inset-0 overflow-y-auto ">
