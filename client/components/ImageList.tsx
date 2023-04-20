@@ -37,7 +37,8 @@ export default function ImageList() {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
-      // const jsonData = {
+      const jsonData=filterResponse
+      //  = {
       //   formMappings: [
       //     {
       //       uuid: "a3e13dc2-4b29-4788-92f9-f313d6d9c518",
