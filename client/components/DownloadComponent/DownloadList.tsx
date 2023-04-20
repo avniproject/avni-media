@@ -1,9 +1,16 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-
+import {
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactFragment,
+  ReactPortal,
+  useEffect,
+  useState,
+} from "react";
 
 export default function Download() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
@@ -13,7 +20,6 @@ export default function Download() {
       setData(response.data);
     };
     fetchData();
-
   }, []);
 
   return (
@@ -53,33 +59,101 @@ export default function Download() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {data.map((files, index) => (
-                    <tr key={index} className="divide-x divide-gray-200">
-                      <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
-                        {files.image_count}
-                      </td>
-                      <td className="whitespace-nowrap p-4 text-sm text-gray-500">
-                        {files.created_date_time}
-                      </td>
-                      <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
-                        {files.status === "Complete" ? (
-                          <>
-                          <a
-                            href={files.zip_url}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
-                            Ready to Download 
-                          </a>
-                          <p>{files.file_size}</p>
-                          </>
-                        ) : (
-                          <span className="text-gray-500">{files.status}</span>
-                        )}
-                        <br />
-                        <span>{files.Status}</span>
-                      </td>
-                    </tr>
-                  ))}
+                  {data.map(
+                    (
+                      files: {
+                        image_count:
+                          | string
+                          | number
+                          | boolean
+                          | ReactElement<
+                              any,
+                              string | JSXElementConstructor<any>
+                            >
+                          | ReactFragment
+                          | ReactPortal
+                          | null
+                          | undefined;
+                        created_date_time:
+                          | string
+                          | number
+                          | boolean
+                          | ReactElement<
+                              any,
+                              string | JSXElementConstructor<any>
+                            >
+                          | ReactFragment
+                          | ReactPortal
+                          | null
+                          | undefined;
+                        status:
+                          | string
+                          | number
+                          | boolean
+                          | ReactElement<
+                              any,
+                              string | JSXElementConstructor<any>
+                            >
+                          | ReactFragment
+                          | null
+                          | undefined;
+                        zip_url: string | undefined;
+                        file_size:
+                          | string
+                          | number
+                          | boolean
+                          | ReactElement<
+                              any,
+                              string | JSXElementConstructor<any>
+                            >
+                          | ReactFragment
+                          | ReactPortal
+                          | null
+                          | undefined;
+                        Status:
+                          | string
+                          | number
+                          | boolean
+                          | ReactElement<
+                              any,
+                              string | JSXElementConstructor<any>
+                            >
+                          | ReactFragment
+                          | ReactPortal
+                          | null
+                          | undefined;
+                      },
+                      index: Key | null | undefined
+                    ) => (
+                      <tr key={index} className="divide-x divide-gray-200">
+                        <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
+                          {files.image_count}
+                        </td>
+                        <td className="whitespace-nowrap p-4 text-sm text-gray-500">
+                          {files.created_date_time}
+                        </td>
+                        <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
+                          {files.status === "Complete" ? (
+                            <>
+                              <a
+                                href={files.zip_url}
+                                className="text-indigo-600 hover:text-indigo-900"
+                              >
+                                Ready to Download
+                              </a>
+                              <p>{files.file_size}</p>
+                            </>
+                          ) : (
+                            <span className="text-gray-500">
+                              {files.status}
+                            </span>
+                          )}
+                          <br />
+                          <span>{files.Status}</span>
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>

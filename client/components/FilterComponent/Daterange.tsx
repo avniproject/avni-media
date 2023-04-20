@@ -1,39 +1,50 @@
-import { DatePicker } from 'antd';
-import { useState } from 'react';
-import { Menu } from '@headlessui/react';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-const { RangePicker } = DatePicker
+import { DatePicker } from "antd";
+import { useEffect, useState } from "react";
+import { Menu } from "@headlessui/react";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import dayjs from "dayjs";
+const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
-const dateFormat = 'DD/MM/YYYY';
+const dateFormat = "DD/MM/YYYY";
+interface Props {
+  dateRange: (data: any[] | null) => void;
+}
 
-
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
-import dayjs from 'dayjs';
-const DateRangeComp = () => {
-
+const DateRangeComp = ({ dateRange }: Props) => {
   // date state
-  const [date, setDate] = useState<null | string[]>(null)
+  const [date, setDate] = useState<null | string[]>(null);
+
+  useEffect(() => {
+    dateRange(date);
+  }, [dateRange, date]);
 
   return (
     <>
-      <Menu as="div" className="relative inline-block text-left -ml-4 pr-0 mt-5 z-10 inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-0 py-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+      <Menu
+        as="div"
+        className=" inline-block text-left -ml-4 pr-0 mt-5 z-10 inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-0 py-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500"
+      >
         <RangePicker
-        format={dateFormat}
+          format={dateFormat}
           onChange={(dateValue) => {
-            if (dateValue) { // check if dateValue is not null
-              setDate(dateValue.map(selectedDte => {
-                return dayjs(selectedDte).format("YYYY-MM-DD")
-
-              }))
-
+            if (dateValue) {
+              // check if dateValue is not null
+              setDate(
+                dateValue.map((selectedDte) => {
+                  return dayjs(selectedDte).format("YYYY-MM-DD");
+                })
+              );
+            } else {
+              // handle null case
+              setDate(null);
             }
-
           }}
         />
       </Menu>
     </>
-  )
-}
+  );
+};
 
-export default DateRangeComp
+export default DateRangeComp;
