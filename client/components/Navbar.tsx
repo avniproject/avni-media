@@ -8,12 +8,13 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
   return (
-    <Disclosure as="nav" className="bg-blue-500">
+    <Disclosure as="nav" className= "navbg-color"
+>
       {({ open }) => (
         <>
           <div className="relative flex justify-between h-16">
             <div className="flex items-center flex-shrink-0 text-white ml-8">
-              <span className="font-semibold text-xl tracking-tight">
+              <span className="text-xl tracking-tight">
                Avni Web Console
               </span>
             </div>
