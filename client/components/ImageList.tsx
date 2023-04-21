@@ -23,8 +23,11 @@ export default function ImageList() {
   const [locationFilter, setLocation] = useState<any>([]);
   const [subjectFilter, setSubjectFilter] = useState<any>();
   const [programFilter, setProgramFilter] = useState<any>([]);
-  const [maxLevelLocation, setMaxLevelLocation] = useState([]);
+  const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
+  const [minLevel, setMinLevel] = useState();
+  const [maxLevel, setMaxLvel] = useState<number>();
   const [encounterFilter, setEncounterFilter] = useState([]);
+  const [loctionPid, setLocationPid] = useState<any>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -37,8 +40,8 @@ export default function ImageList() {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
-      const jsonData=filterResponse
-      //  = {
+      const jsonData = filterResponse
+      // {
       //   formMappings: [
       //     {
       //       uuid: "a3e13dc2-4b29-4788-92f9-f313d6d9c518",
@@ -85,17 +88,17 @@ export default function ImageList() {
       //   relations: [],
       //   subjectTypes: [
       //     {
-      //       groupRoles: [],
-      //       operationalSubjectTypeName: "Album",
-      //       memberSubjectUUIDs: "",
       //       uuid: "095244bf-600a-4872-8553-cc8c8a974c4b",
+      //       operationalSubjectTypeName: "Album",
+      //       groupRoles: [],
+      //       allowEmptyLocation: false,
       //       validFirstNameFormat: null,
       //       validLastNameFormat: null,
       //       iconFileS3Key: null,
       //       nameHelpText: "abc",
-      //       allowEmptyLocation: false,
-      //       allowMiddleName: false,
+      //       memberSubjectUUIDs: "",
       //       validMiddleNameFormat: null,
+      //       allowMiddleName: false,
       //       group: false,
       //       allowProfilePicture: false,
       //       name: "Album",
@@ -111,23 +114,33 @@ export default function ImageList() {
       //     },
       //   ],
       // };
-      // const jsonData = filterResponse.data.content;
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const sub = jsonData.subjectTypes;
       const addressLevel = jsonData.allAddressLevels;
-      const sortedData = addressLevel.sort(
-        (a: { level: number }, b: { level: number }) => b.level - a.level
+      const maxLeveldata = Math.max(...addressLevel.map((obj) => obj.level));
+      setMaxLvel(maxLeveldata);
+      const minLeveldata = Math.min(...addressLevel.map((obj) => obj.level));
+      setMinLevel(minLeveldata);
+      const maxLevelLocation = addressLevel.find(
+        (obj) => obj.level === maxLevel
       );
-      console.log("sort", sortedData);
+
+      setMaxtLevelLocation(maxLevelLocation);
+      if (addressLevel !== undefined && addressLevel !== null) {
+        const sortedData = addressLevel.sort(
+          (a: { level: number }, b: { level: number }) => b.level - a.level
+        );
+        setLocation(sortedData);
+      }
+
       setSubjectFilter(sub);
       setProgramFilter(programs);
       setEncounterFilter(encounters);
-      setLocation(sortedData);
     };
     filterData();
   }, []);
-  console.log("location", locationFilter);
+
   useEffect(() => {
     if (router.isReady) setOrgID(router.query.orgID);
     setUserName(router.query.username);
@@ -248,7 +261,10 @@ export default function ImageList() {
   const accountType = (data: any[]) => {
     setAcountType(data);
   };
-
+  // const locationParentId =(data: number)=>{
+  //   console.log("data",data)
+  //   setLocationPid(data);
+  // }
   const subjectType = (data: any[]) => {
     setSubjectType(data);
   };
@@ -287,6 +303,8 @@ export default function ImageList() {
               key={index}
               locationIndex={locationIndex}
               index={index}
+              minLevel={minLevel}
+              maxLevel={maxLevel}
             />
           ))}
         <Daterange dateRange={dateRange} />

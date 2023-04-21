@@ -4,6 +4,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 import { Option } from "rc-select";
 import axios from "axios";
+import { min } from "date-fns";
 
 interface Option {
   uuid: Key | null | undefined;
@@ -14,6 +15,8 @@ interface Prop {
   filterData: () => void;
   locationIndex: any[];
   index: Key;
+  minLevel: number;
+  maxLevel: number;
 }
 interface Location {
   id: number;
@@ -25,24 +28,41 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function LocationHierarchy({ locationIndex, index }: Prop) {
-  console.log("index", index);
+export default function LocationHierarchy({
+  locationIndex,
+  index,
+  maxLevel,
+  minLevel,
+}: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  console.log("selectedData", selectedOptions);
+  const [selectUUID, setSelectUUID] = useState<any[]>([]);
   const [secondLevel, setSecondLevel] = useState<any>([]);
+  const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
- 
- console.log("select option",selectedOptions)
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+
+  function handleOptionSelect(option: Option) {
+    if (selectedOption?.id === option.id) {
+      setSelectedOption(null);
+    } else {
+      setSelectedOption(option);
+    }
+  }
+
+  useEffect(() => {
+    localStorage.setItem("selectedOption", JSON.stringify(selectedOption));
+  }, [selectedOption]);
+
   useEffect(() => {
     const typeIdData = async () => {
-     
-      
-      // setSecondLevel(locationFilter)
-      if (index == 0) {
-       const  typeId = locationIndex.id
-        const response= await axios.get(`${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`)
-        console.log("loction response",response)
-        const jsonDataState =response
+      if (locationIndex.level === maxLevel) {
+        const typeId = locationIndex.id;
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
+        );
+
+        const jsonDataState = response;
         // {
         //   content: [
         //     {
@@ -54,7 +74,7 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
         //       lineage: "182370",
         //       title: "MH",
         //       id: 182370,
-        //       typeString: "State", 
+        //       typeString: "State",
         //     },
         //     {
         //       uuid: "63cbfbc4-41e8-4952-b2bc-090056ebe7d4",
@@ -95,11 +115,46 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
       }
-     
-       else {
-     
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_NEXTADDRESS}`)
-        const distJsonData = response
+
+      if (locationIndex.level >= minLevel) {
+        const typeId = locationIndex.id;
+
+        const savedSelectedOption = localStorage.getItem("selectedOption");
+
+        if (savedSelectedOption !== null) {
+          const parsedOption = JSON.parse(savedSelectedOption);
+          if (parsedOption && parsedOption.id !== undefined) {
+            setParentId(parsedOption.id);
+          }
+        }
+        const parentIds =
+          selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
+
+        if (locationIndex.level === maxLevel) {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+          );
+
+          const distJsonData = response;
+          const distData = distJsonData.content;
+
+          setSecondLevel(distData);
+        } else {
+          const response = await axios.get(
+            `${
+              process.env.NEXT_PUBLIC_TOP_ADDRESS
+            }?parentId=${selectedOptions.join(
+              ","
+            )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+          );
+
+          const distJsonData = response;
+          const distData = distJsonData.content;
+
+          setSecondLevel(distData);
+        }
+
+        // {
         //   content: [
         //     {
         //       uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
@@ -147,14 +202,19 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
         //   size: 1000,
         //   number: 0,
         // };
-        const distData = distJsonData.content;
-        setTopLevelData(distData);
+        
       }
     };
     typeIdData();
-  }, [selectedOptions]);
+  }, [
+    selectedOptions,
+    selectedOption,
+    locationIndex,
+    maxLevel,
+    minLevel,
+    parentId,
+  ]);
 
- 
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option));
@@ -162,11 +222,18 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
       setSelectedOptions([...selectedOptions, option]);
     }
   }
+  function onclickData(option: Option) {
+    if (selectUUID.includes(option)) {
+      setSelectUUID(selectUUID.filter((o) => o !== option));
+    } else {
+      setSelectUUID([...selectUUID, option]);
+    }
+  }
   return (
     <>
       <Menu
         as="div"
-        className="relative inline-block text-left ml-0 pr-4 mt-5 z-20"
+        className="relative inline-block text-left  pr-6 mt-5 z-20"
       >
         <div>
           <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
@@ -176,7 +243,7 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
                 : locationIndex.name}
             </span>
             <ChevronDownIcon
-              className="-mr-1 ml-2 h-5 w-8"
+              className="-mr-1 ml-2 h-5 w-5"
               aria-hidden="true"
             />
           </Menu.Button>
@@ -191,31 +258,66 @@ export default function LocationHierarchy({ locationIndex, index }: Prop) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              {toplevelData.map((option: Option) => (
-                <Menu.Item key={option.uuid}>
-                  {({ active }) => (
-                    <button
-                      className={classNames(
-                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                        "flex justify-between w-full px-4 py-2 text-sm"
-                      )}
-                      onClick={() => handleOptionClick(option.id)}
-                    >
-                      {option.title}
-                      {selectedOptions.includes(option.id) ? (
-                        <CheckIcon
-                          className="h-5 w-5 text-teal-500"
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                    </button>
-                  )}
-                </Menu.Item>
-              ))}
-            </div>
-          </Menu.Items>
+          {maxLevel === locationIndex.level ? (
+            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {toplevelData.map((option: Option) => (
+                  <Menu.Item key={option.id}>
+                    {({ active }) => (
+                      <button
+                        className={classNames(
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "flex justify-between w-full px-4 py-2 text-sm"
+                        )}
+                        onClick={() => handleOptionSelect(option)}
+                      >
+                        {option.title}
+                        {selectedOption?.id === option.id ? (
+                          <CheckIcon
+                            className="h-5 w-5 text-teal-500"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </button>
+                    )}
+                  </Menu.Item>
+                ))}
+              </div>
+            </Menu.Items>
+          ) : (
+            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {secondLevel.map((option: Option) => (
+                  <Menu.Item key={option.uuid}>
+                    {({ active }) => (
+                      <button
+                        className={classNames(
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "flex justify-between w-full px-4 py-2 text-sm"
+                        )}
+                        onClick={() => {
+                          handleOptionClick(option.id);
+                          onclickData(option.uuid);
+                        }}
+                      >
+                        {option.title}
+                        {selectedOptions.includes(option.id) ? (
+                          <CheckIcon
+                            className="h-5 w-5 text-teal-500"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </button>
+                    )}
+                  </Menu.Item>
+                ))}
+              </div>
+            </Menu.Items>
+          )}
         </Transition>
       </Menu>
     </>
