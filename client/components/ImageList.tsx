@@ -40,7 +40,7 @@ export default function ImageList() {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
-      const jsonData = 
+      const jsonData = filterResponse
       // {
       //   formMappings: [
       //     {
