@@ -154,11 +154,6 @@ export default function LocationHierarchy({
           setSecondLevel(distData);
         }
 
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_NEXTADDRESS}`
-        );
-
-        const distJsonData = response;
         // {
         //   content: [
         //     {
@@ -207,9 +202,7 @@ export default function LocationHierarchy({
         //   size: 1000,
         //   number: 0,
         // };
-        const distData = distJsonData.content;
-
-        setSecondLevel(distData);
+        
       }
     };
     typeIdData();
