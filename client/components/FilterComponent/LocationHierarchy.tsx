@@ -5,7 +5,6 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
 import axios from "axios";
 
-
 interface Option {
   uuid: Key | null | undefined;
   id: number;
@@ -61,7 +60,7 @@ export default function LocationHierarchy({
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
-        console.log("Response data for top level ",response.data)
+        console.log("Response data for top level ", response.data);
         const jsonDataState = response.data;
         // {
         //   content: [
@@ -114,9 +113,7 @@ export default function LocationHierarchy({
 
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-      }
-
-      if (locationIndex.level >= minLevel) {
+      } else {
         const typeId = locationIndex.id;
 
         const savedSelectedOption = localStorage.getItem("selectedOption");
@@ -129,33 +126,33 @@ export default function LocationHierarchy({
         }
         const parentIds =
           selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
+        if (selectedOptions.length > 0) {
+          if (locationIndex.level === maxLevel) {
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
 
-        if (locationIndex.level === maxLevel) {
-          const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-          );
+            const distJsonData = response.data;
+            const distData = distJsonData.content;
+            console.log("Response data for other level", distData);
 
-          const distJsonData = response.data;
-          const distData = distJsonData.content;
-          console.log("Response data for other level",distData)
+            setSecondLevel(distData);
+          } else {
+            const response = await axios.get(
+              `${
+                process.env.NEXT_PUBLIC_TOP_ADDRESS
+              }?parentId=${selectedOptions.join(
+                ","
+              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
 
-          setSecondLevel(distData);
-        } else {
-          const response = await axios.get(
-            `${
-              process.env.NEXT_PUBLIC_TOP_ADDRESS
-            }?parentId=${selectedOptions.join(
-              ","
-            )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-          );
-
-          const distJsonData = response.data;
-          console.log("Response data for multiselec",distJsonData)
-          const distData = distJsonData.content;
-          console.log("dist data", distData)
-          setSecondLevel(distData);
+            const distJsonData = response.data;
+            console.log("Response data for multiselec", distJsonData);
+            const distData = distJsonData.content;
+            console.log("dist data", distData);
+            setSecondLevel(distData);
+          }
         }
-
         // {
         //   content: [
         //     {
@@ -204,7 +201,6 @@ export default function LocationHierarchy({
         //   size: 1000,
         //   number: 0,
         // };
-        
       }
     };
     typeIdData();
@@ -263,60 +259,62 @@ export default function LocationHierarchy({
           {maxLevel === locationIndex.level ? (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
-                {toplevelData.map((option: Option) => (
-                  <Menu.Item key={option.id}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
-                        )}
-                        onClick={() => handleOptionSelect(option)}
-                      >
-                        {option.title}
-                        {selectedOption?.id === option.id ? (
-                          <CheckIcon
-                            className="h-5 w-5 text-teal-500"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
+                {toplevelData &&
+                  toplevelData.map((option: Option) => (
+                    <Menu.Item key={option.id}>
+                      {({ active }) => (
+                        <button
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "flex justify-between w-full px-4 py-2 text-sm"
+                          )}
+                          onClick={() => handleOptionSelect(option)}
+                        >
+                          {option.title}
+                          {selectedOption?.id === option.id ? (
+                            <CheckIcon
+                              className="h-5 w-5 text-teal-500"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))}
               </div>
             </Menu.Items>
           ) : (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
-                {secondLevel.map((option: Option) => (
-                  <Menu.Item key={option.uuid}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
-                        )}
-                        onClick={() => {
-                          handleOptionClick(option.id);
-                          onclickData(option.uuid);
-                        }}
-                      >
-                        {option.title}
-                        {selectedOptions.includes(option.id) ? (
-                          <CheckIcon
-                            className="h-5 w-5 text-teal-500"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
+                {secondLevel &&
+                  secondLevel.map((option: Option) => (
+                    <Menu.Item key={option.uuid}>
+                      {({ active }) => (
+                        <button
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "flex justify-between w-full px-4 py-2 text-sm"
+                          )}
+                          onClick={() => {
+                            handleOptionClick(option.id);
+                            onclickData(option.uuid);
+                          }}
+                        >
+                          {option.title}
+                          {selectedOptions.includes(option.id) ? (
+                            <CheckIcon
+                              className="h-5 w-5 text-teal-500"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))}
               </div>
             </Menu.Items>
           )}
