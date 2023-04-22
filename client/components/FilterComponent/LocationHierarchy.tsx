@@ -4,6 +4,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 import { Option } from "rc-select";
 import axios from "axios";
+import { error } from "console";
 
 interface Option {
   uuid: Key | null | undefined;
@@ -54,8 +55,9 @@ export default function LocationHierarchy({
 
   useEffect(() => {
     const typeIdData = async () => {
+      const typeId = locationIndex.id;
       if (locationIndex.level === maxLevel) {
-        const typeId = locationIndex.id;
+        
 
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
@@ -120,48 +122,63 @@ export default function LocationHierarchy({
 
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-      } else {
-        const typeId = locationIndex.id;
-
         const savedSelectedOption = localStorage.getItem("selectedOption");
 
         if (savedSelectedOption !== null) {
           const parsedOption = JSON.parse(savedSelectedOption);
-          if (parsedOption && parsedOption.id !== undefined) {
-            setParentId(parsedOption.id);
+          try {
+            if (parsedOption && parsedOption.id !== undefined) {
+              setParentId(parsedOption.id);
+              const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              );
+
+              const distJsonData = response.data;
+              console.log("Response Data for other level", distJsonData);
+              const distData = distJsonData.content;
+              console.log("Response content  for other level", distData);
+
+              setSecondLevel(distData);
+            }
+          } catch (Error) {
+            console.log(error);
+            console.log(
+              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
           }
         }
+      } else {
+        const typeId = locationIndex.id;
+
         const parentIds =
           selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
 
+        try {
+          if (selectedOptions.length > 0) {
+            const response = await axios.get(
+              `${
+                process.env.NEXT_PUBLIC_TOP_ADDRESS
+              }?parentId=${selectedOptions.join(
+                ","
+              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
 
-        if (locationIndex.level === maxLevel - 1) {
-          const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-          );
+            const distJsonData = response.data;
+            console.log("Response data for multiselec", distJsonData);
+            const distData = distJsonData.content;
+            console.log("dist data", distData);
+            setSecondLevel(distData);
+          }
+        } catch (Error) {
+          console.log(error);
+          console.log(
+            `error at ${
 
-          const distJsonData = response.data;
-          console.log("Response Data for other level", distJsonData);
-          const distData = distJsonData.content;
-          console.log("Response content  for other level", distData);
-
-          setSecondLevel(distData);
-        }
-        if (selectedOptions.length > 0) {
-
-          const response = await axios.get(
-            `${
               process.env.NEXT_PUBLIC_TOP_ADDRESS
             }?parentId=${selectedOptions.join(
               ","
             )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
-
-          const distJsonData = response.data;
-          console.log("Response data for multiselec", distJsonData);
-          const distData = distJsonData.content;
-          console.log("dist data", distData);
-          setSecondLevel(distData);
 
         }
         // {
@@ -247,30 +264,29 @@ export default function LocationHierarchy({
         <div>
           {maxLevel === locationIndex.level ? (
 
-          <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-            <span>
-              {selectedOptions.length > 0
-                ? selectedOption?.name
-                : locationIndex.name}
-            </span>
-            <ChevronDownIcon
-              className="-mr-1 ml-2 h-5 w-5"
-              aria-hidden="true"
-            />
-          </Menu.Button>
-          ):(
             <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-            <span>
-              {selectedOptions.length > 0
-                ? selectedOptions.length + " selected"
-                : locationIndex.name}
-            </span>
-            <ChevronDownIcon
-              className="-mr-1 ml-2 h-5 w-5"
-              aria-hidden="true"
-            />
-          </Menu.Button>
-
+              <span>
+                {selectedOptions.length > 0
+                  ? selectedOption?.name
+                  : locationIndex.name}
+              </span>
+              <ChevronDownIcon
+                className="-mr-1 ml-2 h-5 w-5"
+                aria-hidden="true"
+              />
+            </Menu.Button>
+          ) : (
+            <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+              <span>
+                {selectedOptions.length > 0
+                  ? selectedOptions.length + " selected"
+                  : locationIndex.name}
+              </span>
+              <ChevronDownIcon
+                className="-mr-1 ml-2 h-5 w-5"
+                aria-hidden="true"
+              />
+            </Menu.Button>
 
           )}
         </div>
