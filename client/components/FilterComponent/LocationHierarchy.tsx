@@ -133,16 +133,11 @@ export default function LocationHierarchy({
         }
         const parentIds =
           selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
-        if (selectedOptions.length > 0) {
-          if (locationIndex.level === maxLevel) {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            );
 
 
-        if (locationIndex.level === maxLevel-1) {
+        if (locationIndex.level === maxLevel - 1) {
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
 
           const distJsonData = response.data;
@@ -151,7 +146,9 @@ export default function LocationHierarchy({
           console.log("Response content  for other level", distData);
 
           setSecondLevel(distData);
-        } if(selectedOptions.length>0) {
+        }
+        if (selectedOptions.length > 0) {
+
           const response = await axios.get(
             `${
               process.env.NEXT_PUBLIC_TOP_ADDRESS
@@ -166,7 +163,6 @@ export default function LocationHierarchy({
           console.log("dist data", distData);
           setSecondLevel(distData);
 
-            
         }
         // {
         //   content: [
@@ -250,6 +246,7 @@ export default function LocationHierarchy({
       >
         <div>
           {maxLevel === locationIndex.level ? (
+
           <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
             <span>
               {selectedOptions.length > 0
@@ -273,6 +270,7 @@ export default function LocationHierarchy({
               aria-hidden="true"
             />
           </Menu.Button>
+
 
           )}
         </div>
