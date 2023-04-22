@@ -42,7 +42,7 @@ export default function ImageList() {
         );
 
       console.log("filter-response",filterResponse)
-      const jsonData = filterResponse;
+      const jsonData = filterResponse.data;
       console.log("json-data",jsonData)
 
       // {
