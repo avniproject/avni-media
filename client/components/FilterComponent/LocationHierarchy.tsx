@@ -60,8 +60,13 @@ export default function LocationHierarchy({
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
-        console.log("Response data for top level ", response.data, "Response",response);
-        const jsonDataState = response.data
+        console.log(
+          "Response data for top level ",
+          response.data,
+          "Response",
+          response
+        );
+        const jsonDataState = response.data;
         // {
         //   content: [
         //     {
@@ -126,34 +131,34 @@ export default function LocationHierarchy({
         }
         const parentIds =
           selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
-        if (selectedOptions.length > 0) {
-          if (locationIndex.level === maxLevel) {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            );
 
-            const distJsonData = response.data;
-            console.log("Response Data for other level",distJsonData )
-            const distData = distJsonData.content;
-            console.log("Response content  for other level", distData);
+        if (locationIndex.level === maxLevel-1) {
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+          );
 
-            setSecondLevel(distData);
-          } else {
-            const response = await axios.get(
-              `${
-                process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${selectedOptions.join(
-                ","
-              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            );
+          const distJsonData = response.data;
+          console.log("Response Data for other level", distJsonData);
+          const distData = distJsonData.content;
+          console.log("Response content  for other level", distData);
 
-            const distJsonData = response.data;
-            console.log("Response data for multiselec", distJsonData);
-            const distData = distJsonData.content;
-            console.log("dist data", distData);
-            setSecondLevel(distData);
-          }
+          setSecondLevel(distData);
+        } if(selectedOptions.length>0) {
+          const response = await axios.get(
+            `${
+              process.env.NEXT_PUBLIC_TOP_ADDRESS
+            }?parentId=${selectedOptions.join(
+              ","
+            )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+          );
+
+          const distJsonData = response.data;
+          console.log("Response data for multiselec", distJsonData);
+          const distData = distJsonData.content;
+          console.log("dist data", distData);
+          setSecondLevel(distData);
         }
+
         // {
         //   content: [
         //     {
@@ -235,7 +240,20 @@ export default function LocationHierarchy({
         className="relative inline-block text-left  pr-6 mt-5 z-20"
       >
         <div>
+          {maxLevel === locationIndex.level ? (
           <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+            <span>
+              {selectedOptions.length > 0
+                ? selectedOption?.name
+                : locationIndex.name}
+            </span>
+            <ChevronDownIcon
+              className="-mr-1 ml-2 h-5 w-5"
+              aria-hidden="true"
+            />
+          </Menu.Button>
+          ):(
+            <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
             <span>
               {selectedOptions.length > 0
                 ? selectedOptions.length + " selected"
@@ -246,6 +264,8 @@ export default function LocationHierarchy({
               aria-hidden="true"
             />
           </Menu.Button>
+
+          )}
         </div>
 
         <Transition
