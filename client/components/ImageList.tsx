@@ -41,7 +41,10 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
         );
 
+
       const jsonData = filterResponse.data;
+
+  
       // {
       //   formMappings: [
       //     {
