@@ -60,6 +60,7 @@ export default function LocationHierarchy({
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
+
         console.log(
           "Response data for top level ",
           response.data,
@@ -67,6 +68,7 @@ export default function LocationHierarchy({
           response
         );
         const jsonDataState = response.data;
+
         // {
         //   content: [
         //     {
@@ -131,6 +133,12 @@ export default function LocationHierarchy({
         }
         const parentIds =
           selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
+        if (selectedOptions.length > 0) {
+          if (locationIndex.level === maxLevel) {
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
+
 
         if (locationIndex.level === maxLevel-1) {
           const response = await axios.get(
@@ -157,8 +165,9 @@ export default function LocationHierarchy({
           const distData = distJsonData.content;
           console.log("dist data", distData);
           setSecondLevel(distData);
-        }
 
+            
+        }
         // {
         //   content: [
         //     {
