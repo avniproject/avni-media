@@ -39,6 +39,7 @@ export default function ImageList() {
     const filterData = async () => {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
+        );
 
       console.log("filter-response",filterResponse)
       const jsonData = filterResponse;
