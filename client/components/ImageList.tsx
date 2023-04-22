@@ -39,8 +39,11 @@ export default function ImageList() {
     const filterData = async () => {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      );
+
+      console.log("filter-response",filterResponse)
       const jsonData = filterResponse;
+      console.log("json-data",jsonData)
+
       // {
       //   formMappings: [
       //     {
@@ -164,7 +167,7 @@ export default function ImageList() {
     fetchImages();
   }, [pagination, orgID]);
 
-  const [showPerpage] = useState(10);
+  const [showPerpage ,setShowperpage] = useState(10);
 
   const [carouselImage, setCarouselImage] = useState<{
     uuid: string;
@@ -279,6 +282,7 @@ export default function ImageList() {
 
   const handleNumberChange = (value: SetStateAction<number>) => {
     setNumber(value);
+    setShowperpage(value);
   };
   return (
     <>
