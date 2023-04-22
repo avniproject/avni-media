@@ -61,8 +61,8 @@ export default function LocationHierarchy({
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
-
-        const jsonDataState = response;
+        console.log("Response data for top level ",response.data)
+        const jsonDataState = response.data;
         // {
         //   content: [
         //     {
@@ -135,8 +135,9 @@ export default function LocationHierarchy({
             `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
 
-          const distJsonData = response;
+          const distJsonData = response.data;
           const distData = distJsonData.content;
+          console.log("Response data for other level",distData)
 
           setSecondLevel(distData);
         } else {
@@ -148,9 +149,10 @@ export default function LocationHierarchy({
             )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
 
-          const distJsonData = response;
+          const distJsonData = response.data;
+          console.log("Response data for multiselec",distJsonData)
           const distData = distJsonData.content;
-
+          console.log("dist data", distData)
           setSecondLevel(distData);
         }
 
