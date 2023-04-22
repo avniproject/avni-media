@@ -40,7 +40,7 @@ export default function ImageList() {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
-      const jsonData = filterResponse
+      const jsonData = filterResponse;
       // {
       //   formMappings: [
       //     {
@@ -118,16 +118,17 @@ export default function ImageList() {
       const encounters = jsonData.encounterTypes;
       const sub = jsonData.subjectTypes;
       const addressLevel = jsonData.allAddressLevels;
-      const maxLeveldata = Math.max(...addressLevel.map((obj) => obj.level));
-      setMaxLvel(maxLeveldata);
-      const minLeveldata = Math.min(...addressLevel.map((obj) => obj.level));
-      setMinLevel(minLeveldata);
-      const maxLevelLocation = addressLevel.find(
-        (obj) => obj.level === maxLevel
-      );
-
-      setMaxtLevelLocation(maxLevelLocation);
       if (addressLevel !== undefined && addressLevel !== null) {
+        const maxLeveldata = Math.max(...addressLevel.map((obj) => obj.level));
+        setMaxLvel(maxLeveldata);
+        const minLeveldata = Math.min(...addressLevel.map((obj) => obj.level));
+        setMinLevel(minLeveldata);
+        const maxLevelLocation = addressLevel.find(
+          (obj) => obj.level === maxLevel
+        );
+
+        setMaxtLevelLocation(maxLevelLocation);
+
         const sortedData = addressLevel.sort(
           (a: { level: number }, b: { level: number }) => b.level - a.level
         );
