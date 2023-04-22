@@ -134,7 +134,7 @@ export default function LocationHierarchy({
 
         if (locationIndex.level === maxLevel-1) {
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentIds}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
 
           const distJsonData = response.data;
