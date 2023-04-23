@@ -4,7 +4,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 import { Option } from "rc-select";
 import axios from "axios";
-import { error } from "console";
+
 
 interface Option {
   uuid: Key | null | undefined;
