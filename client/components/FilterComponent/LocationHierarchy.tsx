@@ -4,7 +4,6 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 import { Option } from "rc-select";
 import axios from "axios";
-import { error } from "console";
 
 interface Option {
   uuid: Key | null | undefined;
@@ -57,8 +56,6 @@ export default function LocationHierarchy({
     const typeIdData = async () => {
       const typeId = locationIndex.id;
       if (locationIndex.level === maxLevel) {
-        
-
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
@@ -141,7 +138,6 @@ export default function LocationHierarchy({
               setSecondLevel(distData);
             }
           } catch (Error) {
-            console.log(error);
             console.log(
               `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
@@ -170,16 +166,13 @@ export default function LocationHierarchy({
             setSecondLevel(distData);
           }
         } catch (Error) {
-          console.log(error);
           console.log(
             `error at ${
-
               process.env.NEXT_PUBLIC_TOP_ADDRESS
             }?parentId=${selectedOptions.join(
               ","
             )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
-
         }
         // {
         //   content: [
@@ -263,7 +256,6 @@ export default function LocationHierarchy({
       >
         <div>
           {maxLevel === locationIndex.level ? (
-
             <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
               <span>
                 {selectedOptions.length > 0
@@ -287,7 +279,6 @@ export default function LocationHierarchy({
                 aria-hidden="true"
               />
             </Menu.Button>
-
           )}
         </div>
 
