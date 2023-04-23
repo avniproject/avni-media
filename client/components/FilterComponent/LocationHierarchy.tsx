@@ -4,7 +4,6 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
 import axios from "axios";
 
-
 interface Option {
   uuid: Key | null | undefined;
   id: number;
@@ -36,6 +35,7 @@ export default function LocationHierarchy({
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [selectUUID, setSelectUUID] = useState<any[]>([]);
   const [secondLevel, setSecondLevel] = useState<any>([]);
+  const [parsedDistData, setParsedDistData] = useState<any>([]);
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -53,18 +53,14 @@ export default function LocationHierarchy({
   }, [selectedOption]);
 
   useEffect(() => {
-    if (locationIndex.level=== maxLevel-1){
-
-    const secondLevelTypeId = locationIndex.id
-    localStorage.setItem('secondLevelTypeId', secondLevelTypeId.toString());
-    
-  }
+    if (locationIndex.level === maxLevel - 1) {
+      const secondLevelTypeId = locationIndex.id;
+      localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+    }
     const typeIdData = async () => {
       const typeId = locationIndex.id;
 
-      if (locationIndex.level === maxLevel || locationIndex.level === maxLevel-1)  {
-
-
+      if (locationIndex.level === maxLevel) {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
@@ -75,8 +71,7 @@ export default function LocationHierarchy({
           "Response",
           response
         );
-        console.log("index",locationIndex)
-        const jsonDataState = response.data
+        const jsonDataState = response.data;
 
         // {
         //   content: [
@@ -130,8 +125,9 @@ export default function LocationHierarchy({
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
         const savedSelectedOption = localStorage.getItem("selectedOption");
-        const secondLevelTypeIdString = localStorage.getItem('secondLevelTypeId');
-        if (savedSelectedOption !== null && secondLevelTypeIdString!==null) {
+        const secondLevelTypeIdString =
+          localStorage.getItem("secondLevelTypeId");
+        if (savedSelectedOption !== null && secondLevelTypeIdString !== null) {
           const parsedOption = JSON.parse(savedSelectedOption);
           try {
             if (parsedOption && parsedOption.id !== undefined) {
@@ -142,14 +138,62 @@ export default function LocationHierarchy({
               );
 
               const distJsonData = response.data;
+              //         {
+              //   content: [
+              //     {
+              //       uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
+              //       titleLineage: "MH, Mumbai",
+              //       level: 1.0,
+              //       typeId: 741,
+              //       parentId: 182370,
+              //       lineage: "182370.182386",
+              //       title: "Mumbai",
+              //       id: 182386,
+              //       typeString: "Dist",
+              //     },
+              //     {
+              //       uuid: "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
+              //       titleLineage: "MH, Nagpur",
+              //       level: 1.0,
+              //       typeId: 741,
+              //       parentId: 182370,
+              //       lineage: "182370.182388",
+              //       title: "Nagpur",
+              //       id: 182388,
+              //       typeString: "Dist",
+              //     },
+              //   ],
+              //   pageable: {
+              //     sort: {
+              //       unsorted: false,
+              //       sorted: true,
+              //     },
+              //     pageNumber: 0,
+              //     pageSize: 1000,
+              //     offset: 0,
+              //     unpaged: false,
+              //     paged: true,
+              //   },
+              //   last: true,
+              //   totalElements: 2,
+              //   totalPages: 1,
+              //   first: true,
+              //   sort: {
+              //     unsorted: false,
+              //     sorted: true,
+              //   },
+              //   numberOfElements: 2,
+              //   size: 1000,
+              //   number: 0,
+              // };
               console.log("Response Data for other level", distJsonData);
               const distData = distJsonData.content;
               console.log("Response content  for other level", distData);
+              localStorage.setItem("distData", JSON.stringify(distData));
 
               setSecondLevel(distData);
             }
           } catch (Error) {
-
             console.log(
               `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
@@ -176,9 +220,15 @@ export default function LocationHierarchy({
             const distData = distJsonData.content;
             console.log("dist data", distData);
             setSecondLevel(distData);
+            console.log(
+              `${
+                process.env.NEXT_PUBLIC_TOP_ADDRESS
+              }?parentId=${selectedOptions.join(
+                ","
+              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
           }
         } catch (Error) {
-
           console.log(
             `error at ${
               process.env.NEXT_PUBLIC_TOP_ADDRESS
@@ -186,56 +236,7 @@ export default function LocationHierarchy({
               ","
             )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
           );
-
         }
-        // {
-        //   content: [
-        //     {
-        //       uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
-        //       titleLineage: "MH, Mumbai",
-        //       level: 1.0,
-        //       typeId: 741,
-        //       parentId: 182370,
-        //       lineage: "182370.182386",
-        //       title: "Mumbai",
-        //       id: 182386,
-        //       typeString: "Dist",
-        //     },
-        //     {
-        //       uuid: "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
-        //       titleLineage: "MH, Nagpur",
-        //       level: 1.0,
-        //       typeId: 741,
-        //       parentId: 182370,
-        //       lineage: "182370.182388",
-        //       title: "Nagpur",
-        //       id: 182388,
-        //       typeString: "Dist",
-        //     },
-        //   ],
-        //   pageable: {
-        //     sort: {
-        //       unsorted: false,
-        //       sorted: true,
-        //     },
-        //     pageNumber: 0,
-        //     pageSize: 1000,
-        //     offset: 0,
-        //     unpaged: false,
-        //     paged: true,
-        //   },
-        //   last: true,
-        //   totalElements: 2,
-        //   totalPages: 1,
-        //   first: true,
-        //   sort: {
-        //     unsorted: false,
-        //     sorted: true,
-        //   },
-        //   numberOfElements: 2,
-        //   size: 1000,
-        //   number: 0,
-        // };
       }
     };
     typeIdData();
@@ -262,6 +263,18 @@ export default function LocationHierarchy({
       setSelectUUID([...selectUUID, option]);
     }
   }
+  console.log("selecond ", secondLevel);
+  console.log("indesx", locationIndex);
+  const storedDistData = localStorage.getItem("distData");
+  useEffect(() => {
+    if (storedDistData !== null) {
+      const parsedDistData = JSON.parse(storedDistData);
+
+      setParsedDistData(parsedDistData);
+      console.log(parsedDistData);
+    }
+  }, [selectedOption]);
+
   return (
     <>
       <Menu
@@ -270,10 +283,9 @@ export default function LocationHierarchy({
       >
         <div>
           {maxLevel === locationIndex.level ? (
-
             <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
               <span>
-                {selectedOptions.length == 0
+                {selectedOptions.length > 0
                   ? selectedOption?.name
                   : locationIndex.name}
               </span>
@@ -294,7 +306,6 @@ export default function LocationHierarchy({
                 aria-hidden="true"
               />
             </Menu.Button>
-
           )}
         </div>
 
@@ -307,7 +318,7 @@ export default function LocationHierarchy({
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          {maxLevel === locationIndex.level ? (
+          {locationIndex.level === maxLevel ? (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {toplevelData &&
@@ -336,9 +347,43 @@ export default function LocationHierarchy({
                   ))}
               </div>
             </Menu.Items>
-          ) : (
+          ) : parsedDistData !== null ? (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
+                {parsedDistData &&
+                  parsedDistData.map((option: Option) => (
+                    <Menu.Item key={option.uuid}>
+                      {({ active }) => (
+                        <button
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "flex justify-between w-full px-4 py-2 text-sm"
+                          )}
+                          onClick={() => {
+                            handleOptionClick(option.id);
+                            onclickData(option.uuid);
+                          }}
+                        >
+                          {option.title}
+                          {selectedOptions.includes(option.id) ? (
+                            <CheckIcon
+                              className="h-5 w-5 text-teal-500"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))}
+              </div>
+            </Menu.Items>
+          ) : (
+            // This is the default block, which will be executed if neither of the above conditions is true
+            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {/* Display third level options */}
                 {secondLevel &&
                   secondLevel.map((option: Option) => (
                     <Menu.Item key={option.uuid}>
