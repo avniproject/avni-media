@@ -61,7 +61,9 @@ export default function LocationHierarchy({
   }
     const typeIdData = async () => {
       const typeId = locationIndex.id;
+
       if (locationIndex.level === maxLevel || locationIndex.level === maxLevel-1)  {
+
 
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
