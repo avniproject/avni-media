@@ -57,7 +57,6 @@ export default function LocationHierarchy({
     const typeIdData = async () => {
       const typeId = locationIndex.id;
       if (locationIndex.level === maxLevel) {
-        
 
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
@@ -141,7 +140,7 @@ export default function LocationHierarchy({
               setSecondLevel(distData);
             }
           } catch (Error) {
-            console.log(error);
+
             console.log(
               `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
@@ -170,7 +169,7 @@ export default function LocationHierarchy({
             setSecondLevel(distData);
           }
         } catch (Error) {
-          console.log(error);
+
           console.log(
             `error at ${
 
