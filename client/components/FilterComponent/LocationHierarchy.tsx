@@ -53,12 +53,14 @@ export default function LocationHierarchy({
   }, [selectedOption]);
 
   useEffect(() => {
+
     if (locationIndex.level === maxLevel - 1) {
       const secondLevelTypeId = locationIndex.id;
       localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
     }
     const typeIdData = async () => {
       const typeId = locationIndex.id;
+
 
       if (locationIndex.level === maxLevel) {
         const response = await axios.get(
@@ -71,6 +73,7 @@ export default function LocationHierarchy({
           "Response",
           response
         );
+        console.log("index",locationIndex)
         const jsonDataState = response.data;
 
         // {
@@ -125,9 +128,11 @@ export default function LocationHierarchy({
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
         const savedSelectedOption = localStorage.getItem("selectedOption");
+
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
         if (savedSelectedOption !== null && secondLevelTypeIdString !== null) {
+
           const parsedOption = JSON.parse(savedSelectedOption);
           try {
             if (parsedOption && parsedOption.id !== undefined) {
