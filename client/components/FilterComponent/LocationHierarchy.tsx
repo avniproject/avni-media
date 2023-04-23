@@ -1,10 +1,9 @@
 import { Fragment, Key, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
-
 import { Option } from "rc-select";
 import axios from "axios";
-import { error } from "console";
+
 
 interface Option {
   uuid: Key | null | undefined;
@@ -54,9 +53,15 @@ export default function LocationHierarchy({
   }, [selectedOption]);
 
   useEffect(() => {
+    if (locationIndex.level=== maxLevel-1){
+
+    const secondLevelTypeId = locationIndex.id
+    localStorage.setItem('secondLevelTypeId', secondLevelTypeId.toString());
+    
+  }
     const typeIdData = async () => {
       const typeId = locationIndex.id;
-      if (locationIndex.level === maxLevel) {
+      if (locationIndex.level === maxLevel || locationIndex.level === maxLevel-1)  {
 
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
@@ -68,7 +73,8 @@ export default function LocationHierarchy({
           "Response",
           response
         );
-        const jsonDataState = response.data;
+        console.log("index",locationIndex)
+        const jsonDataState = response.data
 
         // {
         //   content: [
@@ -122,14 +128,15 @@ export default function LocationHierarchy({
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
         const savedSelectedOption = localStorage.getItem("selectedOption");
-
-        if (savedSelectedOption !== null) {
+        const secondLevelTypeIdString = localStorage.getItem('secondLevelTypeId');
+        if (savedSelectedOption !== null && secondLevelTypeIdString!==null) {
           const parsedOption = JSON.parse(savedSelectedOption);
           try {
             if (parsedOption && parsedOption.id !== undefined) {
               setParentId(parsedOption.id);
+              const secondLevelTypeId = parseInt(secondLevelTypeIdString);
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
               );
 
               const distJsonData = response.data;
@@ -172,7 +179,6 @@ export default function LocationHierarchy({
 
           console.log(
             `error at ${
-
               process.env.NEXT_PUBLIC_TOP_ADDRESS
             }?parentId=${selectedOptions.join(
               ","
@@ -265,7 +271,7 @@ export default function LocationHierarchy({
 
             <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
               <span>
-                {selectedOptions.length > 0
+                {selectedOptions.length == 0
                   ? selectedOption?.name
                   : locationIndex.name}
               </span>
