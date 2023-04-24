@@ -41,7 +41,6 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
         );
 
-
       const jsonData = filterResponse.data;
 
   
@@ -158,10 +157,14 @@ export default function ImageList() {
 
   useEffect(() => {
     const fetchImages = async () => {
+      const options = {
+        headers: {
+          "AUTH-TOKEN": localStorage.getItem('authToken')
+        }
+      };
+
       if (orgID) {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`
-        );
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`, options);
         setImageList(response.data);
       }
     };
