@@ -30,7 +30,12 @@ const ImageCarousel = ({
 
   useEffect(() => {
     const fetchImages = async () => {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=0&size=${totalRecords}`);
+      const options = {
+        headers: {
+          "AUTH-TOKEN": localStorage.getItem('authToken')
+        }
+      };
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=0&size=${totalRecords}`, options);
       setImageCarousel(response.data)
     }
     fetchImages()
