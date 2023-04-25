@@ -158,8 +158,8 @@ export default function ImageList() {
     const fetchImages = async () => {
       const options = {
         headers: {
-          "AUTH-TOKEN": localStorage.getItem("authToken"),
-        },
+          "AUTH-TOKEN": localStorage.getItem("authToken")
+        }
       };
 
       if (orgID) {

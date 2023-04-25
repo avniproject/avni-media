@@ -207,7 +207,7 @@ export default function LocationHierarchy({
               console.log("Response Data for other level", distJsonData);
               const distData = distJsonData.content;
         
-             console.log("distdata",distData)
+             console.log("distdata---->",distData)
              
                 getLocation(distData)
                          }
