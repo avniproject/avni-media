@@ -5,16 +5,27 @@ import { Option } from "rc-select";
 import axios from "axios";
 
 interface Option {
-  uuid: Key | null | undefined;
-  id: number;
+  uuid: any;
+  id: any;
   name: string;
+  title: string;
 }
 interface Prop {
   filterData: () => void;
-  locationIndex: any[];
+  locationIndex: {
+    name: string;
+    id: number;
+    level: number;
+  };
   index: Key;
   minLevel: number;
   maxLevel: number;
+  getLocation:(data : any[])=>void;
+  getOtherLocation:(data : any[])=>void;
+  getTopLevel:(data : any[])=>void;
+  getSecondLevel:(data : any[])=>void;
+  loction: any[];
+  otherLocation:any[];
 }
 interface Location {
   id: number;
@@ -29,13 +40,19 @@ function classNames(...classes: string[]) {
 export default function LocationHierarchy({
   locationIndex,
   index,
+  loction,
+  getLocation,
+  getOtherLocation,
+  getTopLevel,
+  getSecondLevel,
   maxLevel,
+  otherLocation,
   minLevel,
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [selectUUID, setSelectUUID] = useState<any[]>([]);
   const [secondLevel, setSecondLevel] = useState<any>([]);
-  const [parsedDistData, setParsedDistData] = useState<any>([]);
+  
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -53,14 +70,12 @@ export default function LocationHierarchy({
   }, [selectedOption]);
 
   useEffect(() => {
-
     if (locationIndex.level === maxLevel - 1) {
       const secondLevelTypeId = locationIndex.id;
       localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
     }
     const typeIdData = async () => {
       const typeId = locationIndex.id;
-
 
       if (locationIndex.level === maxLevel) {
         const response = await axios.get(
@@ -73,9 +88,8 @@ export default function LocationHierarchy({
           "Response",
           response
         );
-        console.log("index",locationIndex)
-        const jsonDataState = response.data;
-
+        console.log("index", locationIndex);
+        const jsonDataState = response.data
         // {
         //   content: [
         //     {
@@ -132,7 +146,6 @@ export default function LocationHierarchy({
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
         if (savedSelectedOption !== null && secondLevelTypeIdString !== null) {
-
           const parsedOption = JSON.parse(savedSelectedOption);
           try {
             if (parsedOption && parsedOption.id !== undefined) {
@@ -193,11 +206,11 @@ export default function LocationHierarchy({
               // };
               console.log("Response Data for other level", distJsonData);
               const distData = distJsonData.content;
-              console.log("Response content  for other level", distData);
-              localStorage.setItem("distData", JSON.stringify(distData));
-
-              setSecondLevel(distData);
-            }
+        
+             console.log("distdata",distData)
+             
+                getLocation(distData)
+                         }
           } catch (Error) {
             console.log(
               `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
@@ -225,6 +238,7 @@ export default function LocationHierarchy({
             const distData = distJsonData.content;
             console.log("dist data", distData);
             setSecondLevel(distData);
+            getOtherLocation(secondLevel)
             console.log(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
@@ -268,17 +282,10 @@ export default function LocationHierarchy({
       setSelectUUID([...selectUUID, option]);
     }
   }
-  console.log("selecond ", secondLevel);
-  console.log("indesx", locationIndex);
-  const storedDistData = localStorage.getItem("distData");
-  useEffect(() => {
-    if (storedDistData !== null) {
-      const parsedDistData = JSON.parse(storedDistData);
-
-      setParsedDistData(parsedDistData);
-      console.log(parsedDistData);
-    }
-  }, [selectedOption]);
+  useEffect(()=>{
+    getTopLevel(selectedOptions)
+    getSecondLevel(selectedOptions)
+  },[selectedOptions])
 
   return (
     <>
@@ -352,11 +359,11 @@ export default function LocationHierarchy({
                   ))}
               </div>
             </Menu.Items>
-          ) : parsedDistData !== null ? (
+          ) : loction !== null ? (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
-                {parsedDistData &&
-                  parsedDistData.map((option: Option) => (
+                {loction &&
+                  loction.map((option: Option) => (
                     <Menu.Item key={option.uuid}>
                       {({ active }) => (
                         <button
@@ -389,8 +396,8 @@ export default function LocationHierarchy({
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {/* Display third level options */}
-                {secondLevel &&
-                  secondLevel.map((option: Option) => (
+                {otherLocation &&
+                  otherLocation.map((option: Option) => (
                     <Menu.Item key={option.uuid}>
                       {({ active }) => (
                         <button

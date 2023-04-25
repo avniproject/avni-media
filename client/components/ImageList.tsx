@@ -27,7 +27,8 @@ export default function ImageList() {
   const [minLevel, setMinLevel] = useState();
   const [maxLevel, setMaxLvel] = useState<number>();
   const [encounterFilter, setEncounterFilter] = useState([]);
-  const [loctionPid, setLocationPid] = useState<any>([]);
+  const [loction, setLocations] = useState<any>([]);
+  const [otherLocation, setOtherLocation] = useState<any>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,9 +42,7 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
         );
 
-      const jsonData = filterResponse.data;
-
-  
+      const jsonData = filterResponse.data
       // {
       //   formMappings: [
       //     {
@@ -159,19 +158,22 @@ export default function ImageList() {
     const fetchImages = async () => {
       const options = {
         headers: {
-          "AUTH-TOKEN": localStorage.getItem('authToken')
-        }
+          "AUTH-TOKEN": localStorage.getItem("authToken"),
+        },
       };
 
       if (orgID) {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`, options);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`,
+          options
+        );
         setImageList(response.data);
       }
     };
     fetchImages();
   }, [pagination, orgID]);
 
-  const [showPerpage ,setShowperpage] = useState(10);
+  const [showPerpage, setShowperpage] = useState(10);
 
   const [carouselImage, setCarouselImage] = useState<{
     uuid: string;
@@ -269,14 +271,23 @@ export default function ImageList() {
   const accountType = (data: any[]) => {
     setAcountType(data);
   };
-  // const locationParentId =(data: number)=>{
-  //   console.log("data",data)
-  //   setLocationPid(data);
-  // }
+  const getLocation = (data: any[]) => {
+    setLocations(data);
+  };
+  const getOtherLocation = (data: any[]) => {
+    setOtherLocation(data);
+  };
+  const getTopLevel = (data: any[]) => {
+    setSubjectType(data);
+  };
+  
+  const getSecondLevel = (data: any[]) => {
+    setSubjectType(data);
+  };
   const subjectType = (data: any[]) => {
     setSubjectType(data);
   };
-
+  
   const handleApplyFilter = async () => {
     console.log("this file is running ");
     console.log("value", concepts);
@@ -307,13 +318,24 @@ export default function ImageList() {
 
       <dl className="grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0 ml-8">
         {locationFilter &&
-          locationFilter.map((locationIndex: any[], index: Key) => (
+          locationFilter.map((locationIndex: {
+            name: string;
+            id: number;
+            level: number;
+          }, index: Key) => (
             <LocationHierarchy
               key={index}
               locationIndex={locationIndex}
               index={index}
               minLevel={minLevel}
               maxLevel={maxLevel}
+              getLocation={getLocation}
+              loction={loction}
+              getOtherLocation={getOtherLocation}
+              otherLocation={otherLocation}
+              getTopLevel={getTopLevel}
+              getSecondLevel={getSecondLevel}
+
             />
           ))}
         <Daterange dateRange={dateRange} />
