@@ -30,6 +30,7 @@ export default function ImageList() {
   const [encounterFilter, setEncounterFilter] = useState([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [showPerpage, setShowperpage] = useState(10);
   const router = useRouter();
 
   useEffect(() => {
@@ -100,9 +101,9 @@ export default function ImageList() {
     };
 
     fetchImages();
-  }, [pagination]);
+  }, [pagination, showPerpage]);
 
-  const [showPerpage, setShowperpage] = useState(10);
+
 
   const [carouselImage, setCarouselImage] = useState<{
     uuid: string;
@@ -152,9 +153,10 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
+    
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
-      { username: userName, data: selectedImage }
+      { username: userName, data: selectedImage, description:inputValue }
     );
   };
 
@@ -221,14 +223,10 @@ export default function ImageList() {
 
   const handleApplyFilter = async () => {
     console.log("this file is running ");
-    console.log("value", concepts);
-    console.log("datavalue", date);
+   
   };
 
-  const [number, setNumber] = useState(0);
-
-  const handleNumberChange = (value: SetStateAction<number>) => {
-    setNumber(value);
+  const handleNumberChange = (value: number) => {
     setShowperpage(value);
   };
 
@@ -238,9 +236,9 @@ export default function ImageList() {
         <span className="mt-10 text-lg leading-6 font-medium text-gray-900 ml-8 flex-none">
           Filters
         </span>
-        <div className="mt-10 text-base leading-6 font-medium text-gray-900 mr-4">
+        <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
-            label="#Images per page"
+            label="#Images per page "
             min={0}
             max={100}
             step={10}

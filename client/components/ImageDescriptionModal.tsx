@@ -1,18 +1,23 @@
 import React, { useState } from "react";
+import { Styles } from "react-modal";
 import Modal from "react-modal";
-
-const UserInputModal = ({ showModal, onClose, onSubmit, date, subject }) => {
-  const [inputValue, setInputValue] = useState("");
-  console.log("date", date);
-  console.log("subject", subject);
-  const handleSubmit = (event) => {
+interface prop{
+  subject: any[];
+  date : Date[];
+  onSubmit:(inputValue:string)=>void;
+  onClose: ()=>void;
+  showModal: boolean;
+}
+const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) => {
+  const [inputValue, setInputValue] = useState(`Date: ${date} \nsubjectType : ${subject}`);
+  const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
     onSubmit(inputValue);
     onClose();
   };
 
-  const customStyles = {
+  const customStyles: Styles = {
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.75)",
     },
@@ -44,7 +49,7 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject }) => {
       <form onSubmit={handleSubmit} className="w-full">
         <div className="flex flex-col mb-4">
           <label htmlFor="image-description" className="mb-1 font-bold">
-            Enter Image Description:
+            Edit Image Description:
           </label>
           <textarea
             id="image-description"
@@ -58,13 +63,13 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject }) => {
         <div className="flex justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
+            className="bg-teal-500 hover:bg-teal-700 text-white py-1 px-3 rounded-md"
           >
             Submit
           </button>
           <button
             onClick={onClose}
-            className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-3 rounded-md"
+            className="bg-teal-500 hover:bg-teal-700 text-white py-1 px-3 rounded-md"
           >
             Close
           </button>
