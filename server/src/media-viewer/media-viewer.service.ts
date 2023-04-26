@@ -87,8 +87,8 @@ export class MediaViewerService {
   }
 
   async saveMediaData(mediaData: any): Promise<DownloadJobs> {
-    const { username, data } = mediaData;
-
+    const { username, data, description } = mediaData;
+   
     if (!username || typeof username !== 'string' || !data) {
       throw new Error('Invalid media data');
     }
@@ -97,6 +97,7 @@ export class MediaViewerService {
       const media = new DownloadJobs();
       media.username = username;
       media.image_metadata = data;
+      media.image_description = description;
       const savedMedia = await this.mediaRepository.save(media);
 
       return savedMedia;

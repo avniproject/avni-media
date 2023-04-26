@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-
-const UserInputModal = ({ showModal, onClose, onSubmit, date, subject }) => {
-  const [inputValue, setInputValue] = useState("");
+interface prop{
+  subject: any[];
+  date : Date[];
+  onSubmit:(inputValue:string)=>void;
+  onClose: ()=>void;
+  showModal: boolean;
+}
+const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) => {
+  const [inputValue, setInputValue] = useState(`Date: ${date} \nsubjectType : ${subject}`);
   console.log("date", date);
   console.log("subject", subject);
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
     onSubmit(inputValue);
@@ -58,13 +64,13 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject }) => {
         <div className="flex justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
+            className="bg-teal-500 hover:bg-teal-700 text-white py-1 px-3 rounded-md"
           >
             Submit
           </button>
           <button
             onClick={onClose}
-            className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-3 rounded-md"
+            className="bg-teal-500 hover:bg-teal-700 text-white py-1 px-3 rounded-md"
           >
             Close
           </button>
