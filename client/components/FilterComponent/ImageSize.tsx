@@ -4,7 +4,7 @@ interface Prop {
   min: number;
   max: number;
   step: number;
-  onChange: (value: any[]) => void;
+  onChange: (value: number) => void;
 }
 
 const NumberDropdown = ({ label, min, max, step, onChange }: Prop) => {
