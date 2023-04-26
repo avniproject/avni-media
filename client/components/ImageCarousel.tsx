@@ -73,7 +73,11 @@ const ImageCarousel = ({
                     </div>
                     <div className="name-size">
                       <p>Subject Type: {img.subjectTypeName}</p>
-                      <p>Date: {img.createdDateTime}</p>
+                      <p>Date: {new Date(img.createdDateTime).toLocaleDateString('en-IN', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                  }).split('/').join('-')}</p>
                     </div>
                   </div>
                 ))}
