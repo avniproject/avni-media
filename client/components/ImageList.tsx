@@ -291,8 +291,7 @@ export default function ImageList() {
   
   const handleApplyFilter = async () => {
     console.log("this file is running ");
-    console.log("value", concepts);
-    console.log("datavalue", date);
+   
   };
 
   const handleNumberChange = (value: number) => {

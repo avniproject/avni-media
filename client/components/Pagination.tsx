@@ -20,7 +20,7 @@ interface Props {
     else {
       pagechange(showperpage, counter -1 )
     }
-  }, [counter,showperpage])
+  }, [counter, showperpage])
 
 
   const onButtonclick = (type: string) => {
