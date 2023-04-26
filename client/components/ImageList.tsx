@@ -29,6 +29,7 @@ export default function ImageList() {
   const [encounterFilter, setEncounterFilter] = useState([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [showPerpage, setShowperpage] = useState(10);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
         );
 
-      const jsonData = filterResponse.data
+      const jsonData = filterResponse.data;
       // {
       //   formMappings: [
       //     {
@@ -171,9 +172,9 @@ export default function ImageList() {
       }
     };
     fetchImages();
-  }, [pagination, orgID]);
+  }, [pagination, orgID,showPerpage]);
 
-  const [showPerpage, setShowperpage] = useState(10);
+
 
   const [carouselImage, setCarouselImage] = useState<{
     uuid: string;
@@ -293,10 +294,8 @@ export default function ImageList() {
     console.log("value", concepts);
     console.log("datavalue", date);
   };
-  const [number, setNumber] = useState(0);
 
-  const handleNumberChange = (value: SetStateAction<number>) => {
-    setNumber(value);
+  const handleNumberChange = (value: number) => {
     setShowperpage(value);
   };
   return (
@@ -305,9 +304,9 @@ export default function ImageList() {
         <span className="mt-10 text-lg leading-6 font-medium text-gray-900 ml-8 flex-none">
           Filters
         </span>
-        <div className="mt-10 text-base leading-6 font-medium text-gray-900 mr-4">
+        <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
-            label="#Images per page"
+            label="#Images per page "
             min={0}
             max={100}
             step={10}
