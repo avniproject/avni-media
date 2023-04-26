@@ -223,15 +223,11 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-    console.log("selected Images --", JSON.stringify(selectedImage));
-    console.log("userName --", userName);
-    console.log("image des--", await inputValue);
-    // console.log(`{"username": ", userName ", " data": "${selectedImage}]"`);
+    
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
-      { username: userName, data: selectedImage }
+      { username: userName, data: selectedImage, description:inputValue }
     );
-    console.log("response from handle --", response);
   };
 
   //  user input form
