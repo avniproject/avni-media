@@ -14,6 +14,7 @@ import LocationHierarchy from "./FilterComponent/LocationHierarchy";
 import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
+import jwt_decode from "jwt-decode";
 
 export default function ImageList() {
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
@@ -24,7 +25,7 @@ export default function ImageList() {
   const [subjectFilter, setSubjectFilter] = useState<any>();
   const [programFilter, setProgramFilter] = useState<any>([]);
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
-  const [minLevel, setMinLevel] = useState();
+  const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
   const [encounterFilter, setEncounterFilter] = useState([]);
   const [loction, setLocations] = useState<any>([]);
@@ -32,101 +33,27 @@ export default function ImageList() {
   const router = useRouter();
 
   useEffect(() => {
-    if (router.isReady) setOrgID(router.query.orgID);
-    setUserName(router.query.username);
-  }, [router.isReady, router.query.orgID, router.query.username]);
-
-  useEffect(() => {
     const filterData = async () => {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-        );
+      );
 
-      const jsonData = filterResponse.data
-      // {
-      //   formMappings: [
-      //     {
-      //       uuid: "a3e13dc2-4b29-4788-92f9-f313d6d9c518",
-      //       id: 16616,
-      //       formUUID: "0e70785c-7690-4865-b64c-6316fd55473a",
-      //       subjectTypeUUID: "095244bf-600a-4872-8553-cc8c8a974c4b",
-      //       formType: "IndividualProfile",
-      //       formName: "Album Registration",
-      //       enableApproval: false,
-      //     },
-      //   ],
-      //   addressLevelTypes: [
-      //     {
-      //       uuid: "c55af85c-b043-470f-ab13-7871c69536e0",
-      //       id: 741,
-      //       name: "Dist",
-      //       level: 1,
-      //       parent: {
-      //         uuid: "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
-      //       },
-      //     },
-      //   ],
-      //   customRegistrationLocations: [],
-      //   encounterTypes: [],
-      //   allAddressLevels: [
-      //     {
-      //       uuid: "c55af85c-b043-470f-ab13-7871c69536e0",
-      //       id: 741,
-      //       name: "Dist",
-      //       level: 1,
-      //       parent: {
-      //         uuid: "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
-      //       },
-      //     },
-      //     {
-      //       uuid: "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
-      //       id: 725,
-      //       name: "State",
-      //       level: 2,
-      //     },
-      //   ],
-      //   programs: [],
-      //   taskTypes: [],
-      //   relations: [],
-      //   subjectTypes: [
-      //     {
-      //       uuid: "095244bf-600a-4872-8553-cc8c8a974c4b",
-      //       operationalSubjectTypeName: "Album",
-      //       groupRoles: [],
-      //       allowEmptyLocation: false,
-      //       validFirstNameFormat: null,
-      //       validLastNameFormat: null,
-      //       iconFileS3Key: null,
-      //       nameHelpText: "abc",
-      //       memberSubjectUUIDs: "",
-      //       validMiddleNameFormat: null,
-      //       allowMiddleName: false,
-      //       group: false,
-      //       allowProfilePicture: false,
-      //       name: "Album",
-      //       id: 698,
-      //       type: "Individual",
-      //     },
-      //   ],
-      //   forms: [
-      //     {
-      //       formType: "IndividualProfile",
-      //       formName: "Album Registration",
-      //       formUUID: "0e70785c-7690-4865-b64c-6316fd55473a",
-      //     },
-      //   ],
-      // };
+      const jsonData = filterResponse.data;
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const sub = jsonData.subjectTypes;
       const addressLevel = jsonData.allAddressLevels;
       if (addressLevel !== undefined && addressLevel !== null) {
-        const maxLeveldata = Math.max(...addressLevel.map((obj) => obj.level));
+        const maxLeveldata = Math.max(
+          ...addressLevel.map((obj: { level: any }) => obj.level)
+        );
         setMaxLvel(maxLeveldata);
-        const minLeveldata = Math.min(...addressLevel.map((obj) => obj.level));
+        const minLeveldata = Math.min(
+          ...addressLevel.map((obj: { level: any }) => obj.level)
+        );
         setMinLevel(minLeveldata);
         const maxLevelLocation = addressLevel.find(
-          (obj) => obj.level === maxLevel
+          (obj: { level: number | undefined }) => obj.level === maxLevel
         );
 
         setMaxtLevelLocation(maxLevelLocation);
@@ -144,34 +71,36 @@ export default function ImageList() {
     filterData();
   }, []);
 
-  useEffect(() => {
-    if (router.isReady) setOrgID(router.query.orgID);
-    setUserName(router.query.username);
-  }, [router.isReady, router.query.orgID, router.query.username]);
+  interface DecodedToken {
+    [key: string]: any;
+    "custom:userUUID": string;
+  }
 
   useEffect(() => {
-    if (router.isReady) setOrgID(router.query.orgID);
-    setUserName(router.query.username);
-  }, [router.isReady, router.query.orgID, router.query.username]);
+    let authToken: string  = '';
+    authToken = "" + localStorage.getItem("authToken");
+    const decodedToken = jwt_decode(authToken) as DecodedToken;
+    const userUUID = decodedToken["custom:userUUID"];
+    setUserName(userUUID);
+  }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
       const options = {
         headers: {
-          "AUTH-TOKEN": localStorage.getItem('authToken')
-        }
+          "AUTH-TOKEN": localStorage.getItem("authToken"),
+        },
       };
 
-      if (orgID) {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=${pagination.page}&size=${pagination.size}`,
-          options
-        );
-        setImageList(response.data);
-      }
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
+        options
+      );
+      setImageList(response.data);
     };
+
     fetchImages();
-  }, [pagination, orgID]);
+  }, [pagination]);
 
   const [showPerpage, setShowperpage] = useState(10);
 
@@ -223,15 +152,10 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-    console.log("selected Images --", JSON.stringify(selectedImage));
-    console.log("userName --", userName);
-    console.log("image des--", await inputValue);
-    // console.log(`{"username": ", userName ", " data": "${selectedImage}]"`);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
       { username: userName, data: selectedImage }
     );
-    console.log("response from handle --", response);
   };
 
   //  user input form
@@ -262,43 +186,52 @@ export default function ImageList() {
   const programType = (data: any[]) => {
     setProgamType(data);
   };
+
   const dateRange = (data: any[]) => {
     setDateRange(data);
   };
+
   const encounterType = (data: any[]) => {
     setEncounterType(data);
   };
+
   const accountType = (data: any[]) => {
     setAcountType(data);
   };
+
   const getLocation = (data: any[]) => {
     setLocations(data);
   };
+
   const getOtherLocation = (data: any[]) => {
     setOtherLocation(data);
   };
+
   const getTopLevel = (data: any[]) => {
     setSubjectType(data);
   };
-  
+
   const getSecondLevel = (data: any[]) => {
     setSubjectType(data);
   };
+
   const subjectType = (data: any[]) => {
     setSubjectType(data);
   };
-  
+
   const handleApplyFilter = async () => {
     console.log("this file is running ");
     console.log("value", concepts);
     console.log("datavalue", date);
   };
+
   const [number, setNumber] = useState(0);
 
   const handleNumberChange = (value: SetStateAction<number>) => {
     setNumber(value);
     setShowperpage(value);
   };
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -318,26 +251,30 @@ export default function ImageList() {
 
       <dl className="grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0 ml-8">
         {locationFilter &&
-          locationFilter.map((locationIndex: {
-            name: string;
-            id: number;
-            level: number;
-          }, index: Key) => (
-            <LocationHierarchy
-              key={index}
-              locationIndex={locationIndex}
-              index={index}
-              minLevel={minLevel}
-              maxLevel={maxLevel}
-              getLocation={getLocation}
-              loction={loction}
-              getOtherLocation={getOtherLocation}
-              otherLocation={otherLocation}
-              getTopLevel={getTopLevel}
-              getSecondLevel={getSecondLevel}
-
-            />
-          ))}
+          locationFilter.map(
+            (
+              locationIndex: {
+                name: string;
+                id: number;
+                level: number;
+              },
+              index: Key
+            ) => (
+              <LocationHierarchy
+                key={index}
+                locationIndex={locationIndex}
+                index={index}
+                minLevel={minLevel}
+                maxLevel={maxLevel}
+                getLocation={getLocation}
+                loction={loction}
+                getOtherLocation={getOtherLocation}
+                otherLocation={otherLocation}
+                getTopLevel={getTopLevel}
+                getSecondLevel={getSecondLevel}
+              />
+            )
+          )}
         <Daterange dateRange={dateRange} />
         <EncounterType
           encounterType={encounterType}
@@ -427,7 +364,6 @@ export default function ImageList() {
             onSelectImage={onSelectImage}
             checkedImage={checkedImage}
             setCheckedImage={[]}
-            orgID={orgID}
           />
         )}
         <Pagination

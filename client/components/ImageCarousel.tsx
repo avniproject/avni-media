@@ -12,7 +12,6 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void,
   checkedImage: string[],
   setCheckedImage: string[],
-  orgID: string | string[] | undefined,
 }
 
 const ImageCarousel = ({
@@ -22,7 +21,6 @@ const ImageCarousel = ({
   onClose,
   onSelectImage,
   checkedImage,
-  orgID,
 }: Props) => {
   const ci = carouselImage as never
   const index = imageList.indexOf(ci);
@@ -35,12 +33,12 @@ const ImageCarousel = ({
           "AUTH-TOKEN": localStorage.getItem('authToken')
         }
       };
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?orgID=${orgID}&page=0&size=${totalRecords}`, options);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=${totalRecords}`, options);
       setImageCarousel(response.data)
     }
     fetchImages()
 
-  }, [totalRecords, orgID]);
+  }, [totalRecords]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
     const base = imageCarousel.data;
@@ -71,7 +69,7 @@ const ImageCarousel = ({
                     <div className="checkbox">
                       <CheckButton name={img.subjectTypeName} id={img.uuid} onSelectImageCarousel={onSelectImageCarousel} flag="carousel" onSelectImage={function (): void {
                         throw new Error("Function not implemented.");
-                      }} checkedImage={checkedImage} />
+                      } } checkedImage={checkedImage} imageDetail={undefined} />
                     </div>
                     <div className="name-size">
                       <p>Subject Type: {img.subjectTypeName}</p>
