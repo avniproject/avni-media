@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Styles } from "react-modal";
 import Modal from "react-modal";
 interface prop{
   subject: any[];
@@ -9,8 +10,6 @@ interface prop{
 }
 const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) => {
   const [inputValue, setInputValue] = useState(`Date: ${date} \nsubjectType : ${subject}`);
-  console.log("date", date);
-  console.log("subject", subject);
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
@@ -18,7 +17,7 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) =
     onClose();
   };
 
-  const customStyles = {
+  const customStyles: Styles = {
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.75)",
     },
@@ -50,7 +49,7 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) =
       <form onSubmit={handleSubmit} className="w-full">
         <div className="flex flex-col mb-4">
           <label htmlFor="image-description" className="mb-1 font-bold">
-            Enter Image Description:
+            Edit Image Description:
           </label>
           <textarea
             id="image-description"
