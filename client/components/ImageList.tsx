@@ -223,7 +223,6 @@ export default function ImageList() {
 
   const handleApplyFilter = async () => {
     if (date && date.length > 0) {
-      console.log(date);
       setToDate(date[0]);
       setFromDate(date[1]);
     } else {
