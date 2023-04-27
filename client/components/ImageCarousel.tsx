@@ -33,7 +33,7 @@ const ImageCarousel = ({
           "AUTH-TOKEN": localStorage.getItem('authToken')
         }
       };
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=${totalRecords}`, options);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=10000`, options);
       setImageCarousel(response.data)
     }
     fetchImages()
