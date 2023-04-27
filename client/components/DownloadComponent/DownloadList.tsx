@@ -61,7 +61,7 @@ export default function Download() {
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {data.map((files: {
-                    image_description: ReactNode; image_count: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; created_date_time: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; status: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | null | undefined; zip_url: string | undefined; file_size: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; Status: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; 
+                    image_description: ReactNode; image_count: string | number | null | undefined; created_date_time: string | number | null | undefined; status: string | number | null | undefined; zip_url: string | undefined; file_size: string | number | null | undefined;  
 },index: Key | null | undefined) => (
                       <tr key={index} className="divide-x divide-gray-200">
                         <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
@@ -87,7 +87,7 @@ export default function Download() {
                             </span>
                           )}
                           <br />
-                          <span>{files.Status}</span>
+                          <span>{files.status}</span>
                         </td>
                       </tr>
                     )
