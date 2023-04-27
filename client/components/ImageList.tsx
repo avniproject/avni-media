@@ -96,7 +96,7 @@ export default function ImageList() {
       };
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
         options
       );
       setImageList(response.data);
@@ -272,7 +272,7 @@ export default function ImageList() {
         <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
             label="#Images per page "
-            min={0}
+            min={10}
             max={100}
             step={10}
             onChange={handleNumberChange}
