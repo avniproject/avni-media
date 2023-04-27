@@ -17,6 +17,8 @@ import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
 
 export default function ImageList() {
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
   const [orgID, setOrgID] = useState<string | string[] | undefined>();
@@ -78,7 +80,7 @@ export default function ImageList() {
   }
 
   useEffect(() => {
-    let authToken: string  = '';
+    let authToken: string = "";
     authToken = "" + localStorage.getItem("authToken");
     const decodedToken = jwt_decode(authToken) as DecodedToken;
     const userUUID = decodedToken["custom:userUUID"];
@@ -102,8 +104,6 @@ export default function ImageList() {
 
     fetchImages();
   }, [pagination, showPerpage]);
-
-
 
   const [carouselImage, setCarouselImage] = useState<{
     uuid: string;
@@ -153,10 +153,10 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-    
+
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
-      { username: userName, data: selectedImage, description:inputValue }
+      { username: userName, data: selectedImage, description: inputValue }
     );
   };
 
@@ -222,10 +222,43 @@ export default function ImageList() {
   };
 
   const handleApplyFilter = async () => {
-    console.log("this file is running ");
-   
-  };
+    if (date && date.length > 0) {
+      setToDate(date[0]);
+      setFromDate(date[1]);
+    } else {
+      setToDate(null);
+      setFromDate(null);
+    }
+    const body = Object.fromEntries(
+      Object.entries({
+        subjectTypeNames: subject,
+        programNames: program,
+        encounterTypeNames: encouter,
+        fromDate: fromDate,
+        toDate: toDate,
+      }).filter(([_, value]) => {
+        if (Array.isArray(value)) {
+          return value.length > 0;
+        } else {
+          return value !== null && value !== undefined && value !== "";
+        }
+      })
+    );
 
+    const options = {
+      headers: {
+        "AUTH-TOKEN": localStorage.getItem("authToken"),
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+      body,
+      options
+    );
+    setImageList(response.data);
+  };
   const handleNumberChange = (value: number) => {
     setShowperpage(value);
   };
@@ -247,7 +280,7 @@ export default function ImageList() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0 ml-8">
+      <dl className="grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0 ml-28">
         {locationFilter &&
           locationFilter.map(
             (
@@ -280,8 +313,8 @@ export default function ImageList() {
         />
         <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />
         <Program programType={programType} programFilter={programFilter} />
-        <Concepts concept={concept} />
-        <Accounts accountType={accountType} />
+        {/* <Concepts concept={concept} />
+        <Accounts accountType={accountType} /> */}
       </dl>
       <div className="bg-white">
         <div className="flex justify-center mt-10">
