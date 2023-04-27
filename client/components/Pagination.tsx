@@ -51,7 +51,7 @@ interface Props {
           Previous
         </button>
       </div>
-      {
+      {/* {
         new Array(Math.ceil(total / showperpage)).fill("").map((page, index) => (
           <div key={index} className="pagination" onClick={() => setCounter(index + 1)} >
             <a
@@ -62,7 +62,7 @@ interface Props {
             </a>
           </div>
         ))
-      }
+      } */}
       <div className="-mt-px w-0 flex-1 flex justify-start">
         <button
           onClick={() => onButtonclick("next")}
