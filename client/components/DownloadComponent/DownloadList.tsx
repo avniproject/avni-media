@@ -1,11 +1,7 @@
 import axios from "axios";
 import {
-  JSXElementConstructor,
   Key,
-  ReactElement,
-  ReactFragment,
   ReactNode,
-  ReactPortal,
   useEffect,
   useState,
 } from "react";
@@ -60,9 +56,18 @@ export default function Download() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {data.map((files: {
-                    image_description: ReactNode; image_count: string | number | null | undefined; created_date_time: string | number | null | undefined; status: string | number | null | undefined; zip_url: string | undefined; file_size: string | number | null | undefined;  
-},index: Key | null | undefined) => (
+                  {data.map(
+                    (
+                      files: {
+                        image_description: ReactNode;
+                        image_count: string | number | null | undefined;
+                        created_date_time: string | number | null | undefined;
+                        status: string | number | null | undefined;
+                        zip_url: string | undefined;
+                        file_size: string | number | null | undefined;
+                      },
+                      index: Key | null | undefined
+                    ) => (
                       <tr key={index} className="divide-x divide-gray-200">
                         <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
                           {files.image_count}

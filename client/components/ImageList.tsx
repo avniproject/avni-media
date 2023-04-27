@@ -80,7 +80,7 @@ export default function ImageList() {
   }
 
   useEffect(() => {
-    let authToken: string  = '';
+    let authToken: string = "";
     authToken = "" + localStorage.getItem("authToken");
     const decodedToken = jwt_decode(authToken) as DecodedToken;
     const userUUID = decodedToken["custom:userUUID"];
@@ -254,8 +254,9 @@ export default function ImageList() {
     };
 
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,body,options,
-     
+      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+      body,
+      options
     );
     setImageList(response.data);
   };
