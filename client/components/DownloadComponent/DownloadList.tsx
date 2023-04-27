@@ -1,5 +1,11 @@
 import axios from "axios";
 import {
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactFragment,
+  ReactNode,
+  ReactPortal,
   useEffect,
   useState,
 } from "react";
@@ -37,7 +43,7 @@ export default function Download() {
                       scope="col"
                       className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6"
                     >
-                      Size Of Download
+                      No. of Images
                     </th>
                     <th
                       scope="col"
@@ -54,13 +60,15 @@ export default function Download() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {data.map((files,index) => (
+                  {data.map((files: {
+                    image_description: ReactNode; image_count: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; created_date_time: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; status: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | null | undefined; zip_url: string | undefined; file_size: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; Status: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined; 
+},index: Key | null | undefined) => (
                       <tr key={index} className="divide-x divide-gray-200">
                         <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
                           {files.image_count}
                         </td>
                         <td className="whitespace-nowrap p-4 text-sm text-gray-500">
-                          {files.created_date_time}
+                          {files.image_description}
                         </td>
                         <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
                           {files.status === "Complete" ? (
