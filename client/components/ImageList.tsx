@@ -254,8 +254,7 @@ export default function ImageList() {
     };
 
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`, options,
-      body
+      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,body,options,
      
     );
     setImageList(response.data);
