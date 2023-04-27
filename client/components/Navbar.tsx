@@ -15,22 +15,17 @@ export default function Navbar() {
           <div className="relative flex justify-between h-16">
             <div className="flex items-center flex-shrink-0 text-white ml-8">
               <span className="text-xl tracking-tight">
-               Avni Media Viewer
+               Avni Web Console
               </span>
             </div>
-            <div className="flex-shrink-0 flex items-center ml-auto  mr-8">
-              <IconButton
-                onClick={() =>
-                  {
-                    const currentUrl = window.location.href;
-                    const newUrl = currentUrl.replace("avni-media", "/#/home");
-                    window.location.href = newUrl;
-                  }
-                }
-                aria-label="Home"
-                color="inherit">
-                <HomeIcon style={{ color: "white" }} />
-              </IconButton>
+            <div className="flex-shrink-0 flex items-center ml-auto  mr-32">
+              <Link href="/">
+                <img
+                  className="hidden lg:block h-8 w-auto"
+                  src="home.png"
+                  alt="home button"
+                />
+              </Link>
             </div>
           </div>
         </>
