@@ -62,10 +62,10 @@ export default function Program({ programType, programFilter }: Props) {
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "flex justify-between w-full px-4 py-2 text-sm"
                       )}
-                      onClick={() => handleOptionClick(option)}
+                      onClick={() => handleOptionClick(option.name)}
                     >
                       {option.name}
-                      {selectedOptions.includes(option) ? (
+                      {selectedOptions.includes(option.name) ? (
                         <CheckIcon
                           className="h-5 w-5 text-teal-500"
                           aria-hidden="true"
