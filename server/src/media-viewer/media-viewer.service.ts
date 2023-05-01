@@ -8,7 +8,7 @@ import axios from 'axios';
 import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
 import * as fs from 'fs';
-
+import * as fsrm from 'fs-extra';
 @Injectable()
 export class MediaViewerService {
   constructor(
@@ -25,11 +25,23 @@ export class MediaViewerService {
     const jsonData = JSON.stringify(data);
     const parsedData = JSON.parse(jsonData);
     const zip = new JSZip();
-
+    let folderName = '';
     for (const id in parsedData) {
       let imageCount = 0;
       for (let i = 0; i < parsedData[id].image_metadata.length; i++) {
         const imageUrl = parsedData[id].image_metadata[i].url;
+        const address = parsedData[id].image_metadata[i].address;
+        const conceptType = parsedData[id].image_metadata[i].conceptName;
+        const subjectType = parsedData[id].image_metadata[i].subjectTypeName;
+        const encounterType =
+          parsedData[id].image_metadata[i].encounterTypeName;
+        folderName = await this.folderStructure(
+          address,
+          subjectType,
+          encounterType,
+          conceptType,
+        );
+
         try {
           const splitOn =
             '.com/' + this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') + '/';
@@ -47,7 +59,9 @@ export class MediaViewerService {
 
           if (response.status === 200) {
             const filename = `image${[i]}.jpg`;
-            zip.file(filename, response.data, { binary: true });
+            zip
+              .folder(folderName)
+              .file(filename, response.data, { binary: true });
           }
           imageCount = imageCount + 1;
         } catch (error) {
@@ -82,6 +96,14 @@ export class MediaViewerService {
       await this.mediaRepository.update(record.id, updatedRecord);
 
       fs.unlinkSync(filePath);
+      try {
+        const folderSName = folderName.split('/');
+        const rmFolder = folderSName[0];
+        await fsrm.remove(rmFolder);
+        console.log(`Directory ${rmFolder} was deleted successfully.`);
+      } catch (err) {
+        console.error(`Error deleting directory ${folderName}: ${err}`);
+      }
     }
     return;
   }
@@ -156,5 +178,105 @@ export class MediaViewerService {
     }
 
     return `${size} ${unit}`;
+  }
+
+  async folderStructure(
+    address,
+    subjectType,
+    encounterType,
+    conceptType,
+  ): Promise<string> {
+    const jsonadd = JSON.parse(address);
+
+    const state = jsonadd.State;
+    const dist = jsonadd.District;
+    const taluka = jsonadd.Taluka;
+    const village = jsonadd.Village;
+    const dam = jsonadd.Dam;
+
+    let directoryPath = '';
+    if (state) {
+      directoryPath = `${state}`;
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (dist) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${dist}`;
+      } else {
+        directoryPath = `${dist}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (taluka) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${taluka}`;
+      } else {
+        directoryPath = `${taluka}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (village) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${village}`;
+      } else {
+        directoryPath = `${village}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (dam) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${dam}`;
+      } else {
+        directoryPath = `${dam}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (subjectType) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${subjectType}`;
+      } else {
+        directoryPath = `${subjectType}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+
+    if (encounterType) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${encounterType}`;
+      } else {
+        directoryPath = `${encounterType}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+    if (conceptType) {
+      if (directoryPath) {
+        directoryPath = `${directoryPath}/${conceptType}`;
+      } else {
+        directoryPath = `${conceptType}`;
+      }
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath);
+      }
+    }
+    return directoryPath;
   }
 }
