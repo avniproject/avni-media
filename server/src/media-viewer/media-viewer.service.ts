@@ -26,91 +26,99 @@ export class MediaViewerService {
     const parsedData = JSON.parse(jsonData);
     const zip = new JSZip();
     let folderName = '';
-    for (const id in parsedData) {
-      let imageCount = 0;
-      for (let i = 0; i < parsedData[id].image_metadata.length; i++) {
-        const imageUrl = parsedData[id].image_metadata[i].url;
-        const address = parsedData[id].image_metadata[i].address;
-        const conceptType = parsedData[id].image_metadata[i].conceptName;
-        const subjectType = parsedData[id].image_metadata[i].subjectTypeName;
-        const encounterType =
-          parsedData[id].image_metadata[i].encounterTypeName;
-        folderName = await this.folderStructure(
-          address,
-          subjectType,
-          encounterType,
-          conceptType,
+    await Promise.all(
+      Object.keys(parsedData).map(async (id) => {
+        let imageCount = 0;
+        await Promise.all(
+          parsedData[id].image_metadata.map(async (metadata, i) => {
+            const imageUrl = metadata.url;
+            const address = metadata.address;
+            const conceptType = metadata.conceptName;
+            const subjectType = metadata.subjectTypeName;
+            const encounterType = metadata.encounterTypeName;
+            folderName = await this.folderStructure(
+              address,
+              subjectType,
+              encounterType,
+              conceptType,
+            );
+      
+            try {
+              const splitOn =
+                '.com/' +
+                this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') +
+                '/';
+
+              const parts = imageUrl.split(splitOn);
+              const objectKey = parts[1];
+
+              const presignedURL = await this.s3Service.generatePresignedUrl(
+                objectKey,
+              );
+
+              const response = await axios.get(presignedURL, {
+                responseType: 'arraybuffer',
+              });
+
+              if (response.status === 200) {
+                const filename = `image${[i]}.jpg`;
+                zip
+                  .folder(folderName)
+                  .file(filename, response.data, { binary: true });
+              }
+              imageCount = imageCount + 1;
+            } catch (error) {
+              console.error(
+                `Error downloading image from ${imageUrl}: ${error}`,
+              );
+            }
+          }),
         );
 
+        const content = await zip.generateAsync({ type: 'nodebuffer' });
+        const timestamp = new Date().getTime();
+        const filename = `${parsedData[id].id}${timestamp}.zip`;
+        const filePath = __dirname + filename;
+        fs.writeFileSync(filePath, content);
+        const stats = fs.statSync(filePath);
+        const fileSizeInBytes = stats.size;
+
+        const fileSizeLabel = this.getFileSizeText(fileSizeInBytes);
+        const s3FileName = 'media-zipped-files/' + filename;
+
+        const zipFileS3url = await this.s3Service.uploadFileToS3(
+          filePath,
+          s3FileName,
+        );
+
+        const record = parsedData[id];
+        const updatedRecord = {
+          ...record,
+          status: 'Complete',
+          zip_url: zipFileS3url,
+          file_size: fileSizeLabel,
+          image_count: imageCount,
+        };
+        await this.mediaRepository.update(record.id, updatedRecord);
+
+        fs.unlinkSync(filePath);
         try {
-          const splitOn =
-            '.com/' + this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') + '/';
-
-          const parts = imageUrl.split(splitOn);
-          const objectKey = parts[1];
-
-          const presignedURL = await this.s3Service.generatePresignedUrl(
-            objectKey,
-          );
-
-          const response = await axios.get(presignedURL, {
-            responseType: 'arraybuffer',
-          });
-
-          if (response.status === 200) {
-            const filename = `image${[i]}.jpg`;
-            zip
-              .folder(folderName)
-              .file(filename, response.data, { binary: true });
-          }
-          imageCount = imageCount + 1;
-        } catch (error) {
-          console.error(`Error downloading image from ${imageUrl}: ${error}`);
+          const folderSName = folderName.split('/');
+          const rmFolder = folderSName[0];
+          await fsrm.remove(rmFolder);
+          console.log(`Directory ${rmFolder} was deleted successfully.`);
+        } catch (err) {
+          console.error(`Error deleting directory ${folderName}: ${err}`);
         }
-      }
+      }),
+    );
 
-      const content = await zip.generateAsync({ type: 'nodebuffer' });
-      const timestamp = new Date().getTime();
-      const filename = `${parsedData[id].id}${timestamp}.zip`;
-      const filePath = __dirname + filename;
-      fs.writeFileSync(filePath, content);
-      const stats = fs.statSync(filePath);
-      const fileSizeInBytes = stats.size;
-
-      const fileSizeLabel = this.getFileSizeText(fileSizeInBytes);
-      const s3FileName = 'media-zipped-files/' + filename;
-
-      const zipFileS3url = await this.s3Service.uploadFileToS3(
-        filePath,
-        s3FileName,
-      );
-
-      const record = parsedData[id];
-      const updatedRecord = {
-        ...record,
-        status: 'Complete',
-        zip_url: zipFileS3url,
-        file_size: fileSizeLabel,
-        image_count: imageCount,
-      };
-      await this.mediaRepository.update(record.id, updatedRecord);
-
-      fs.unlinkSync(filePath);
-      try {
-        const folderSName = folderName.split('/');
-        const rmFolder = folderSName[0];
-        await fsrm.remove(rmFolder);
-        console.log(`Directory ${rmFolder} was deleted successfully.`);
-      } catch (err) {
-        console.error(`Error deleting directory ${folderName}: ${err}`);
-      }
-    }
     return;
   }
 
   async saveMediaData(mediaData: any): Promise<DownloadJobs> {
     const { username, data, description } = mediaData;
-   
+
     if (!username || typeof username !== 'string' || !data) {
       throw new Error('Invalid media data');
     }
@@ -188,63 +196,28 @@ export class MediaViewerService {
   ): Promise<string> {
     const jsonadd = JSON.parse(address);
 
-    const state = jsonadd.State;
-    const dist = jsonadd.District;
-    const taluka = jsonadd.Taluka;
-    const village = jsonadd.Village;
-    const dam = jsonadd.Dam;
-
+  
     let directoryPath = '';
-    if (state) {
-      directoryPath = `${state}`;
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
 
-    if (dist) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${dist}`;
-      } else {
-        directoryPath = `${dist}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
+    const addressArray = Object.values(jsonadd).slice(0, 6);
+    const filteredArray = addressArray.filter(
+      (element) => typeof element === 'string',
+    );
 
-    if (taluka) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${taluka}`;
-      } else {
-        directoryPath = `${taluka}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
-
-    if (village) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${village}`;
-      } else {
-        directoryPath = `${village}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
-
-    if (dam) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${dam}`;
-      } else {
-        directoryPath = `${dam}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
+    await Promise.all(
+      filteredArray.map(async (addressPart) => {
+        if (addressPart) {
+          if (directoryPath) {
+            directoryPath = `${directoryPath}/${addressPart}`;
+          } else {
+            directoryPath = `${addressPart}`;
+          }
+          if (!fs.existsSync(directoryPath)) {
+            fs.mkdirSync(directoryPath);
+          }
+        }
+      }),
+    );
 
     if (subjectType) {
       if (directoryPath) {
@@ -267,6 +240,7 @@ export class MediaViewerService {
         fs.mkdirSync(directoryPath);
       }
     }
+
     if (conceptType) {
       if (directoryPath) {
         directoryPath = `${directoryPath}/${conceptType}`;
@@ -277,6 +251,7 @@ export class MediaViewerService {
         fs.mkdirSync(directoryPath);
       }
     }
+
     return directoryPath;
   }
 }
