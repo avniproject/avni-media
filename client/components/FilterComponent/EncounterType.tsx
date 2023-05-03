@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
+
 interface Option {
   id: number;
   name: string;
@@ -11,6 +12,7 @@ interface Prop {
   encounterType: (data: any[]) => void;
   encounterFilter: any[];
 }
+
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -22,7 +24,8 @@ export default function EncounterType({
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   useEffect(() => {
     encounterType(selectedOptions);
-  }, [encounterType, Option]);
+  }, [encounterType, selectedOptions]);
+  
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option));
@@ -37,7 +40,7 @@ export default function EncounterType({
       className="relative inline-block text-left -ml-4 pr-6 mt-5 z-10"
     >
       <div>
-        <Menu.Button className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+        <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
           <span>
             {selectedOptions.length > 0
               ? selectedOptions.length + " selected"

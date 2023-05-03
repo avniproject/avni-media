@@ -1,17 +1,17 @@
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
+import { Carousel } from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 interface Props {
-  imageList: object[]
-  totalRecords: any
-  carouselImage: any
+  imageList: object[];
+  totalRecords: any;
+  carouselImage: any;
   onClose: () => void;
-  onSelectImage: (value: string, checked: boolean) => void,
-  checkedImage: string[],
-  setCheckedImage: string[],
+  onSelectImage: (value: string, checked: boolean) => void;
+  checkedImage: string[];
+  setCheckedImage: string[];
 }
 
 const ImageCarousel = ({
@@ -22,27 +22,33 @@ const ImageCarousel = ({
   onSelectImage,
   checkedImage,
 }: Props) => {
-  const ci = carouselImage as never
+  const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
-  const [imageCarousel, setImageCarousel] = useState({ total: 0, page: 0, data: [] });
+  const [imageCarousel, setImageCarousel] = useState({
+    total: 0,
+    page: 0,
+    data: [],
+  });
 
   useEffect(() => {
     const fetchImages = async () => {
       const options = {
         headers: {
-          "AUTH-TOKEN": localStorage.getItem('authToken')
-        }
+          "AUTH-TOKEN": localStorage.getItem("authToken"),
+        },
       };
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=10000`, options);
-      setImageCarousel(response.data)
-    }
-    fetchImages()
-
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=10000`,
+        options
+      );
+      setImageCarousel(response.data);
+    };
+    fetchImages();
   }, [totalRecords]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
     const base = imageCarousel.data;
-    const selectedImageDetails = base.filter(obj => obj.uuid === value)[0];
+    const selectedImageDetails = base.filter((obj) => obj.uuid === value)[0];
     onSelectImage(value, checked, selectedImageDetails);
   };
 
@@ -141,6 +147,7 @@ const ImageCarousel = ({
                             <span>Download</span>
                           </button>
                         </a>
+
                       </div>
                     </div>
                   )
@@ -152,6 +159,6 @@ const ImageCarousel = ({
       </div>
     </>
   );
-}
+};
 
 export default ImageCarousel;
