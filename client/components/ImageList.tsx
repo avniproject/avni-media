@@ -15,6 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
+import{ArrowDownOutlined} from '@ant-design/icons';
 
 export default function ImageList() {
   const [fromDate, setFromDate] = useState(null);
@@ -394,6 +395,9 @@ export default function ImageList() {
                         throw new Error("Function not implemented.");
                       }}
                     />
+                    <a href={image.signedUrl}>
+                      <ArrowDownOutlined/>
+                    </a>
                   </div>
                 </div>
               )
