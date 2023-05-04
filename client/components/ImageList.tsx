@@ -282,7 +282,7 @@ export default function ImageList() {
         </span>
         <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
-            label="#Images per page "
+            label="Images per page "
             min={10}
             max={100}
             step={10}
