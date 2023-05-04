@@ -55,10 +55,9 @@ export default function LocationHierarchy({
   minLevel,
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [optionSelecte, setOptionSelect] = useState<any>()
+  const [optionSelected, setOptionSelected] = useState<any>()
   const [secondTypeName, setSecondTypeName] = useState<any>()
   const [selectLevelName, setSelectLevelName] = useState(null)
-  const [selectUUID, setSelectUUID] = useState<any[]>([]);
   const [secondLevel, setSecondLevel] = useState<any>([]);
   
   const [parentId, setParentId] = useState<Option | null>(null);
@@ -66,7 +65,7 @@ export default function LocationHierarchy({
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
 
   function handleOptionSelect(option: Option) {
-    setOptionSelect(option)
+    setOptionSelected(option)
     if (selectedOption.includes(option.id)) {
       setSelectedOption(selectedOption.filter((o) => o !== option.id));
     } else {
@@ -75,38 +74,18 @@ export default function LocationHierarchy({
   }
 
   useEffect(() => {
-    if (optionSelecte !== undefined) {
-      setSelectLevelName(optionSelecte.typeString)
+    if (optionSelected !== undefined) {
+      setSelectLevelName(optionSelected.typeString)
     } else {
       setSelectLevelName(null)
     }
-    if (optionSelecte !== undefined && selectLevelName !== null) {
+    if (optionSelected !== undefined && selectLevelName !== null) {
    getTopLevel(selectedOption,selectLevelName)}
 
-  }, [optionSelecte,selectedOptions,selectedOption,selectLevelName])
+  }, [optionSelected,selectedOptions,selectedOption,selectLevelName])
   
   
-  // function handleLvelName(option: Option){
-  //   if(selectedOption.length>0){
-  //     console.log(option)
-  //     setSelectLevelName(option.typeString)
-  //   }
-  //   else{
-  //     setSelectLevelName(null)
-  //   }
-  //   // if(selectLevelName.includes(option)){
-  //   //   setSelectLevelName(selectLevelName.filter((o)=>o !== option));
-  //   // }
-  //   // else{
-  //   //   setSelectLevelName([...selectLevelName, option]);
-  //   // }
-  // }
-
-
-  // useEffect(() => {
-  //   localStorage.setItem("selectedOption", JSON.stringify(selectedOption));
-  // }, [selectedOption]);
-
+ 
   useEffect(() => {
     if (locationIndex.level === maxLevel - 1) {
       const secondLevelTypeId = locationIndex.id;
@@ -116,17 +95,17 @@ export default function LocationHierarchy({
       const typeId = locationIndex.id;
 
       if (locationIndex.level === maxLevel) {
-        // const response = await axios.get(
-        //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
-        // );
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
+        );
 
-        // console.log(
-        //   "Response data for top level ",
-        //   response.data,
-        //   "Response",
-        //   response
-        // );
-        // console.log("index", locationIndex);
+        console.log(
+          "Response data for top level ",
+          response.data,
+          "Response",
+          response
+        );
+        console.log("index", locationIndex);
         const jsonDataState =
         {
           content: [
@@ -184,15 +163,10 @@ export default function LocationHierarchy({
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
         if ( secondLevelTypeIdString !== null) {
-         
-          // const parsedOption = JSON.parse(savedSelectedOption);
           try {
-           
-              // console.log("saveed option",savedSelectedOption)
-              // setParentId(parsedOption.id);
               const secondLevelTypeId = parseInt(secondLevelTypeIdString);
               // const response = await axios.get(
-              //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+              //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
               // );
 
               const distJsonData = 
@@ -253,7 +227,7 @@ export default function LocationHierarchy({
                          
           } catch (Error) {
             console.log(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         }
@@ -263,22 +237,23 @@ export default function LocationHierarchy({
 
         try {
           if (selectedOptions.length > 0) {
-            // const response = await axios.get(
-            //   `${
-            //     process.env.NEXT_PUBLIC_TOP_ADDRESS
-            //   }?parentId=${selectedOptions}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            // );
+            console.log("multiple selected options ")
+            const response = await axios.get(
+              `${
+                process.env.NEXT_PUBLIC_TOP_ADDRESS
+              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
 
-            // const distJsonData = response.data;
-            // console.log("Response data for multiselec", distJsonData);
-            // const distData = distJsonData.content;
-            // console.log("dist data", distData);
-            // setSecondLevel(distData);
-            // getOtherLocation(secondLevel)
+            const distJsonData = response.data;
+            console.log("Response data for multiselec", distJsonData);
+            const distData = distJsonData.content;
+            console.log("dist data", distData);
+            setSecondLevel(distData);
+            getOtherLocation(secondLevel)
             console.log(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId${selectedOptions}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         } catch (Error) {
@@ -313,22 +288,11 @@ export default function LocationHierarchy({
   
   useEffect(()=>{
     if(selectedOptions !== undefined && secondTypeName !== undefined){
-      console.log("data pass here ")
       getSecondLevel(selectedOptions, secondTypeName.typeString)
     }
   },[selectedOptions, secondTypeName])
 
-  // function onclickData(option: Option) {
-  //   if (selectUUID.includes(option)) {
-  //     setSelectUUID(selectUUID.filter((o) => o !== option));
-  //   } else {
-  //     setSelectUUID([...selectUUID, option]);
-  //   }
-  // }
-  // useEffect(()=>{
-  //   getTopLevel(selectedOptions)
-  //   getSecondLevel(selectedOptions)
-  // },[selectedOptions])
+ 
 
   return (
     <>
@@ -456,7 +420,7 @@ export default function LocationHierarchy({
                           }}
                         >
                           {option.title}
-                          {selectedOptions.includes(option) ? (
+                          {selectedOptions.includes(option.id) ? (
                             <CheckIcon
                               className="h-5 w-5 text-teal-500"
                               aria-hidden="true"

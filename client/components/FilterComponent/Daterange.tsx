@@ -18,7 +18,7 @@ const DateRangeComp = ({ dateRange }: Props) => {
 
   useEffect(() => {
     dateRange(date);
-  }, [dateRange, date]);
+  }, [date]);
 
   return (
     <>

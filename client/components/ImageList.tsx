@@ -15,10 +15,10 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
-import{ArrowDownOutlined} from '@ant-design/icons';
 
 
 export default function ImageList() {
+  const [add, setAdd]= useState<any>([])
   const[address ,setAddress] = useState<any>([])
   const[secondAddress, setSecondAddress] = useState<any>([])
   const [selectedParentId,setSelectedParentId] = useState<any>([])
@@ -52,85 +52,10 @@ export default function ImageList() {
 
   useEffect(() => {
     const filterData = async () => {
-      // const filterResponse = await axios.get(
-      //   `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      // );
-
-
-      const jsonData = {
-        "formMappings": [
-          {
-            "uuid": "a3e13dc2-4b29-4788-92f9-f313d6d9c518",
-            "id": 16616,
-            "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a",
-            "subjectTypeUUID": "095244bf-600a-4872-8553-cc8c8a974c4b",
-            "formType": "IndividualProfile",
-            "formName": "Album Registration",
-            "enableApproval": false
-          }
-        ],
-        "addressLevelTypes": [
-          {
-            "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
-            "id": 741,
-            "name": "Dist",
-            "level": 1,
-            "parent": {
-              "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
-            }
-          }
-        ],
-        "customRegistrationLocations": [],
-        "encounterTypes": [],
-        "allAddressLevels": [
-          {
-            "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
-            "id": 741,
-            "name": "Dist",
-            "level": 1,
-            "parent": {
-              "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
-            }
-          },
-          {
-            "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
-            "id": 725,
-            "name": "State",
-            "level": 2
-          }
-        ],
-        "programs": [],
-        "taskTypes": [],
-        "relations": [],
-        "subjectTypes": [
-          {
-            "uuid": "095244bf-600a-4872-8553-cc8c8a974c4b",
-            "operationalSubjectTypeName": "Album",
-            "groupRoles": [],
-            "allowEmptyLocation": false,
-            "validFirstNameFormat": null,
-            "validLastNameFormat": null,
-            "iconFileS3Key": null,
-            "nameHelpText": "abc",
-            "memberSubjectUUIDs": "",
-            "validMiddleNameFormat": null,
-            "allowMiddleName": false,
-            "group": false,
-            "allowProfilePicture": false,
-            "name": "Album",
-            "id": 698,
-            "type": "Individual"
-          }
-        ],
-        "forms": [
-          {
-            "formType": "IndividualProfile",
-            "formName": "Album Registration",
-            "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a"
-          }
-        ]
-      }
-
+      const filterResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
+      );
+      const jsonData =  filterResponse.data
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const subjects = jsonData.subjectTypes;
@@ -156,8 +81,8 @@ export default function ImageList() {
         setLocation(sortedData);
       }
 
-      setSubjectFilter(sub);
-      setSubjectFilter(sub);
+    
+      setSubjectFilter(subjects);
       setProgramFilter(programs);
       setEncounterFilter(encounters);
     };
@@ -169,13 +94,13 @@ export default function ImageList() {
     "custom:userUUID": string;
   }
 
-  // useEffect(() => {
-  //   let authToken: string = "";
-  //   authToken = "" + localStorage.getItem("authToken");
-  //   const decodedToken = jwt_decode(authToken) as DecodedToken;
-  //   const userUUID = decodedToken["custom:userUUID"];
-  //   setUserName(userUUID);
-  // }, []);
+  useEffect(() => {
+    let authToken: string = "";
+    authToken = "" + localStorage.getItem("authToken");
+    const decodedToken = jwt_decode(authToken) as DecodedToken;
+    const userUUID = decodedToken["custom:userUUID"];
+    setUserName(userUUID);
+  }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -185,11 +110,11 @@ export default function ImageList() {
         },
       };
 
-      // const response = await axios.get(
-      //   `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
-      //   options
-      // );
-      // setImageList(response.data);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
+        options
+      );
+      setImageList(response.data);
     };
 
     fetchImages();
@@ -299,32 +224,56 @@ export default function ImageList() {
 
 
   const getTopLevel = (data: any[],levelname: string) => {
-   
+
     setSelectedParentId(data)
+    if(data.length>0 && levelname !== null){
+    
     setAddress([{
       "addressLevelType":levelname,
       "addressLevelIds":data
     }])
+  }
+  else{
+ 
+    setAddress([])
+  }
   };
  
   const getSecondLevel = (data: any[],levelname: string) => {
-  setSecondAddress([{
-    "addressLevelType": levelname,
-    "addressLevelIds":data
-  }])
+  if(data.length>0 && levelname!= undefined){
+
+    setSecondAddress([{
+      "addressLevelType": levelname,
+      "addressLevelIds":data
+    }])
+  }
+  else{
+  
+    setSecondAddress([])
+  }
+ 
   };
-
-
 
   const subjectType = (data: any[]) => {
     setSubjectType(data);
   };
 
+useEffect(() => {
+
+  if (address.length > 0 || secondAddress.length > 0) {
+    setAdd([...address, ...secondAddress]);
+  }
+  else{
+    setAdd([])
+  }
+}, [address, secondAddress]);
+
  useEffect(()=>{
   const fitersData = async () => {
+
     if (date && date.length > 0) {
-      setToDate(date[0]);
-      setFromDate(date[1]);
+      setToDate(date[1]);
+      setFromDate(date[0]);
     } else {
       setToDate(null);
       setFromDate(null);
@@ -336,7 +285,7 @@ export default function ImageList() {
         encounterTypeNames: encouter,
         fromDate: fromDate,
         toDate: toDate,
-        addresses: [...address, ...secondAddress],
+        addresses: add,
       }).filter(([_, value]) => {
         if (Array.isArray(value)) {
           return value.length > 0;
@@ -348,7 +297,8 @@ export default function ImageList() {
    setDataBody(body)
   }
   fitersData()
- },[date, subject, encouter, program]);
+ },[date, subject, encouter, program, toDate, fromDate, add]);
+
 
 
   const handleApplyFilter = async () => {
@@ -360,14 +310,12 @@ export default function ImageList() {
     };
 
 
-    // const response = await axios.post(
-    //   `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
-    //   body,
-    //   options
-    // );
-    // setImageList(response.data);
-  
-
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+      dataBody,
+      options
+    );
+    setImageList(response.data);
   };
   const handleNumberChange = (value: number) => {
     setShowperpage(value);
@@ -492,14 +440,14 @@ export default function ImageList() {
                       onSelectImage={onSelectImage}
                       checkedImage={checkedImage}
                       imageDetail={image}
+                      image_url = {image.signedUrl}
                       flag="list"
                       onSelectImageCarousel={function (): void {
                         throw new Error("Function not implemented.");
                       }}
                     />
-                    <a href={image.signedUrl}>
-                      <ArrowDownOutlined/>
-                    </a>
+                    
+                   
                   </div>
                 </div>
               )
