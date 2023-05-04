@@ -94,13 +94,13 @@ export default function ImageList() {
     "custom:userUUID": string;
   }
 
-  // useEffect(() => {
-  //   let authToken: string = "";
-  //   authToken = "" + localStorage.getItem("authToken");
-  //   const decodedToken = jwt_decode(authToken) as DecodedToken;
-  //   const userUUID = decodedToken["custom:userUUID"];
-  //   setUserName(userUUID);
-  // }, []);
+  useEffect(() => {
+    let authToken: string = "";
+    authToken = "" + localStorage.getItem("authToken");
+    const decodedToken = jwt_decode(authToken) as DecodedToken;
+    const userUUID = decodedToken["custom:userUUID"];
+    setUserName(userUUID);
+  }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -339,8 +339,6 @@ useEffect(() => {
       </div>
 
       <div className="flex justify-center mx-auto w-center mr-4 ml-4">
-
-
         {locationFilter &&
           locationFilter.map(
             (
@@ -355,7 +353,7 @@ useEffect(() => {
                 key={index}
                 locationIndex={locationIndex}
                 index={index}
-                selectedParentId = {selectedParentId}
+                selectedParentId={selectedParentId}
                 minLevel={minLevel}
                 maxLevel={maxLevel}
                 getLocation={getLocation}
@@ -364,24 +362,31 @@ useEffect(() => {
                 otherLocation={otherLocation}
                 getTopLevel={getTopLevel}
                 getSecondLevel={getSecondLevel}
-                getSelectedLocation ={getSelectedLocation}
+                getSelectedLocation={getSelectedLocation}
               />
             )
           )}
         <Daterange dateRange={dateRange} />
-       {encounterFilter &&( <EncounterType
-          encounterType={encounterType}
-          encounterFilter={encounterFilter}
-        />)}
-       {subjectFilter &&( 
-       <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />)}
+        {encounterFilter && (
+          <EncounterType
+            encounterType={encounterType}
+            encounterFilter={encounterFilter}
+          />
+        )}
+        {subjectFilter && (
+          <SubjectType
+            subjectType={subjectType}
+            subjectFilter={subjectFilter}
+          />
+        )}
 
-        {programFilter &&(
-        <Program programType={programType} programFilter={programFilter} />)}
+        {programFilter && (
+          <Program programType={programType} programFilter={programFilter} />
+        )}
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
       </div>
-  
+
       <div className="bg-white">
         <div className="flex justify-center mt-10">
           {showModal && (
@@ -441,14 +446,12 @@ useEffect(() => {
                       onSelectImage={onSelectImage}
                       checkedImage={checkedImage}
                       imageDetail={image}
-                      image_url = {image.signedUrl}
+                      image_url={image.signedUrl}
                       flag="list"
                       onSelectImageCarousel={function (): void {
                         throw new Error("Function not implemented.");
                       }}
                     />
-                    
-                   
                   </div>
                 </div>
               )
