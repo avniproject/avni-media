@@ -40,13 +40,13 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="comments" className="font-medium text-gray-700">
-            {name}{"  "} 
-            <a href={image_url}>
-                    <DownloadOutlined />
-                    </a>
+            {name}
           </label>
+          <a href={image_url} className="text-right">
+            <DownloadOutlined />
+          </a>
         </div>
       </div>
     </fieldset>
-  )
+  );
 }
