@@ -106,119 +106,21 @@ export default function LocationHierarchy({
           response
         );
         console.log("index", locationIndex);
-        const jsonDataState =
-        {
-          content: [
-            {
-              uuid: "c155bfca-b718-484b-b4fc-e84844edcd15",
-              titleLineage: "MH",
-              level: 2.0,
-              typeId: 725,
-              parentId: null,
-              lineage: "182370",
-              title: "MH",
-              id: 182370,
-              typeString: "State",
-            },
-            {
-              uuid: "63cbfbc4-41e8-4952-b2bc-090056ebe7d4",
-              titleLineage: "RJ",
-              level: 2.0,
-              typeId: 725,
-              parentId: null,
-              lineage: "182387",
-              title: "RJ",
-              id: 182387,
-              typeString: "State",
-            },
-          ],
-          pageable: {
-            sort: {
-              unsorted: false,
-              sorted: true,
-            },
-            pageNumber: 0,
-            pageSize: 1000,
-            offset: 0,
-            unpaged: false,
-            paged: true,
-          },
-          last: true,
-          totalElements: 2,
-          totalPages: 1,
-          first: true,
-          sort: {
-            unsorted: false,
-            sorted: true,
-          },
-          numberOfElements: 2,
-          size: 1000,
-          number: 0,
-        };
+        const jsonDataState =response.data
 
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-        // const savedSelectedOption = localStorage.getItem("selectedOption");
         
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
         if ( secondLevelTypeIdString !== null) {
           try {
               const secondLevelTypeId = parseInt(secondLevelTypeIdString);
-              // const response = await axios.get(
-              //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
-              // );
+              const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+              );
 
-              const distJsonData = 
-                      {
-                content: [
-                  {
-                    uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
-                    titleLineage: "MH, Mumbai",
-                    level: 1.0,
-                    typeId: 741,
-                    parentId: 182370,
-                    lineage: "182370.182386",
-                    title: "Mumbai",
-                    id: 182386,
-                    typeString: "Dist",
-                  },
-                  {
-                    uuid: "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
-                    titleLineage: "MH, Nagpur",
-                    level: 1.0,
-                    typeId: 741,
-                    parentId: 182370,
-                    lineage: "182370.182388",
-                    title: "Nagpur",
-                    id: 182388,
-                    typeString: "Dist", 
-                  },
-                ],
-                pageable: {
-                  sort: {
-                    unsorted: false,
-                    sorted: true,
-                  },
-                  pageNumber: 0,
-                  pageSize: 1000,
-                  offset: 0,
-                  unpaged: false,
-                  paged: true,
-                },
-                last: true,
-                totalElements: 2,
-                totalPages: 1,
-                first: true,
-                sort: {
-                  unsorted: false,
-                  sorted: true,
-                },
-                numberOfElements: 2,
-                size: 1000,
-                number: 0,
-              };
-              
+              const distJsonData = response.data
               const distData = distJsonData.content;
         
             
@@ -237,7 +139,6 @@ export default function LocationHierarchy({
 
         try {
           if (selectedOptions.length > 0) {
-            console.log("multiple selected options ")
             const response = await axios.get(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
@@ -245,9 +146,9 @@ export default function LocationHierarchy({
             );
 
             const distJsonData = response.data;
-            console.log("Response data for multiselec", distJsonData);
+           
             const distData = distJsonData.content;
-            console.log("dist data", distData);
+           
             setSecondLevel(distData);
             getOtherLocation(secondLevel)
             console.log(
@@ -291,8 +192,6 @@ export default function LocationHierarchy({
       getSecondLevel(selectedOptions, secondTypeName.typeString)
     }
   },[selectedOptions, secondTypeName])
-
- 
 
   return (
     <>
