@@ -1,4 +1,4 @@
-import { Fragment, Key, useEffect, useState } from "react";
+import { Fragment, Key, SetStateAction, use, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
@@ -6,6 +6,7 @@ import axios from "axios";
 
 interface Option {
   uuid: any;
+  parentId: any;
   id: any;
   name: string;
   title: string;
@@ -20,10 +21,12 @@ interface Prop {
   index: Key;
   minLevel: number;
   maxLevel: number;
+  selectedParentId : any[];
   getLocation:(data : any[])=>void;
   getOtherLocation:(data : any[])=>void;
-  getTopLevel:(data : any[])=>void;
-  getSecondLevel:(data : any[])=>void;
+  getTopLevel:(data : any[],levelname: string)=>void;
+  getSecondLevel:(data : any[],levelType: string )=>void;
+  getSelectedLocation: (data: any[])=>void
   loction: any[];
   otherLocation:any[];
 }
@@ -41,34 +44,48 @@ export default function LocationHierarchy({
   locationIndex,
   index,
   loction,
+  selectedParentId,
   getLocation,
   getOtherLocation,
   getTopLevel,
+  getSelectedLocation,
   getSecondLevel,
   maxLevel,
   otherLocation,
   minLevel,
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [selectUUID, setSelectUUID] = useState<any[]>([]);
+  const [optionSelected, setOptionSelected] = useState<any>()
+  const [secondTypeName, setSecondTypeName] = useState<any>()
+  const [selectLevelName, setSelectLevelName] = useState(null)
   const [secondLevel, setSecondLevel] = useState<any>([]);
   
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
-  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+  const [selectedOption, setSelectedOption] = useState<Option[]>([]);
 
   function handleOptionSelect(option: Option) {
-    if (selectedOption?.id === option.id) {
-      setSelectedOption(null);
+    setOptionSelected(option)
+    if (selectedOption.includes(option.id)) {
+      setSelectedOption(selectedOption.filter((o) => o !== option.id));
     } else {
-      setSelectedOption(option);
+      setSelectedOption([...selectedOption, option.id]);
     }
   }
 
   useEffect(() => {
-    localStorage.setItem("selectedOption", JSON.stringify(selectedOption));
-  }, [selectedOption]);
+    if (optionSelected !== undefined) {
+      setSelectLevelName(optionSelected.typeString)
+    } else {
+      setSelectLevelName(null)
+    }
+    if (optionSelected !== undefined && selectLevelName !== null) {
+   getTopLevel(selectedOption,selectLevelName)}
 
+  }, [optionSelected,selectedOptions,selectedOption,selectLevelName])
+  
+  
+ 
   useEffect(() => {
     if (locationIndex.level === maxLevel - 1) {
       const secondLevelTypeId = locationIndex.id;
@@ -89,160 +106,55 @@ export default function LocationHierarchy({
           response
         );
         console.log("index", locationIndex);
-        const jsonDataState = response.data
-        // {
-        //   content: [
-        //     {
-        //       uuid: "c155bfca-b718-484b-b4fc-e84844edcd15",
-        //       titleLineage: "MH",
-        //       level: 2.0,
-        //       typeId: 725,
-        //       parentId: null,
-        //       lineage: "182370",
-        //       title: "MH",
-        //       id: 182370,
-        //       typeString: "State",
-        //     },
-        //     {
-        //       uuid: "63cbfbc4-41e8-4952-b2bc-090056ebe7d4",
-        //       titleLineage: "RJ",
-        //       level: 2.0,
-        //       typeId: 725,
-        //       parentId: null,
-        //       lineage: "182387",
-        //       title: "RJ",
-        //       id: 182387,
-        //       typeString: "State",
-        //     },
-        //   ],
-        //   pageable: {
-        //     sort: {
-        //       unsorted: false,
-        //       sorted: true,
-        //     },
-        //     pageNumber: 0,
-        //     pageSize: 1000,
-        //     offset: 0,
-        //     unpaged: false,
-        //     paged: true,
-        //   },
-        //   last: true,
-        //   totalElements: 2,
-        //   totalPages: 1,
-        //   first: true,
-        //   sort: {
-        //     unsorted: false,
-        //     sorted: true,
-        //   },
-        //   numberOfElements: 2,
-        //   size: 1000,
-        //   number: 0,
-        // };
+        const jsonDataState =response.data
 
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-        const savedSelectedOption = localStorage.getItem("selectedOption");
-
+        
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
-        if (savedSelectedOption !== null && secondLevelTypeIdString !== null) {
-          const parsedOption = JSON.parse(savedSelectedOption);
+        if ( secondLevelTypeIdString !== null) {
           try {
-            if (parsedOption && parsedOption.id !== undefined) {
-              setParentId(parsedOption.id);
               const secondLevelTypeId = parseInt(secondLevelTypeIdString);
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
               );
 
-              const distJsonData = response.data;
-              //         {
-              //   content: [
-              //     {
-              //       uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
-              //       titleLineage: "MH, Mumbai",
-              //       level: 1.0,
-              //       typeId: 741,
-              //       parentId: 182370,
-              //       lineage: "182370.182386",
-              //       title: "Mumbai",
-              //       id: 182386,
-              //       typeString: "Dist",
-              //     },
-              //     {
-              //       uuid: "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
-              //       titleLineage: "MH, Nagpur",
-              //       level: 1.0,
-              //       typeId: 741,
-              //       parentId: 182370,
-              //       lineage: "182370.182388",
-              //       title: "Nagpur",
-              //       id: 182388,
-              //       typeString: "Dist",
-              //     },
-              //   ],
-              //   pageable: {
-              //     sort: {
-              //       unsorted: false,
-              //       sorted: true,
-              //     },
-              //     pageNumber: 0,
-              //     pageSize: 1000,
-              //     offset: 0,
-              //     unpaged: false,
-              //     paged: true,
-              //   },
-              //   last: true,
-              //   totalElements: 2,
-              //   totalPages: 1,
-              //   first: true,
-              //   sort: {
-              //     unsorted: false,
-              //     sorted: true,
-              //   },
-              //   numberOfElements: 2,
-              //   size: 1000,
-              //   number: 0,
-              // };
-              console.log("Response Data for other level", distJsonData);
+              const distJsonData = response.data
               const distData = distJsonData.content;
         
-             console.log("distdata---->",distData)
+            
              
                 getLocation(distData)
-                         }
+                         
           } catch (Error) {
             console.log(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parsedOption.id}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         }
       } else {
         const typeId = locationIndex.id;
 
-        const parentIds =
-          selectedOptions.length >= 1 ? selectedOptions.join(",") : parentId;
 
         try {
           if (selectedOptions.length > 0) {
             const response = await axios.get(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId${selectedOptions}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
 
             const distJsonData = response.data;
-            console.log("Response data for multiselec", distJsonData);
+           
             const distData = distJsonData.content;
-            console.log("dist data", distData);
+           
             setSecondLevel(distData);
             getOtherLocation(secondLevel)
             console.log(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${selectedOptions.join(
-                ","
-              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         } catch (Error) {
@@ -267,23 +179,19 @@ export default function LocationHierarchy({
   ]);
 
   function handleOptionClick(option: Option) {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+    setSecondTypeName(option)
+    if (selectedOptions.includes(option.id)) {
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.id));
     } else {
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.id]);
     }
   }
-  function onclickData(option: Option) {
-    if (selectUUID.includes(option)) {
-      setSelectUUID(selectUUID.filter((o) => o !== option));
-    } else {
-      setSelectUUID([...selectUUID, option]);
-    }
-  }
+  
   useEffect(()=>{
-    getTopLevel(selectedOptions)
-    getSecondLevel(selectedOptions)
-  },[selectedOptions])
+    if(selectedOptions !== undefined && secondTypeName !== undefined){
+      getSecondLevel(selectedOptions, secondTypeName.typeString)
+    }
+  },[selectedOptions, secondTypeName])
 
   return (
     <>
@@ -295,8 +203,8 @@ export default function LocationHierarchy({
           {maxLevel === locationIndex.level ? (
             <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
               <span>
-                {selectedOptions.length > 0
-                  ? selectedOption?.name
+                {selectedOption.length > 0
+                  ? selectedOption.length+" selected"
                   : locationIndex.name}
               </span>
               <ChevronDownIcon
@@ -342,10 +250,11 @@ export default function LocationHierarchy({
                               : "text-gray-700",
                             "flex justify-between w-full px-4 py-2 text-sm"
                           )}
-                          onClick={() => handleOptionSelect(option)}
+                          onClick={() => {handleOptionSelect(option);
+                          }}
                         >
                           {option.title}
-                          {selectedOption?.id === option.id ? (
+                          {selectedOption.includes(option.id) ? (
                             <CheckIcon
                               className="h-5 w-5 text-teal-500"
                               aria-hidden="true"
@@ -372,12 +281,11 @@ export default function LocationHierarchy({
                             "flex justify-between w-full px-4 py-2 text-sm"
                           )}
                           onClick={() => {
-                            handleOptionClick(option.id);
-                            onclickData(option.uuid);
+                            handleOptionClick(option);
                           }}
                         >
                           {option.title}
-                          {selectedOptions.includes(option.id) ? (
+                          {selectedOptions.includes(option.id)? (
                             <CheckIcon
                               className="h-5 w-5 text-teal-500"
                               aria-hidden="true"
@@ -406,8 +314,8 @@ export default function LocationHierarchy({
                             "flex justify-between w-full px-4 py-2 text-sm"
                           )}
                           onClick={() => {
-                            handleOptionClick(option.id);
-                            onclickData(option.uuid);
+                            handleOptionClick(option);
+                           
                           }}
                         >
                           {option.title}
