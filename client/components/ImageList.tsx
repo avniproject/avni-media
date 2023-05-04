@@ -30,11 +30,11 @@ export default function ImageList() {
   const [userName, setUserName] = useState<string | string[] | undefined>();
   const [locationFilter, setLocation] = useState<any>([]);
   const [subjectFilter, setSubjectFilter] = useState<any>();
-  const [programFilter, setProgramFilter] = useState<any>([]);
+  const [programFilter, setProgramFilter] = useState<any>();
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
-  const [encounterFilter, setEncounterFilter] = useState([]);
+  const [encounterFilter, setEncounterFilter] = useState();
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
   const [topLevel ,setTopLevel] =useState<any>([]);
@@ -94,13 +94,13 @@ export default function ImageList() {
     "custom:userUUID": string;
   }
 
-  useEffect(() => {
-    let authToken: string = "";
-    authToken = "" + localStorage.getItem("authToken");
-    const decodedToken = jwt_decode(authToken) as DecodedToken;
-    const userUUID = decodedToken["custom:userUUID"];
-    setUserName(userUUID);
-  }, []);
+  // useEffect(() => {
+  //   let authToken: string = "";
+  //   authToken = "" + localStorage.getItem("authToken");
+  //   const decodedToken = jwt_decode(authToken) as DecodedToken;
+  //   const userUUID = decodedToken["custom:userUUID"];
+  //   setUserName(userUUID);
+  // }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -369,14 +369,15 @@ useEffect(() => {
             )
           )}
         <Daterange dateRange={dateRange} />
-
-        <EncounterType
+       {encounterFilter &&( <EncounterType
           encounterType={encounterType}
           encounterFilter={encounterFilter}
-        />
+        />)}
+       {subjectFilter &&( 
+       <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />)}
 
-        <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />
-        <Program programType={programType} programFilter={programFilter} />
+        {programFilter &&(
+        <Program programType={programType} programFilter={programFilter} />)}
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
       </div>
