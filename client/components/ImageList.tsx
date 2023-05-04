@@ -17,7 +17,11 @@ import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
 import{ArrowDownOutlined} from '@ant-design/icons';
 
+
 export default function ImageList() {
+  const[address ,setAddress] = useState<any>([])
+  const[secondAddress, setSecondAddress] = useState<any>([])
+  const [selectedParentId,setSelectedParentId] = useState<any>([])
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
@@ -48,11 +52,85 @@ export default function ImageList() {
 
   useEffect(() => {
     const filterData = async () => {
-      const filterResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      );
+      // const filterResponse = await axios.get(
+      //   `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
+      // );
 
-      const jsonData = filterResponse.data
+
+      const jsonData = {
+        "formMappings": [
+          {
+            "uuid": "a3e13dc2-4b29-4788-92f9-f313d6d9c518",
+            "id": 16616,
+            "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a",
+            "subjectTypeUUID": "095244bf-600a-4872-8553-cc8c8a974c4b",
+            "formType": "IndividualProfile",
+            "formName": "Album Registration",
+            "enableApproval": false
+          }
+        ],
+        "addressLevelTypes": [
+          {
+            "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
+            "id": 741,
+            "name": "Dist",
+            "level": 1,
+            "parent": {
+              "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
+            }
+          }
+        ],
+        "customRegistrationLocations": [],
+        "encounterTypes": [],
+        "allAddressLevels": [
+          {
+            "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
+            "id": 741,
+            "name": "Dist",
+            "level": 1,
+            "parent": {
+              "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
+            }
+          },
+          {
+            "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
+            "id": 725,
+            "name": "State",
+            "level": 2
+          }
+        ],
+        "programs": [],
+        "taskTypes": [],
+        "relations": [],
+        "subjectTypes": [
+          {
+            "uuid": "095244bf-600a-4872-8553-cc8c8a974c4b",
+            "operationalSubjectTypeName": "Album",
+            "groupRoles": [],
+            "allowEmptyLocation": false,
+            "validFirstNameFormat": null,
+            "validLastNameFormat": null,
+            "iconFileS3Key": null,
+            "nameHelpText": "abc",
+            "memberSubjectUUIDs": "",
+            "validMiddleNameFormat": null,
+            "allowMiddleName": false,
+            "group": false,
+            "allowProfilePicture": false,
+            "name": "Album",
+            "id": 698,
+            "type": "Individual"
+          }
+        ],
+        "forms": [
+          {
+            "formType": "IndividualProfile",
+            "formName": "Album Registration",
+            "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a"
+          }
+        ]
+      }
+
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const subjects = jsonData.subjectTypes;
@@ -78,7 +156,8 @@ export default function ImageList() {
         setLocation(sortedData);
       }
 
-      setSubjectFilter(subjects);
+      setSubjectFilter(sub);
+      setSubjectFilter(sub);
       setProgramFilter(programs);
       setEncounterFilter(encounters);
     };
@@ -90,13 +169,13 @@ export default function ImageList() {
     "custom:userUUID": string;
   }
 
-  useEffect(() => {
-    let authToken: string = "";
-    authToken = "" + localStorage.getItem("authToken");
-    const decodedToken = jwt_decode(authToken) as DecodedToken;
-    const userUUID = decodedToken["custom:userUUID"];
-    setUserName(userUUID);
-  }, []);
+  // useEffect(() => {
+  //   let authToken: string = "";
+  //   authToken = "" + localStorage.getItem("authToken");
+  //   const decodedToken = jwt_decode(authToken) as DecodedToken;
+  //   const userUUID = decodedToken["custom:userUUID"];
+  //   setUserName(userUUID);
+  // }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -106,11 +185,11 @@ export default function ImageList() {
         },
       };
 
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
-        options
-      );
-      setImageList(response.data);
+      // const response = await axios.get(
+      //   `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
+      //   options
+      // );
+      // setImageList(response.data);
     };
 
     fetchImages();
@@ -184,6 +263,7 @@ export default function ImageList() {
     await handleSendSelectedImages(inputValue);
   };
 
+  
 
   const concept = (data: any[]) => {
     setConcept(data);
@@ -209,17 +289,32 @@ export default function ImageList() {
     setLocations(data);
   };
 
+  const getSelectedLocation=(data: any[])=>{
+   console.log("data",data)
+  }
+
   const getOtherLocation = (data: any[]) => {
     setOtherLocation(data);
   };
 
-  const getTopLevel = (data: any[]) => {
-    setTopLevel(data);
+
+  const getTopLevel = (data: any[],levelname: string) => {
+   
+    setSelectedParentId(data)
+    setAddress([{
+      "addressLevelType":levelname,
+      "addressLevelIds":data
+    }])
+  };
+ 
+  const getSecondLevel = (data: any[],levelname: string) => {
+  setSecondAddress([{
+    "addressLevelType": levelname,
+    "addressLevelIds":data
+  }])
   };
 
-  const getSecondLevel = (data: any[]) => {
-    setSecondLevel(data);
-  };
+
 
   const subjectType = (data: any[]) => {
     setSubjectType(data);
@@ -241,6 +336,7 @@ export default function ImageList() {
         encounterTypeNames: encouter,
         fromDate: fromDate,
         toDate: toDate,
+        addresses: [...address, ...secondAddress],
       }).filter(([_, value]) => {
         if (Array.isArray(value)) {
           return value.length > 0;
@@ -262,13 +358,16 @@ export default function ImageList() {
         "Content-Type": "application/json",
       },
     };
-   
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
-      dataBody,
-      options
-    );
-    setImageList(response.data);
+
+
+    // const response = await axios.post(
+    //   `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+    //   body,
+    //   options
+    // );
+    // setImageList(response.data);
+  
+
   };
   const handleNumberChange = (value: number) => {
     setShowperpage(value);
@@ -308,6 +407,7 @@ export default function ImageList() {
                 key={index}
                 locationIndex={locationIndex}
                 index={index}
+                selectedParentId = {selectedParentId}
                 minLevel={minLevel}
                 maxLevel={maxLevel}
                 getLocation={getLocation}
@@ -316,6 +416,7 @@ export default function ImageList() {
                 otherLocation={otherLocation}
                 getTopLevel={getTopLevel}
                 getSecondLevel={getSecondLevel}
+                getSelectedLocation ={getSelectedLocation}
               />
             )
           )}
@@ -331,6 +432,7 @@ export default function ImageList() {
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
       </div>
+  
       <div className="bg-white">
         <div className="flex justify-center mt-10">
           {showModal && (
