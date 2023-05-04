@@ -113,7 +113,7 @@ export default function LocationHierarchy({
         
         const secondLevelTypeIdString =
           localStorage.getItem("secondLevelTypeId");
-        if ( secondLevelTypeIdString !== null) {
+        if ( secondLevelTypeIdString !== null && selectedOption.length > 0) {
           try {
               const secondLevelTypeId = parseInt(secondLevelTypeIdString);
               const response = await axios.get(
@@ -138,7 +138,7 @@ export default function LocationHierarchy({
 
 
         try {
-          if (selectedOptions.length > 0) {
+          if (selectedOptions.length > 0 && typeId!==null) {
             const response = await axios.get(
               `${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS

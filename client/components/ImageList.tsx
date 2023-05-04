@@ -381,7 +381,8 @@ useEffect(() => {
         )}
 
         {programFilter && (
-          <Program programType={programType} programFilter={programFilter} />
+          <Program programType={programType} 
+          programFilter={programFilter} />
         )}
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
