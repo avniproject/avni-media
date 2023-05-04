@@ -16,7 +16,12 @@ import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
 
+
 export default function ImageList() {
+  const [add, setAdd]= useState<any>([])
+  const[address ,setAddress] = useState<any>([])
+  const[secondAddress, setSecondAddress] = useState<any>([])
+  const [selectedParentId,setSelectedParentId] = useState<any>([])
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
@@ -32,7 +37,17 @@ export default function ImageList() {
   const [encounterFilter, setEncounterFilter] = useState([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [topLevel ,setTopLevel] =useState<any>([]);
+  const [secondLevel ,setSecondLevel] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
+  // filters state
+  const [concepts, setConcept] = useState<any[]>([]);
+  const [date, setDateRange] = useState<any[]>([]);
+  const [encouter, setEncounterType] = useState<any[]>([]);
+  const [program, setProgamType] = useState<any[]>([]);
+  const [account, setAcountType] = useState<any[]>([]);
+  const [subject, setSubjectType] = useState<any[]>([]);
+  const [dataBody, setDataBody]= useState<any>()
   const router = useRouter();
 
   useEffect(() => {
@@ -40,11 +55,10 @@ export default function ImageList() {
       const filterResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
-
-      const jsonData = filterResponse.data;
+      const jsonData =  filterResponse.data
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
-      const sub = jsonData.subjectTypes;
+      const subjects = jsonData.subjectTypes;
       const addressLevel = jsonData.allAddressLevels;
       if (addressLevel !== undefined && addressLevel !== null) {
         const maxLeveldata = Math.max(
@@ -67,7 +81,8 @@ export default function ImageList() {
         setLocation(sortedData);
       }
 
-      setSubjectFilter(sub);
+    
+      setSubjectFilter(subjects);
       setProgramFilter(programs);
       setEncounterFilter(encounters);
     };
@@ -173,13 +188,7 @@ export default function ImageList() {
     await handleSendSelectedImages(inputValue);
   };
 
-  // filters state
-  const [concepts, setConcept] = useState<any[]>([]);
-  const [date, setDateRange] = useState<any[]>([]);
-  const [encouter, setEncounterType] = useState<any[]>([]);
-  const [program, setProgamType] = useState<any[]>([]);
-  const [account, setAcountType] = useState<any[]>([]);
-  const [subject, setSubjectType] = useState<any[]>([]);
+  
 
   const concept = (data: any[]) => {
     setConcept(data);
@@ -205,26 +214,66 @@ export default function ImageList() {
     setLocations(data);
   };
 
+  const getSelectedLocation=(data: any[])=>{
+   console.log("data",data)
+  }
+
   const getOtherLocation = (data: any[]) => {
     setOtherLocation(data);
   };
 
-  const getTopLevel = (data: any[]) => {
-    setSubjectType(data);
-  };
 
-  const getSecondLevel = (data: any[]) => {
-    setSubjectType(data);
+  const getTopLevel = (data: any[],levelname: string) => {
+
+    setSelectedParentId(data)
+    if(data.length>0 && levelname !== null){
+    
+    setAddress([{
+      "addressLevelType":levelname,
+      "addressLevelIds":data
+    }])
+  }
+  else{
+ 
+    setAddress([])
+  }
+  };
+ 
+  const getSecondLevel = (data: any[],levelname: string) => {
+  if(data.length>0 && levelname!= undefined){
+
+    setSecondAddress([{
+      "addressLevelType": levelname,
+      "addressLevelIds":data
+    }])
+  }
+  else{
+  
+    setSecondAddress([])
+  }
+ 
   };
 
   const subjectType = (data: any[]) => {
     setSubjectType(data);
   };
 
-  const handleApplyFilter = async () => {
+useEffect(() => {
+
+  if (address.length > 0 || secondAddress.length > 0) {
+    setAdd([...address, ...secondAddress]);
+  }
+  else{
+    setAdd([])
+  }
+}, [address, secondAddress]);
+
+ useEffect(()=>{
+  const fitersData = async () => {
+
     if (date && date.length > 0) {
-      setToDate(date[0]);
-      setFromDate(date[1]);
+      setToDate(date[1]);
+      setFromDate(date[0]);
     } else {
       setToDate(null);
       setFromDate(null);
@@ -236,6 +285,7 @@ export default function ImageList() {
         encounterTypeNames: encouter,
         fromDate: fromDate,
         toDate: toDate,
+        addresses: add,
       }).filter(([_, value]) => {
         if (Array.isArray(value)) {
           return value.length > 0;
@@ -244,7 +294,14 @@ export default function ImageList() {
         }
       })
     );
+   setDataBody(body)
+  }
+  fitersData()
+ },[date, subject, encouter, program, toDate, fromDate, add]);
 
+
+
+  const handleApplyFilter = async () => {
     const options = {
       headers: {
         "AUTH-TOKEN": localStorage.getItem("authToken"),
@@ -252,9 +309,10 @@ export default function ImageList() {
       },
     };
 
+
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
-      body,
+      dataBody,
       options
     );
     setImageList(response.data);
@@ -271,7 +329,7 @@ export default function ImageList() {
         </span>
         <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
-            label="#Images per page "
+            label="Images per page "
             min={10}
             max={100}
             step={10}
@@ -280,7 +338,9 @@ export default function ImageList() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-0 gap-1 sm:grid-cols-7 w-auto mr-0 ml-28">
+      <div className="flex justify-center mx-auto w-center mr-4 ml-4">
+
+
         {locationFilter &&
           locationFilter.map(
             (
@@ -295,6 +355,7 @@ export default function ImageList() {
                 key={index}
                 locationIndex={locationIndex}
                 index={index}
+                selectedParentId = {selectedParentId}
                 minLevel={minLevel}
                 maxLevel={maxLevel}
                 getLocation={getLocation}
@@ -303,19 +364,23 @@ export default function ImageList() {
                 otherLocation={otherLocation}
                 getTopLevel={getTopLevel}
                 getSecondLevel={getSecondLevel}
+                getSelectedLocation ={getSelectedLocation}
               />
             )
           )}
         <Daterange dateRange={dateRange} />
+
         <EncounterType
           encounterType={encounterType}
           encounterFilter={encounterFilter}
         />
+
         <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />
         <Program programType={programType} programFilter={programFilter} />
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
-      </dl>
+      </div>
+  
       <div className="bg-white">
         <div className="flex justify-center mt-10">
           {showModal && (
@@ -375,11 +440,14 @@ export default function ImageList() {
                       onSelectImage={onSelectImage}
                       checkedImage={checkedImage}
                       imageDetail={image}
+                      image_url = {image.signedUrl}
                       flag="list"
                       onSelectImageCarousel={function (): void {
                         throw new Error("Function not implemented.");
                       }}
                     />
+                    
+                   
                   </div>
                 </div>
               )
