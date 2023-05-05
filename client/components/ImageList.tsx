@@ -30,12 +30,12 @@ export default function ImageList() {
   const [orgID, setOrgID] = useState<string | string[] | undefined>();
   const [userName, setUserName] = useState<string | string[] | undefined>();
   const [locationFilter, setLocation] = useState<any>([]);
-  const [subjectFilter, setSubjectFilter] = useState<any>();
-  const [programFilter, setProgramFilter] = useState<any>();
+  const [subjectFilter, setSubjectFilter] = useState<any>([]);
+  const [programFilter, setProgramFilter] = useState<any>([]);
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
-  const [encounterFilter, setEncounterFilter] = useState();
+  const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
   const [topLevel ,setTopLevel] =useState<any>([]);
@@ -369,20 +369,20 @@ useEffect(() => {
             )
           )}
         <Daterange dateRange={dateRange} />
-        {encounterFilter && (
+        {encounterFilter && encounterFilter.length >0 && (
           <EncounterType
             encounterType={encounterType}
             encounterFilter={encounterFilter}
           />
         )}
-        {subjectFilter && (
+        {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
             subjectFilter={subjectFilter}
           />
         )}
 
-        {programFilter && (
+        {programFilter && programFilter.length > 0 && (
           <Program programType={programType} 
           programFilter={programFilter} />
         )}
