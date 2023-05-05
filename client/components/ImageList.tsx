@@ -15,6 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
+import { redirectIfNotValid } from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -103,6 +104,7 @@ export default function ImageList() {
   }, []);
 
   useEffect(() => {
+    redirectIfNotValid();
     const fetchImages = async () => {
       const options = {
         headers: {
@@ -168,10 +170,9 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
-      { username: userName, data: selectedImage, description: inputValue }
+      { username: userName, data: selectedImage, description: inputValue, addressLevel: locationFilter }
     );
   };
 
@@ -302,6 +303,7 @@ useEffect(() => {
 
 
   const handleApplyFilter = async () => {
+    redirectIfNotValid();
     const options = {
       headers: {
         "AUTH-TOKEN": localStorage.getItem("authToken"),
