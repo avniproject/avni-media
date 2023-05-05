@@ -15,6 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
+import { redirectIfNotValid } from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -103,6 +104,7 @@ export default function ImageList() {
   }, []);
 
   useEffect(() => {
+    redirectIfNotValid();
     const fetchImages = async () => {
       const options = {
         headers: {
@@ -301,6 +303,7 @@ useEffect(() => {
 
 
   const handleApplyFilter = async () => {
+    redirectIfNotValid();
     const options = {
       headers: {
         "AUTH-TOKEN": localStorage.getItem("authToken"),
