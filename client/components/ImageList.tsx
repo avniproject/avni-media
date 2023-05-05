@@ -168,10 +168,9 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
-      { username: userName, data: selectedImage, description: inputValue }
+      { username: userName, data: selectedImage, description: inputValue, addressLevel: locationFilter }
     );
   };
 

@@ -28,9 +28,10 @@ export class MediaViewerService {
     let folderName = '';
     await Promise.all(
       Object.keys(parsedData).map(async (id) => {
+        const locationHierarchy = parsedData[id].location_level 
         let imageCount = 0;
         await Promise.all(
-          parsedData[id].image_metadata.map(async (metadata, i) => {
+          parsedData[id].image_metadata.map(async (metadata: { url: any; address: any; conceptName: any; subjectTypeName: any; encounterTypeName: any; }, i: any) => {
             const imageUrl = metadata.url;
             const address = metadata.address;
             const conceptType = metadata.conceptName;
@@ -41,8 +42,8 @@ export class MediaViewerService {
               subjectType,
               encounterType,
               conceptType,
+              locationHierarchy
             );
-      
             try {
               const splitOn =
                 '.com/' +
@@ -117,8 +118,8 @@ export class MediaViewerService {
   }
 
   async saveMediaData(mediaData: any): Promise<DownloadJobs> {
-    const { username, data, description } = mediaData;
-
+    const { username, data, description, addressLevel} = mediaData;
+    
     if (!username || typeof username !== 'string' || !data) {
       throw new Error('Invalid media data');
     }
@@ -128,6 +129,7 @@ export class MediaViewerService {
       media.username = username;
       media.image_metadata = data;
       media.image_description = description;
+      media.location_level = addressLevel
       const savedMedia = await this.mediaRepository.save(media);
 
       return savedMedia;
@@ -189,23 +191,23 @@ export class MediaViewerService {
   }
 
   async folderStructure(
-    address,
-    subjectType,
-    encounterType,
-    conceptType,
+    address: string,
+    subjectType: any,
+    encounterType: any,
+    conceptType: any,
+    locationHierarchy: { name: any; }[]
   ): Promise<string> {
+    const keys = locationHierarchy.map((index: { name: any; }) => index.name);
     const jsonadd = JSON.parse(address);
-
-  
-    let directoryPath = '';
-
-    const addressArray = Object.values(jsonadd).slice(0, 6);
-    const filteredArray = addressArray.filter(
-      (element) => typeof element === 'string',
-    );
-
+    const addressArray = [];
+    let val =''
+    for (const key of keys) {
+      val= key.toString()
+      addressArray.push(jsonadd[val]);
+    }
+    let directoryPath = ''
     await Promise.all(
-      filteredArray.map(async (addressPart) => {
+      addressArray.map(async (addressPart) => {
         if (addressPart) {
           if (directoryPath) {
             directoryPath = `${directoryPath}/${addressPart}`;
