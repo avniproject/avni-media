@@ -56,7 +56,6 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
       );
       const jsonData =  filterResponse.data
-    
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const subjects = jsonData.subjectTypes;
@@ -169,7 +168,6 @@ export default function ImageList() {
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
-   
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_DOWNLOAD_REQUEST_URL}`,
       { username: userName, data: selectedImage, description: inputValue, addressLevel: locationFilter }
