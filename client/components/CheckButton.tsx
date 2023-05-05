@@ -48,5 +48,5 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
         </div>
       </div>
     </fieldset>
-  );
+  )
 }
