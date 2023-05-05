@@ -31,7 +31,7 @@ export class MediaViewerService {
         const locationHierarchy = parsedData[id].location_level 
         let imageCount = 0;
         await Promise.all(
-          parsedData[id].image_metadata.map(async (metadata, i) => {
+          parsedData[id].image_metadata.map(async (metadata: { url: any; address: any; conceptName: any; subjectTypeName: any; encounterTypeName: any; }, i: any) => {
             const imageUrl = metadata.url;
             const address = metadata.address;
             const conceptType = metadata.conceptName;
@@ -191,19 +191,19 @@ export class MediaViewerService {
   }
 
   async folderStructure(
-    address,
-    subjectType,
-    encounterType,
-    conceptType,
-    locationHierarchy
+    address: string,
+    subjectType: any,
+    encounterType: any,
+    conceptType: any,
+    locationHierarchy: { name: any; }[]
   ): Promise<string> {
-    const keys = locationHierarchy.map((index) => index.name);
+    const keys = locationHierarchy.map((index: { name: any; }) => index.name);
     const jsonadd = JSON.parse(address);
     const addressArray = [];
     let val =''
     for (const key of keys) {
       val= key.toString()
-    addressArray.push(jsonadd[val]);
+      addressArray.push(jsonadd[val]);
     }
     let directoryPath = ''
     await Promise.all(

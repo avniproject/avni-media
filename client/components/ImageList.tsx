@@ -52,77 +52,15 @@ export default function ImageList() {
 
   useEffect(() => {
     const filterData = async () => {
-      // const filterResponse = await axios.get(
-      //   `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      // );
-      const jsonData =  
-      {
-        "formMappings": [{
-          "uuid": "1f9fd805-fa51-4256-acb7-0d2989097513",
-          "id": 17310,
-          "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a",
-          "subjectTypeUUID": "095244bf-600a-4872-8553-cc8c8a974c4b",
-          "formType": "IndividualProfile",
-          "formName": "Album Registration",
-          "enableApproval": false
-        }],
-        "addressLevelTypes": [{
-          "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
-          "id": 741,
-          "name": "Dist",
-          "level": 1.0,
-          "parent": {
-            "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
-          }
-        }],
-        "customRegistrationLocations": [],
-        "encounterTypes": [],
-        "allAddressLevels": [{
-          "uuid": "c55af85c-b043-470f-ab13-7871c69536e0",
-          "id": 741,
-          "name": "Dist",
-          "level": 1.0,
-          "parent": {
-            "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f"
-          }
-        }, {
-          "uuid": "4e9ed3ea-149e-46dd-a46f-c6eb2826e34f",
-          "id": 725,
-          "name": "State",
-          "level": 2.0
-        }],
-        "programs": [],
-        "taskTypes": [],
-        "relations": [],
-        "subjectTypes": [{
-          "uuid": "095244bf-600a-4872-8553-cc8c8a974c4b",
-          "allowMiddleName": false,
-          "allowProfilePicture": false,
-          "group": false,
-          "operationalSubjectTypeName": "Album",
-          "allowEmptyLocation": false,
-          "validFirstNameFormat": null,
-          "validLastNameFormat": null,
-          "iconFileS3Key": null,
-          "nameHelpText": "abc",
-          "groupRoles": [],
-          "validMiddleNameFormat": null,
-          "memberSubjectUUIDs": "",
-          "name": "Album",
-          "id": 698,
-          "type": "Individual"
-        }],
-        "forms": [{
-          "formType": "IndividualProfile",
-          "formName": "Album Registration",
-          "formUUID": "0e70785c-7690-4865-b64c-6316fd55473a"
-        }]
-      }
+      const filterResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
+      );
+      const jsonData =  filterResponse.data
+      
       const programs = jsonData.programs;
       const encounters = jsonData.encounterTypes;
       const subjects = jsonData.subjectTypes;
       const addressLevel = jsonData.allAddressLevels;
-      console.log("addlevel",addressLevel)
       if (addressLevel !== undefined && addressLevel !== null) {
         const maxLeveldata = Math.max(
           ...addressLevel.map((obj: { level: any }) => obj.level)
@@ -157,13 +95,13 @@ export default function ImageList() {
     "custom:userUUID": string;
   }
 
-  // useEffect(() => {
-  //   let authToken: string = "";
-  //   authToken = "" + localStorage.getItem("authToken");
-  //   const decodedToken = jwt_decode(authToken) as DecodedToken;
-  //   const userUUID = decodedToken["custom:userUUID"];
-  //   setUserName(userUUID);
-  // }, []);
+  useEffect(() => {
+    let authToken: string = "";
+    authToken = "" + localStorage.getItem("authToken");
+    const decodedToken = jwt_decode(authToken) as DecodedToken;
+    const userUUID = decodedToken["custom:userUUID"];
+    setUserName(userUUID);
+  }, []);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -440,8 +378,8 @@ useEffect(() => {
         />
 
         <SubjectType subjectType={subjectType} subjectFilter={subjectFilter} />
-        { programFilter &&
-         ( <Program programType={programType} programFilter={programFilter} />)}
+    
+        <Program programType={programType} programFilter={programFilter} />
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
       </div>
