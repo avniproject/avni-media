@@ -37,4 +37,7 @@ export class DownloadJobs {
 
   @Column({ nullable: true })
   image_count: number;
+
+  @Column('jsonb',{nullable: true})
+  location_level:  Record<string, any>;
 }
