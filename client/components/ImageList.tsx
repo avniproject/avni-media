@@ -369,7 +369,7 @@ useEffect(() => {
             )
           )}
         <Daterange dateRange={dateRange} />
-        {encounterFilter && encounterFilter.length >0 && (
+        {encounterFilter && encounterFilter.length > 0 && (
           <EncounterType
             encounterType={encounterType}
             encounterFilter={encounterFilter}
