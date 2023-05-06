@@ -15,7 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
-import { redirectIfNotValid } from '@/utils/helpers'
+import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -90,16 +90,8 @@ export default function ImageList() {
     filterData();
   }, []);
 
-  interface DecodedToken {
-    [key: string]: any;
-    "custom:userUUID": string;
-  }
-
   useEffect(() => {
-    let authToken: string = "";
-    authToken = "" + localStorage.getItem("authToken");
-    const decodedToken = jwt_decode(authToken) as DecodedToken;
-    const userUUID = decodedToken["custom:userUUID"];
+    const userUUID = getUserUuidFromToken()
     setUserName(userUUID);
   }, []);
 
@@ -167,6 +159,7 @@ export default function ImageList() {
   const [showModal, setShowModal] = useState(false);
 
   const handleSendSelectedImages = async (inputValue: any) => {
+
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
