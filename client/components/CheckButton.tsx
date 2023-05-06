@@ -1,3 +1,4 @@
+import{DownloadOutlined} from '@ant-design/icons';
 interface prop {
   name: string,
   id: string,
@@ -6,9 +7,10 @@ interface prop {
   onSelectImageCarousel: (value: string, checked: boolean) => void,
   flag: string,
   imageDetail: any
+  image_url: string
 }
 
-export default function CheckButton({ name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag }: prop) {
+export default function CheckButton({ name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag,image_url }: prop) {
   const handleChecked = (e: any) => {
     const { value, checked } = e.target;
     if (flag == 'list') {
@@ -23,7 +25,6 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
 
   return (
     <fieldset className="space-y-5">
-      <legend className="sr-only">Notifications</legend>
       <div className="relative flex items-start">
         <div className="flex items-center h-5">
           <input
@@ -38,7 +39,10 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="comments" className="font-medium text-gray-700">
-            {name}
+            {name}{"  "} 
+            <a href={image_url}>
+                    <DownloadOutlined />
+                    </a>
           </label>
         </div>
       </div>
