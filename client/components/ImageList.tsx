@@ -448,9 +448,6 @@ useEffect(() => {
                         throw new Error("Function not implemented.");
                       }}
                     />
-                    <a href={image.signedUrl}>
-                      <ArrowDownOutlined/>
-                    </a>
                   </div>
                 </div>
               )
