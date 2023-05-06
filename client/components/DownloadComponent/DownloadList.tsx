@@ -8,6 +8,13 @@ import {
 import { getUserUuidFromToken } from '@/utils/helpers'
 
 
+import jwt_decode from "jwt-decode";
+
+interface DecodedToken {
+ [key: string]: any;
+ "custom:userUUID": string;
+}
+
 export default function Download() {
  const [data, setData] = useState<any>([]);
  useEffect(() => {
