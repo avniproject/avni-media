@@ -5,6 +5,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { getUserUuidFromToken } from '@/utils/helpers'
+
 
 import jwt_decode from "jwt-decode";
 
@@ -16,14 +18,10 @@ interface DecodedToken {
 export default function Download() {
  const [data, setData] = useState<any>([]);
  useEffect(() => {
-   let authToken: string = "";
-   authToken = "" + localStorage.getItem("authToken");
-   const decodedToken = jwt_decode(authToken) as DecodedToken;
-   const userUUID = decodedToken["custom:userUUID"];
-
+   const username = getUserUuidFromToken()
     const fetchData = async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${userUUID}`
+        `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${username}`
       );
 
       setData(response.data);
