@@ -22,9 +22,9 @@ export default function Download() {
    const userUUID = decodedToken["custom:userUUID"];
 
     const fetchData = async () => {
-     const response = await axios.get(
-       `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${userUUID}`
-     );
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${userUUID}`
+      );
 
       setData(response.data);
     };

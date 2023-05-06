@@ -160,7 +160,7 @@ export class MediaViewerService {
       }
       return item;
     });
-    return allData;
+    return parsedData;
   }
 
   getFileSizeText(fileSizeInBytes: number): string {
