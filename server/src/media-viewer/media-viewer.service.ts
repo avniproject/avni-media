@@ -140,7 +140,6 @@ export class MediaViewerService {
   }
 
   async getDownloadData(username: string): Promise<DownloadJobs[]> {
-
     const allData = await this.mediaRepository.find({where:{username: username}});
 
     const presignedUrls = await Promise.all(
