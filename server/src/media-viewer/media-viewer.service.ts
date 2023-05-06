@@ -139,8 +139,10 @@ export class MediaViewerService {
     }
   }
 
-  async getDownloadData(): Promise<DownloadJobs[]> {
-    const allData = await this.mediaRepository.find();
+  async getDownloadData(username: string): Promise<DownloadJobs[]> {
+
+    const allData = await this.mediaRepository.find({where:{username: username}});
+
     const presignedUrls = await Promise.all(
       allData.map(async (item) => {
         if (item.zip_url) {
@@ -158,7 +160,7 @@ export class MediaViewerService {
       }
       return item;
     });
-    return parsedData;
+    return allData;
   }
 
   getFileSizeText(fileSizeInBytes: number): string {
