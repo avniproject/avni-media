@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
 } from '@nestjs/common';
 import { MediaViewerService } from './media-viewer.service';
 import { S3Service } from 'src/s3/s3.Service';
@@ -43,9 +44,9 @@ export class MediaViewerController {
   }
 
   @Get('/allData')
-  async getAllData() {
+  async getAllData(@Query('username') username: string) {
     try {
-      const allData = await this.mediaService.getDownloadData();
+      const allData = await this.mediaService.getDownloadData(username);
       return allData;
     } catch (error) {
       throw new HttpException(
