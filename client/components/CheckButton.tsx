@@ -42,12 +42,10 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
             <DownloadOutlined />
           </a>
         </div>
-        <div className="mt-1 text-sm">
-          <label className="font-medium text-gray-700">
-            {name}
-          </label>
-        </div>
+      </div>
+      <div className="mt-1 text-sm">
+        <label className="font-medium text-gray-700">{name}</label>
       </div>
     </fieldset>
-  )
+  );
 }
