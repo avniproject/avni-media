@@ -1,4 +1,3 @@
-
 import{DownloadOutlined} from '@ant-design/icons';
 interface prop {
   name: string,
@@ -25,9 +24,9 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
   const isChecked = checkedImage.includes(id.toString());
 
   return (
-    <fieldset className="space-y-5">
-      <div className="relative flex items-start">
-        <div className="flex items-center h-5">
+    <fieldset className="mt-5">
+      <div className="flex justify-between">
+        <div className="">
           <input
             id={id.toString()}
             value={id}
@@ -38,12 +37,14 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
             onChange={(e) => handleChecked(e)}
           />
         </div>
-        <div className="ml-3 text-sm">
-          <label htmlFor="comments" className="font-medium text-gray-700">
-            {name}{"  "} 
-            <a href={image_url}>
-                    <DownloadOutlined />
-                    </a>
+        <div className="mr-3">
+          <a href={image_url}>
+            <DownloadOutlined />
+          </a>
+        </div>
+        <div className="mt-1 text-sm">
+          <label className="font-medium text-gray-700">
+            {name}
           </label>
         </div>
       </div>

@@ -15,7 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
-import { redirectIfNotValid } from '@/utils/helpers'
+import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -35,6 +35,10 @@ export default function ImageList() {
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
+<<<<<<< HEAD
+=======
+  const [minLevelName, setMinLevelName] = useState<string>();
+>>>>>>> b8bee482af121cd6b5094dedf080e83c507d4f0d
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
@@ -70,6 +74,10 @@ export default function ImageList() {
           ...addressLevel.map((obj: { level: any }) => obj.level)
         );
         setMinLevel(minLeveldata);
+
+        const minLevelAddress: any = addressLevel.find(obj => obj.level === minLeveldata);
+        setMinLevelName(minLevelAddress.name)
+
         const maxLevelLocation = addressLevel.find(
           (obj: { level: number | undefined }) => obj.level === maxLevel
         );
@@ -90,16 +98,8 @@ export default function ImageList() {
     filterData();
   }, []);
 
-  interface DecodedToken {
-    [key: string]: any;
-    "custom:userUUID": string;
-  }
-
   useEffect(() => {
-    let authToken: string = "";
-    authToken = "" + localStorage.getItem("authToken");
-    const decodedToken = jwt_decode(authToken) as DecodedToken;
-    const userUUID = decodedToken["custom:userUUID"];
+    const userUUID = getUserUuidFromToken()
     setUserName(userUUID);
   }, []);
 
@@ -167,6 +167,7 @@ export default function ImageList() {
   const [showModal, setShowModal] = useState(false);
 
   const handleSendSelectedImages = async (inputValue: any) => {
+
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
@@ -323,6 +324,31 @@ useEffect(() => {
     setShowperpage(value);
   };
 
+  interface imageType {
+    signedUrl: string;
+    signedThumbnailUrl: string;
+    uuid: string;
+    subjectTypeName: string;
+    createdDateTime: string;
+    encounterTypeName: string;
+    programName: string;
+    address: string;
+    subjectName: string;
+  }
+
+  const getImageName = (image: imageType , minLevelName: string) => {
+    const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
+    return `${image.subjectName ? image.subjectName : ''} 
+              ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
+              ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
+              ${image.programName ? '_' + image.programName : ''}
+              ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
+  }
+
+  const getLowestLocation = (address: string, minLevelName: string) => {
+    return JSON.parse(address)[minLevelName];
+  }
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -424,13 +450,7 @@ useEffect(() => {
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
             {imageList.data.map(
-              (image: {
-                signedUrl: string;
-                signedThumbnailUrl: string;
-                uuid: string;
-                subjectTypeName: string;
-                createdDateTime: string;
-              }) => (
+              (image: imageType) => (
                 <div key={image.uuid}>
                   <div className="relative">
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
@@ -444,7 +464,7 @@ useEffect(() => {
                       </button>
                     </div>
                     <CheckButton
-                      name={image.subjectTypeName}
+                      name={ getImageName(image, minLevelName)}
                       id={image.uuid}
                       onSelectImage={onSelectImage}
                       checkedImage={checkedImage}
