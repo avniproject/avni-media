@@ -15,7 +15,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import jwt_decode from "jwt-decode";
-import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
+import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -34,8 +34,8 @@ export default function ImageList() {
   const [programFilter, setProgramFilter] = useState<any>([]);
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
-  const [maxLevel, setMaxLvel] = useState<number>();
-  const [minLevelName, setMinLevelName] = useState<string>();
+  const [maxLevel, setMaxLevel] = useState<number>();
+  const [minLevelName, setMinLevelName] = useState<string>('');
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
@@ -54,43 +54,23 @@ export default function ImageList() {
 
   useEffect(() => {
     const filterData = async () => {
-      const filterResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      );
-      const jsonData =  filterResponse.data
-      const programs = jsonData.programs;
-      const encounters = jsonData.encounterTypes;
-      const subjects = jsonData.subjectTypes;
-      const addressLevel = jsonData.allAddressLevels;
-      if (addressLevel !== undefined && addressLevel !== null) {
-        const maxLeveldata = Math.max(
-          ...addressLevel.map((obj: { level: any }) => obj.level)
-        );
-        setMaxLvel(maxLeveldata);
-        const minLeveldata = Math.min(
-          ...addressLevel.map((obj: { level: any }) => obj.level)
-        );
-        setMinLevel(minLeveldata);
+      const processedData = await operationalModuleData()
 
-        const minLevelAddress: any = addressLevel.find(obj => obj.level === minLeveldata);
-        setMinLevelName(minLevelAddress.name)
+      setMaxLevel(processedData.maxAddressLevel);
 
-        const maxLevelLocation = addressLevel.find(
-          (obj: { level: number | undefined }) => obj.level === maxLevel
-        );
+      setMinLevel(processedData.minAddressLevel);
 
-        setMaxtLevelLocation(maxLevelLocation);
+      setMinLevelName(processedData.minLevelAddressName)
 
-        const sortedData = addressLevel.sort(
-          (a: { level: number }, b: { level: number }) => b.level - a.level
-        );
-        setLocation(sortedData);
-      }
+      setMaxtLevelLocation(processedData.maxLevelLocation);
 
-    
-      setSubjectFilter(subjects);
-      setProgramFilter(programs);
-      setEncounterFilter(encounters);
+      setLocation(processedData.sortedAddressLevel);
+
+      setSubjectFilter(processedData.subjects);
+
+      setProgramFilter(processedData.programs);
+
+      setEncounterFilter(processedData.encounters);
     };
     filterData();
   }, []);
@@ -320,31 +300,6 @@ useEffect(() => {
   const handleNumberChange = (value: number) => {
     setShowperpage(value);
   };
-
-  interface imageType {
-    signedUrl: string;
-    signedThumbnailUrl: string;
-    uuid: string;
-    subjectTypeName: string;
-    createdDateTime: string;
-    encounterTypeName: string;
-    programName: string;
-    address: string;
-    subjectName: string;
-  }
-
-  const getImageName = (image: imageType , minLevelName: string) => {
-    const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    return `${image.subjectName ? image.subjectName : ''} 
-              ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
-              ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
-              ${image.programName ? '_' + image.programName : ''}
-              ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
-  }
-
-  const getLowestLocation = (address: string, minLevelName: string) => {
-    return JSON.parse(address)[minLevelName];
-  }
 
   return (
     <>
