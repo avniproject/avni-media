@@ -36,6 +36,7 @@ export default function ImageList() {
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
+  const [minLevelName, setMinLevelName] = useState<string>();
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
@@ -71,6 +72,10 @@ export default function ImageList() {
           ...addressLevel.map((obj: { level: any }) => obj.level)
         );
         setMinLevel(minLeveldata);
+
+        const minLevelAddress: any = addressLevel.find(obj => obj.level === minLeveldata);
+        setMinLevelName(minLevelAddress.name)
+
         const maxLevelLocation = addressLevel.find(
           (obj: { level: number | undefined }) => obj.level === maxLevel
         );
@@ -317,6 +322,31 @@ useEffect(() => {
     setShowperpage(value);
   };
 
+  interface imageType {
+    signedUrl: string;
+    signedThumbnailUrl: string;
+    uuid: string;
+    subjectTypeName: string;
+    createdDateTime: string;
+    encounterTypeName: string;
+    programName: string;
+    address: string;
+    subjectName: string;
+  }
+
+  const getImageName = (image: imageType , minLevelName: string) => {
+    const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
+    return `${image.subjectName ? image.subjectName : ''} 
+              ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
+              ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
+              ${image.programName ? '_' + image.programName : ''}
+              ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
+  }
+
+  const getLowestLocation = (address: string, minLevelName: string) => {
+    return JSON.parse(address)[minLevelName];
+  }
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -421,13 +451,7 @@ useEffect(() => {
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
             {imageList.data.map(
-              (image: {
-                signedUrl: string;
-                signedThumbnailUrl: string;
-                uuid: string;
-                subjectTypeName: string;
-                createdDateTime: string;
-              }) => (
+              (image: imageType) => (
                 <div key={image.uuid}>
                   <div className="relative">
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
@@ -441,7 +465,7 @@ useEffect(() => {
                       </button>
                     </div>
                     <CheckButton
-                      name={image.subjectTypeName}
+                      name={ getImageName(image, minLevelName)}
                       id={image.uuid}
                       onSelectImage={onSelectImage}
                       checkedImage={checkedImage}
