@@ -35,10 +35,7 @@ export default function ImageList() {
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLvel] = useState<number>();
-<<<<<<< HEAD
-=======
   const [minLevelName, setMinLevelName] = useState<string>();
->>>>>>> b8bee482af121cd6b5094dedf080e83c507d4f0d
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
