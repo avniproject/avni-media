@@ -23,11 +23,15 @@ export default function Download() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 mt-5">
-      <div className="sm:flex sm:items-center">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Available Downloads
-          </h1>
-      </div>
+      <div className="sm:flex sm:items-center justify-between">
+    <h1 className="text-xl font-semibold text-gray-900">
+      Available Downloads
+    </h1>
+    <a href="/avni-media" className=" text-gray-900">
+      Back To Media Viewer 
+    </a>
+  </div>
+     
       <div className="mt-8 flex flex-col">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300">

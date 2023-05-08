@@ -1,7 +1,6 @@
-import { Fragment, Key, SetStateAction, use, useEffect, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import {Key,useEffect, useState } from "react";
+import { Menu} from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
-import { Option } from "rc-select";
 import axios from "axios";
 
 interface Option {
@@ -12,15 +11,14 @@ interface Option {
   title: string;
 }
 interface Prop {
-  filterData: () => void;
   locationIndex: {
     name: string;
     id: number;
     level: number;
   };
   index: Key;
-  minLevel: number;
-  maxLevel: number;
+  minLevel: number |undefined;
+  maxLevel: number|undefined ;
   selectedParentId : any[];
   getLocation:(data : any[])=>void;
   getOtherLocation:(data : any[])=>void;
@@ -84,13 +82,14 @@ export default function LocationHierarchy({
 
   }, [optionSelected,selectedOptions,selectedOption,selectLevelName])
   
-  
- 
   useEffect(() => {
-    if (locationIndex.level === maxLevel - 1) {
-      const secondLevelTypeId = locationIndex.id;
-      localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+    if (maxLevel !== undefined){
+      if ( locationIndex.level === maxLevel - 1) {
+        const secondLevelTypeId = locationIndex.id;
+        localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+      }
     }
+    
     const typeIdData = async () => {
       const typeId = locationIndex.id;
 
@@ -119,13 +118,9 @@ export default function LocationHierarchy({
               const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
               );
-
               const distJsonData = response.data
               const distData = distJsonData.content;
-        
-            
-             
-                getLocation(distData)
+              getLocation(distData)
                          
           } catch (Error) {
             console.log(
