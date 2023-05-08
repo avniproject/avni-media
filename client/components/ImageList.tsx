@@ -127,7 +127,7 @@ export default function ImageList() {
   };
 
   useEffect(() => {
-    const { data } = imageList;
+
     const filteredData = imageList.data.filter((item: { uuid: string; }) => checkedImage.includes(item.uuid))
     setSelectedImage((prevImages) => {
       const newImages = [...prevImages, ...filteredData];
