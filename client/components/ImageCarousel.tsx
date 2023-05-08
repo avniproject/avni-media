@@ -9,6 +9,7 @@ interface Props {
   imageList: object[];
   totalRecords: any;
   carouselImage: any;
+  pagination: any;
   onClose: () => void;
   onSelectImage: (value: string, checked: boolean) => void;
   checkedImage: string[];
@@ -19,6 +20,7 @@ const ImageCarousel = ({
   imageList,
   totalRecords,
   carouselImage,
+  pagination,
   onClose,
   onSelectImage,
   checkedImage,
@@ -26,7 +28,7 @@ const ImageCarousel = ({
   const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
   const [imageCarousel, setImageCarousel] = useState({
-    total: 0,
+    
     page: 0,
     data: [],
   });
@@ -50,7 +52,7 @@ const ImageCarousel = ({
         },
       };
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=10000`,
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
         options
       );
       setImageCarousel(response.data);
@@ -59,9 +61,7 @@ const ImageCarousel = ({
   }, [totalRecords]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
-    const base = imageCarousel.data;
-    const selectedImageDetails = base.filter((obj) => obj.uuid === value)[0];
-    onSelectImage(value, checked, selectedImageDetails);
+    onSelectImage(value, checked,);
   };
 
   return (
