@@ -1,16 +1,11 @@
 import axios from "axios";
-import {
-  Key,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
-import { getUserUuidFromToken } from '@/utils/helpers'
+import { Key, ReactNode, useEffect, useState } from "react";
+import { getUserUuidFromToken } from "@/utils/helpers";
 
 export default function Download() {
- const [data, setData] = useState<any>([]);
- useEffect(() => {
-   const username = getUserUuidFromToken()
+  const [data, setData] = useState<any>([]);
+  useEffect(() => {
+    const username = getUserUuidFromToken();
     const fetchData = async () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${username}`
@@ -39,15 +34,15 @@ export default function Download() {
               <tr className="divide-x divide-gray-200">
                 <th
                   scope="col"
-                  className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                >
-                  No. of Images
-                </th>
-                <th
-                  scope="col"
                   className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
                   Download Description
+                </th>
+                <th
+                  scope="col"
+                  className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                >
+                  No. of Images
                 </th>
                 <th
                   scope="col"
@@ -71,11 +66,11 @@ export default function Download() {
                   index: Key | null | undefined
                 ) => (
                   <tr key={index} className="divide-x divide-gray-200">
-                    <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
-                      {files.image_count}
-                    </td>
                     <td className="whitespace-nowrap p-4 text-sm text-gray-500">
                       {files.image_description}
+                    </td>
+                    <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6">
+                      {files.image_count}
                     </td>
                     <td className="py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6">
                       {files.status === "Complete" ? (
@@ -84,15 +79,13 @@ export default function Download() {
                             href={files.zip_url}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
-                            Ready to Download
+                            Download
                           </a>
                           <p>{files.file_size}</p>
                         </>
                       ) : (
                         <span className="text-gray-500">{files.status}</span>
                       )}
-                      <br />
-                      <span>{files.status}</span>
                     </td>
                   </tr>
                 )

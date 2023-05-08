@@ -296,9 +296,9 @@ useEffect(() => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <span className="mt-10 text-lg leading-6 font-medium text-gray-900 ml-8 flex-none">
-          Filters
-        </span>
+        <h1 className="text-xl leading-6 font-semibold text-gray-900 ml-8 flex-none">
+          Media Viewer
+        </h1>
         <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
             label="Images per page "
