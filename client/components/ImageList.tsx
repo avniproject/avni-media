@@ -379,9 +379,7 @@ useEffect(() => {
             name=" Download" />
           <Link href="./downloadList">
             <Button 
-              name='Available Downloads' onClick={function (): void {
-                throw new Error("Function not implemented.");
-              } }       
+              name='Available Downloads' onClick={function (): void {}}       
             />
         </Link>
         </div>
