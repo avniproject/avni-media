@@ -141,7 +141,6 @@ export default function ImageList() {
   const [showModal, setShowModal] = useState(false);
 
   const handleSendSelectedImages = async (inputValue: any) => {
-    console.log("selected ",selectedImage,checkedImage)
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
