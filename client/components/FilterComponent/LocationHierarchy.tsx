@@ -1,7 +1,6 @@
-import { Fragment, Key, SetStateAction, use, useEffect, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import {Key,useEffect, useState } from "react";
+import { Menu} from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
-import { Option } from "rc-select";
 import axios from "axios";
 
 interface Option {
@@ -12,15 +11,14 @@ interface Option {
   title: string;
 }
 interface Prop {
-  filterData: () => void;
   locationIndex: {
     name: string;
     id: number;
     level: number;
   };
   index: Key;
-  minLevel: number;
-  maxLevel: number;
+  minLevel: number |undefined;
+  maxLevel: number|undefined ;
   selectedParentId : any[];
   getLocation:(data : any[])=>void;
   getOtherLocation:(data : any[])=>void;
@@ -84,13 +82,14 @@ export default function LocationHierarchy({
 
   }, [optionSelected,selectedOptions,selectedOption,selectLevelName])
   
-  
- 
   useEffect(() => {
-    if (locationIndex.level === maxLevel - 1) {
-      const secondLevelTypeId = locationIndex.id;
-      localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+    if (maxLevel !== undefined){
+      if ( locationIndex.level === maxLevel - 1) {
+        const secondLevelTypeId = locationIndex.id;
+        localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+      }
     }
+    
     const typeIdData = async () => {
       const typeId = locationIndex.id;
 
@@ -119,13 +118,9 @@ export default function LocationHierarchy({
               const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
               );
-
               const distJsonData = response.data
               const distData = distJsonData.content;
-        
-            
-             
-                getLocation(distData)
+              getLocation(distData)
                          
           } catch (Error) {
             console.log(
@@ -197,7 +192,7 @@ export default function LocationHierarchy({
     <>
       <Menu
         as="div"
-        className="relative inline-block text-left  pr-2 mt-5 z-20"
+        className="menu"
       >
         <div>
           {maxLevel === locationIndex.level ? (
@@ -225,17 +220,7 @@ export default function LocationHierarchy({
               />
             </Menu.Button>
           )}
-        </div>
-
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
+        </div>     
           {locationIndex.level === maxLevel ? (
             <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
@@ -256,7 +241,7 @@ export default function LocationHierarchy({
                           {option.title}
                           {selectedOption.includes(option.id) ? (
                             <CheckIcon
-                              className="h-5 w-5 text-teal-500"
+                              className="check-button"
                               aria-hidden="true"
                             />
                           ) : null}
@@ -332,7 +317,6 @@ export default function LocationHierarchy({
               </div>
             </Menu.Items>
           )}
-        </Transition>
       </Menu>
     </>
   );

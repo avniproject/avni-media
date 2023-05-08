@@ -3,7 +3,7 @@ import { Styles } from "react-modal";
 import Modal from "react-modal";
 interface prop{
   subject: any[];
-  date : Date[];
+  date : any[]|null;
   onSubmit:(inputValue:string)=>void;
   onClose: ()=>void;
   showModal: boolean;
