@@ -34,3 +34,16 @@
   background: #2196f3;
 ;
 }
+.menu{
+  position: relative;
+  display: inline-block;
+  text-align: left;
+  padding-right: 8px;
+  margin-top: 20px;
+  z-index: 1o;
+}
+.check-button {
+  height: 20px; 
+  width: 20px; 
+  color: #38b2ac; 
+}

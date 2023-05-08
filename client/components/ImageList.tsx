@@ -14,6 +14,7 @@ import LocationHierarchy from "./FilterComponent/LocationHierarchy";
 import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
+import Button from "./DownloadComponent/Button";
 import jwt_decode from "jwt-decode";
 import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
 
@@ -25,7 +26,7 @@ export default function ImageList() {
   const [selectedParentId,setSelectedParentId] = useState<any>([])
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
+  const [imageList, setImageList] = useState({ page: 0, data: [] });
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
   const [orgID, setOrgID] = useState<string | string[] | undefined>();
   const [userName, setUserName] = useState<string | string[] | undefined>();
@@ -379,25 +380,28 @@ useEffect(() => {
               subject={subject}
             />
           )}
-          <button
+          {/* <button
             onClick={handleApplyFilter}
             className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2"
           >
             Apply Filter
-          </button>
+          </button> */}
 
-          <button
+          <Button 
+            name="Apply Filter"
+            onClick={handleApplyFilter} />
+          <Button
             onClick={handleOpenModal}
-            className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2"
-          >
-            Download
-          </button>
-
+            name=" Download" />
           <Link href="./downloadList">
-            <button className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2">
-              Available Downloads
-            </button>
-          </Link>
+            <Button 
+              name='Available Downloads' onClick={function (): void {
+                throw new Error("Function not implemented.");
+              } }       
+            
+            />
+            
+        </Link>
         </div>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
