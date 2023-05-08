@@ -16,7 +16,7 @@ import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
 import jwt_decode from "jwt-decode";
-import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
+import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -62,15 +62,22 @@ export default function ImageList() {
 
       setMinLevelName(processedData.minLevelAddressName)
 
-      setMaxtLevelLocation(processedData.maxLevelLocation);
+        const maxLevelLocation = addressLevel.find(
+          (obj: { level: number | undefined }) => obj.level === maxLevel
+        );
 
-      setLocation(processedData.sortedAddressLevel);
+        setMaxtLevelLocation(maxLevelLocation);
 
-      setSubjectFilter(processedData.subjects);
+        const sortedData = addressLevel.sort(
+          (a: { level: number }, b: { level: number }) => b.level - a.level
+        );
+        setLocation(sortedData);
+      }
 
-      setProgramFilter(processedData.programs);
-
-      setEncounterFilter(processedData.encounters);
+    
+      setSubjectFilter(subjects);
+      setProgramFilter(programs);
+      setEncounterFilter(encounters);
     };
     filterData();
   }, []);
