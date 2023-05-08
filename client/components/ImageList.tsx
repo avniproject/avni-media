@@ -1,9 +1,8 @@
 import CheckButton from "./CheckButton";
-import { useState, useEffect, SetStateAction, Key } from "react";
+import { useState, useEffect, Key } from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import UserInputModal from "./ImageDescriptionModal";
 import Accounts from "./FilterComponent/Accounts";
@@ -15,8 +14,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import jwt_decode from "jwt-decode";
-import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
+import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -39,8 +37,6 @@ export default function ImageList() {
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
-  const [topLevel ,setTopLevel] =useState<any>([]);
-  const [secondLevel ,setSecondLevel] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
   // filters state
   const [concepts, setConcept] = useState<any[]>([]);
@@ -50,7 +46,6 @@ export default function ImageList() {
   const [account, setAcountType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
   const [dataBody, setDataBody]= useState<any>()
-  const router = useRouter();
 
   useEffect(() => {
     const filterData = async () => {
@@ -62,22 +57,15 @@ export default function ImageList() {
 
       setMinLevelName(processedData.minLevelAddressName)
 
-        const maxLevelLocation = addressLevel.find(
-          (obj: { level: number | undefined }) => obj.level === maxLevel
-        );
+      setMaxtLevelLocation(processedData.maxLevelLocation);
 
-        setMaxtLevelLocation(maxLevelLocation);
+      setLocation(processedData.sortedAddressLevel);
 
-        const sortedData = addressLevel.sort(
-          (a: { level: number }, b: { level: number }) => b.level - a.level
-        );
-        setLocation(sortedData);
-      }
+      setSubjectFilter(processedData.subjects);
 
-    
-      setSubjectFilter(subjects);
-      setProgramFilter(programs);
-      setEncounterFilter(encounters);
+      setProgramFilter(processedData.programs);
+
+      setEncounterFilter(processedData.encounters);
     };
     filterData();
   }, []);
