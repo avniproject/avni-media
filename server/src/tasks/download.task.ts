@@ -8,7 +8,7 @@ export class DownloadMediaTask {
 
   constructor(private readonly mediaViewerService: MediaViewerService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  // @Cron(CronExpression.EVERY_MINUTE)
   async runTask() {
     try {
       this.logger.debug('Starting running the cron.');
