@@ -1,4 +1,4 @@
-import { FileUtility } from "./file-size";
+import { FileUtility } from "./file-utility";
 describe("FileSize", () => {
     
   let fileSize: FileUtility;
