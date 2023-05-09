@@ -37,17 +37,15 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
             onChange={(e) => handleChecked(e)}
           />
         </div>
-        <div className="mr-3">
+        <div className="mr-8">
           <a href={image_url}>
             <DownloadOutlined />
           </a>
         </div>
-        <div className="mt-1 text-sm">
-          <label className="font-medium text-gray-700">
-            {name}
-          </label>
-        </div>
+      </div>
+      <div className="mt-1 text-sm">
+        <label className="font-medium text-gray-700">{name}</label>
       </div>
     </fieldset>
-  )
+  );
 }
