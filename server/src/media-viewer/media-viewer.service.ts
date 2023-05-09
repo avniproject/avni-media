@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
-import { FileUtility } from 'src/fileUtility/file-size';
+import { FileUtility } from 'src/utils/file-utility';
 import axios from 'axios';
 import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
