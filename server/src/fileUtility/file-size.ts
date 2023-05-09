@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import * as fs from 'fs';
 Injectable()
-export class FileSize{
+export class FileUtility{
     getFileSizeText(fileSizeInBytes: number): string {
         const BYTE_TO_KB = 1024;
         const KB_TO_MB = 1024;

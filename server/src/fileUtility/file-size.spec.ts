@@ -1,9 +1,9 @@
-import { FileSize } from "./file-size";
+import { FileUtility } from "./file-size";
 describe("FileSize", () => {
     
-  let fileSize: FileSize;
+  let fileSize: FileUtility;
   beforeEach(() => {
-    fileSize = new FileSize();
+    fileSize = new FileUtility();
   });
 
   describe("getFileSizeText", () => {
@@ -37,7 +37,7 @@ describe("FileSize", () => {
 describe("FileSize", () => {
     describe("folderStructure", () => {
       it("should create directory path with metadata and location hierarchy", async () => {
-        const fileSize = new FileSize();
+        const fileSize = new FileUtility();
         const metadata = {
           address: '{"Dist": "Mumbai", "state": "MH"}',
           conceptName: "testConcept",

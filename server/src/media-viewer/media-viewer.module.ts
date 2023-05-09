@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { S3Service } from 'src/s3/s3.Service';
 import { ConfigModule } from '@nestjs/config';
-import { FileSize } from 'src/getFileSize/file-size';
+import { FileUtility } from 'src/fileUtility/file-size';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { FileSize } from 'src/getFileSize/file-size';
     }),
     TypeOrmModule.forFeature([DownloadJobs]),
   ],
-  providers: [MediaViewerService, S3Service,FileSize],
+  providers: [MediaViewerService, S3Service,FileUtility],
   controllers: [MediaViewerController],
 })
 export class MediaViewerModule {}

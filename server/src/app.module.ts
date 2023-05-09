@@ -9,7 +9,7 @@ import { S3Service } from './s3/s3.Service';
 import { DownloadJobs } from './entity/media.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { FileSize } from './getFileSize/file-size';
+import { FileUtility } from './fileUtility/file-size';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { FileSize } from './getFileSize/file-size';
     MediaViewerService,
     S3Service,
     ConfigService,
-    FileSize
+    FileUtility,
   ],
 })
 export class AppModule {}

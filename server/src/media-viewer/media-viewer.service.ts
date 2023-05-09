@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
-import { FileSize } from '../getFileSize/file-size';
+import { FileUtility } from 'src/fileUtility/file-size';
 import axios from 'axios';
 import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
@@ -14,7 +14,7 @@ import * as fsrm from 'fs-extra';
 export class MediaViewerService {
   constructor(
     private readonly s3Service: S3Service,
-    private readonly fileSize: FileSize,
+    private readonly fileUtility: FileUtility,
     @InjectRepository(DownloadJobs)
     private readonly mediaRepository: Repository<DownloadJobs>,
     private readonly configService: ConfigService,
@@ -35,7 +35,7 @@ export class MediaViewerService {
         await Promise.all(
           parsedData[id].image_metadata.map(async (metadata: { url: any; address: any; conceptName: any; subjectTypeName: any; encounterTypeName: any; }, i: any) => {
             const imageUrl = metadata.url;
-            folderName = await this.fileSize.folderStructure(
+            folderName = await this.fileUtility.folderStructure(
               metadata,
               locationHierarchy
             );
@@ -79,7 +79,7 @@ export class MediaViewerService {
         const stats = fs.statSync(filePath);
         const fileSizeInBytes = stats.size;
 
-        const fileSizeLabel = this.fileSize.getFileSizeText(fileSizeInBytes);
+        const fileSizeLabel = this.fileUtility.getFileSizeText(fileSizeInBytes);
         console.log("fileSize",fileSizeLabel)
         const s3FileName = 'media-zipped-files/' + filename;
 
