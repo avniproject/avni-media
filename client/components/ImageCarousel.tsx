@@ -3,11 +3,13 @@ import { Carousel } from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { redirectIfNotValid, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
 
 interface Props {
   imageList: object[];
   totalRecords: any;
   carouselImage: any;
+  pagination: any;
   onClose: () => void;
   onSelectImage: (value: string, checked: boolean) => void;
   checkedImage: string[];
@@ -18,6 +20,7 @@ const ImageCarousel = ({
   imageList,
   totalRecords,
   carouselImage,
+  pagination,
   onClose,
   onSelectImage,
   checkedImage,
@@ -25,12 +28,23 @@ const ImageCarousel = ({
   const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
   const [imageCarousel, setImageCarousel] = useState({
-    total: 0,
+    
     page: 0,
     data: [],
   });
 
+  const [minLevelName, setMinLevelName] = useState<string>('');
+
   useEffect(() => {
+    const filterData = async () => {
+      const processedData = await operationalModuleData()
+      setMinLevelName(processedData.minLevelAddressName)
+    };
+    filterData();
+  }, []);
+
+  useEffect(() => {
+    redirectIfNotValid();
     const fetchImages = async () => {
       const options = {
         headers: {
@@ -38,7 +52,7 @@ const ImageCarousel = ({
         },
       };
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=0&size=10000`,
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
         options
       );
       setImageCarousel(response.data);
@@ -47,9 +61,7 @@ const ImageCarousel = ({
   }, [totalRecords]);
 
   const onSelectImageCarousel = (value: string, checked: boolean) => {
-    const base = imageCarousel.data;
-    const selectedImageDetails = base.filter((obj) => obj.uuid === value)[0];
-    onSelectImage(value, checked, selectedImageDetails);
+    onSelectImage(value, checked,);
   };
 
   return (
@@ -99,20 +111,15 @@ const ImageCarousel = ({
               >
                 {imageCarousel.data.map(
                   (
-                    img: {
-                      signedUrl: string;
-                      uuid: string;
-                      subjectTypeName: string;
-                      createdDateTime: string;
-                    },
+                    img: imageType,
                     index
                   ) => (
                     <div key={index}>
                       <img src={img.signedUrl} className="carousel-image" />
                       <div className="checkbox">
                         <CheckButton
-                         image_url={img.signedUrl}
-                          name={img.subjectTypeName}
+                          image_url={img.signedUrl}
+                          name={ getImageName(img, minLevelName)}
                           id={img.uuid}
                           onSelectImageCarousel={onSelectImageCarousel}
                           flag="carousel"
@@ -124,8 +131,7 @@ const ImageCarousel = ({
                         />
                       </div>
                       <div className="name-size">
-                        <p>Subject Type: {img.subjectTypeName}</p>
-                        <p>
+                        <p className="text-sm">
                           Date:{" "}
                           {new Date(img.createdDateTime)
                             .toLocaleDateString("en-IN", {
@@ -136,8 +142,6 @@ const ImageCarousel = ({
                             .split("/")
                             .join("-")}
                         </p>
-                       
-
                       </div>
                     </div>
                   )

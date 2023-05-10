@@ -19,7 +19,7 @@ export default function Navbar() {
                 onClick={() =>
                   {
                     const currentUrl = window.location.href;
-                    const newUrl = currentUrl.replace("avni-media", "/#/home");
+                    const newUrl = currentUrl.replace(/\/avni-media.*$/, "#/home");
                     window.location.href = newUrl;
                   }}/>
            

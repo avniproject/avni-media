@@ -1,9 +1,8 @@
 import CheckButton from "./CheckButton";
-import { useState, useEffect, SetStateAction, Key } from "react";
+import { useState, useEffect, Key } from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import UserInputModal from "./ImageDescriptionModal";
 import Accounts from "./FilterComponent/Accounts";
@@ -14,8 +13,8 @@ import LocationHierarchy from "./FilterComponent/LocationHierarchy";
 import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
-import jwt_decode from "jwt-decode";
-import { redirectIfNotValid, getUserUuidFromToken} from '@/utils/helpers'
+import Button from "./DownloadComponent/Button";
+import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
 
 
 export default function ImageList() {
@@ -25,72 +24,48 @@ export default function ImageList() {
   const [selectedParentId,setSelectedParentId] = useState<any>([])
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [imageList, setImageList] = useState({ total: 0, page: 0, data: [] });
+  const [imageList, setImageList] = useState<any>({ page: 0, data: [] });
   const [pagination, setPagination] = useState({ size: 10, page: 0 });
-  const [orgID, setOrgID] = useState<string | string[] | undefined>();
   const [userName, setUserName] = useState<string | string[] | undefined>();
   const [locationFilter, setLocation] = useState<any>([]);
   const [subjectFilter, setSubjectFilter] = useState<any>([]);
   const [programFilter, setProgramFilter] = useState<any>([]);
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
-  const [maxLevel, setMaxLvel] = useState<number>();
-  const [minLevelName, setMinLevelName] = useState<string>();
+  const [maxLevel, setMaxLevel] = useState<number>();
+  const [minLevelName, setMinLevelName] = useState<string>('');
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
-  const [topLevel ,setTopLevel] =useState<any>([]);
-  const [secondLevel ,setSecondLevel] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
   // filters state
   const [concepts, setConcept] = useState<any[]>([]);
-  const [date, setDateRange] = useState<any[]>([]);
+  const [date, setDateRange] = useState<any[]|null>([]);
   const [encouter, setEncounterType] = useState<any[]>([]);
   const [program, setProgamType] = useState<any[]>([]);
   const [account, setAcountType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
   const [dataBody, setDataBody]= useState<any>()
-  const router = useRouter();
 
   useEffect(() => {
     const filterData = async () => {
-      const filterResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
-      );
-      const jsonData =  filterResponse.data
-      const programs = jsonData.programs;
-      const encounters = jsonData.encounterTypes;
-      const subjects = jsonData.subjectTypes;
-      const addressLevel = jsonData.allAddressLevels;
-      if (addressLevel !== undefined && addressLevel !== null) {
-        const maxLeveldata = Math.max(
-          ...addressLevel.map((obj: { level: any }) => obj.level)
-        );
-        setMaxLvel(maxLeveldata);
-        const minLeveldata = Math.min(
-          ...addressLevel.map((obj: { level: any }) => obj.level)
-        );
-        setMinLevel(minLeveldata);
+      const processedData = await operationalModuleData()
 
-        const minLevelAddress: any = addressLevel.find(obj => obj.level === minLeveldata);
-        setMinLevelName(minLevelAddress.name)
+      setMaxLevel(processedData.maxAddressLevel);
 
-        const maxLevelLocation = addressLevel.find(
-          (obj: { level: number | undefined }) => obj.level === maxLevel
-        );
+      setMinLevel(processedData.minAddressLevel);
 
-        setMaxtLevelLocation(maxLevelLocation);
+      setMinLevelName(processedData.minLevelAddressName)
 
-        const sortedData = addressLevel.sort(
-          (a: { level: number }, b: { level: number }) => b.level - a.level
-        );
-        setLocation(sortedData);
-      }
+      setMaxtLevelLocation(processedData.maxLevelLocation);
 
-    
-      setSubjectFilter(subjects);
-      setProgramFilter(programs);
-      setEncounterFilter(encounters);
+      setLocation(processedData.sortedAddressLevel);
+
+      setSubjectFilter(processedData.subjects);
+
+      setProgramFilter(processedData.programs);
+
+      setEncounterFilter(processedData.encounters);
     };
     filterData();
   }, []);
@@ -127,36 +102,38 @@ export default function ImageList() {
   } | null>(null);
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<any[]>([]);
   // checke images function
   const onSelectImage = (
     value: string,
     checked: boolean,
-    selectedImageDetails: any
+   
   ) => {
     if (checked) {
       setCheckedImage((prevCheckedImage) => {
         const updatedCheckedImage = [...prevCheckedImage, value];
         return updatedCheckedImage;
       });
-
-      setSelectedImage((prevSelectedImage) => {
-        const updatedSelectedImage = [
-          ...prevSelectedImage,
-          selectedImageDetails,
-        ];
-        return updatedSelectedImage;
-      });
     } else {
       setCheckedImage((prevCheckedImage) =>
         prevCheckedImage.filter((item) => item !== value)
       );
-
-      setSelectedImage((prevSelectedImage) =>
-        prevSelectedImage.filter((item) => item !== selectedImageDetails)
-      );
     }
   };
+
+  useEffect(() => {
+
+    const filteredData = imageList.data.filter((item: { uuid: string; }) => checkedImage.includes(item.uuid))
+    setSelectedImage((prevImages) => {
+      const newImages = [...prevImages, ...filteredData];
+      return newImages.filter(
+        ({ uuid }, index) =>
+          newImages.findIndex((image) => image.uuid === uuid) === index // remove duplicates
+          && checkedImage.includes(uuid) // include only checked images
+      );
+    });
+  }, [checkedImage, imageList]);
+  
   // pagination function
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page });
@@ -164,7 +141,6 @@ export default function ImageList() {
   const [showModal, setShowModal] = useState(false);
 
   const handleSendSelectedImages = async (inputValue: any) => {
-
     alert(
       `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
     );
@@ -187,8 +163,6 @@ export default function ImageList() {
     await handleSendSelectedImages(inputValue);
   };
 
-  
-
   const concept = (data: any[]) => {
     setConcept(data);
   };
@@ -197,8 +171,10 @@ export default function ImageList() {
     setProgamType(data);
   };
 
-  const dateRange = (data: any[]) => {
-    setDateRange(data);
+  const dateRange = (data: any[]|null) => {
+    if(data !== null){
+      setDateRange(data);
+    }
   };
 
   const encounterType = (data: any[]) => {
@@ -298,8 +274,6 @@ useEffect(() => {
   fitersData()
  },[date, subject, encouter, program, toDate, fromDate, add]);
 
-
-
   const handleApplyFilter = async () => {
     redirectIfNotValid();
     const options = {
@@ -308,8 +282,6 @@ useEffect(() => {
         "Content-Type": "application/json",
       },
     };
-
-
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
       dataBody,
@@ -321,37 +293,12 @@ useEffect(() => {
     setShowperpage(value);
   };
 
-  interface imageType {
-    signedUrl: string;
-    signedThumbnailUrl: string;
-    uuid: string;
-    subjectTypeName: string;
-    createdDateTime: string;
-    encounterTypeName: string;
-    programName: string;
-    address: string;
-    subjectName: string;
-  }
-
-  const getImageName = (image: imageType , minLevelName: string) => {
-    const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    return `${image.subjectName ? image.subjectName : ''} 
-              ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
-              ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
-              ${image.programName ? '_' + image.programName : ''}
-              ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
-  }
-
-  const getLowestLocation = (address: string, minLevelName: string) => {
-    return JSON.parse(address)[minLevelName];
-  }
-
   return (
     <>
       <div className="flex items-center justify-between">
-        <span className="mt-10 text-lg leading-6 font-medium text-gray-900 ml-8 flex-none">
-          Filters
-        </span>
+        <h1 className="text-xl leading-6 font-semibold text-gray-900 ml-8 flex-none">
+          Media Viewer
+        </h1>
         <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
           <NumberDropdown
             label="Images per page "
@@ -424,25 +371,17 @@ useEffect(() => {
               subject={subject}
             />
           )}
-          <button
-            onClick={handleApplyFilter}
-            className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2"
-          >
-            Apply Filter
-          </button>
-
-          <button
+          <Button 
+            name="Apply Filter"
+            onClick={handleApplyFilter} />
+          <Button
             onClick={handleOpenModal}
-            className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2"
-          >
-            Download
-          </button>
-
+            name=" Download" />
           <Link href="./downloadList">
-            <button className="inline-flex items-center px-9 py-2 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-offset-2 focus:ring-teal-500 ml-2 mb-2">
-              Available Downloads
-            </button>
-          </Link>
+            <Button 
+              name='Available Downloads' onClick={function (): void {}}       
+            />
+        </Link>
         </div>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
@@ -485,6 +424,7 @@ useEffect(() => {
             carouselImage={carouselImage}
             onClose={() => setCarouselImage(null)}
             onSelectImage={onSelectImage}
+            pagination ={pagination}
             checkedImage={checkedImage}
             setCheckedImage={[]}
           />
