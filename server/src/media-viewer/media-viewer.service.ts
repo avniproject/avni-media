@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
+import { FileUtility } from 'src/utils/file-utility';
 import axios from 'axios';
 import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
@@ -13,6 +14,7 @@ import * as fsrm from 'fs-extra';
 export class MediaViewerService {
   constructor(
     private readonly s3Service: S3Service,
+    private readonly fileUtility: FileUtility,
     @InjectRepository(DownloadJobs)
     private readonly mediaRepository: Repository<DownloadJobs>,
     private readonly configService: ConfigService,
@@ -33,15 +35,8 @@ export class MediaViewerService {
         await Promise.all(
           parsedData[id].image_metadata.map(async (metadata: { url: any; address: any; conceptName: any; subjectTypeName: any; encounterTypeName: any; }, i: any) => {
             const imageUrl = metadata.url;
-            const address = metadata.address;
-            const conceptType = metadata.conceptName;
-            const subjectType = metadata.subjectTypeName;
-            const encounterType = metadata.encounterTypeName;
-            folderName = await this.folderStructure(
-              address,
-              subjectType,
-              encounterType,
-              conceptType,
+            folderName = await this.fileUtility.folderStructure(
+              metadata,
               locationHierarchy
             );
             try {
@@ -84,7 +79,8 @@ export class MediaViewerService {
         const stats = fs.statSync(filePath);
         const fileSizeInBytes = stats.size;
 
-        const fileSizeLabel = this.getFileSizeText(fileSizeInBytes);
+        const fileSizeLabel = this.fileUtility.getFileSizeText(fileSizeInBytes);
+        console.log("fileSize",fileSizeLabel)
         const s3FileName = 'media-zipped-files/' + filename;
 
         const zipFileS3url = await this.s3Service.uploadFileToS3(
@@ -159,101 +155,5 @@ export class MediaViewerService {
       return item;
     });
     return parsedData;
-  }
-
-  getFileSizeText(fileSizeInBytes: number): string {
-    const BYTE_TO_KB = 1024;
-    const KB_TO_MB = 1024;
-    const MB_TO_GB = 1024;
-
-    if (!Number.isFinite(fileSizeInBytes) || fileSizeInBytes < 0) {
-      throw new Error('Invalid file size');
-    }
-
-    let size: string | number;
-    let unit: string;
-
-    if (fileSizeInBytes < BYTE_TO_KB) {
-      size = fileSizeInBytes;
-      unit = 'bytes';
-    } else if (fileSizeInBytes < BYTE_TO_KB * KB_TO_MB) {
-      size = (fileSizeInBytes / BYTE_TO_KB).toFixed(2);
-      unit = 'KB';
-    } else if (fileSizeInBytes < BYTE_TO_KB * KB_TO_MB * MB_TO_GB) {
-      size = (fileSizeInBytes / BYTE_TO_KB / KB_TO_MB).toFixed(2);
-      unit = 'MB';
-    } else {
-      size = (fileSizeInBytes / BYTE_TO_KB / KB_TO_MB / MB_TO_GB).toFixed(2);
-      unit = 'GB';
-    }
-
-    return `${size} ${unit}`;
-  }
-
-  async folderStructure(
-    address: string,
-    subjectType: any,
-    encounterType: any,
-    conceptType: any,
-    locationHierarchy: { name: any; }[]
-  ): Promise<string> {
-    const keys = locationHierarchy.map((index: { name: any; }) => index.name);
-    const jsonadd = JSON.parse(address);
-    const addressArray = [];
-    let val =''
-    for (const key of keys) {
-      val= key.toString()
-      addressArray.push(jsonadd[val]);
-    }
-    let directoryPath = ''
-    await Promise.all(
-      addressArray.map(async (addressPart) => {
-        if (addressPart) {
-          if (directoryPath) {
-            directoryPath = `${directoryPath}/${addressPart}`;
-          } else {
-            directoryPath = `${addressPart}`;
-          }
-          if (!fs.existsSync(directoryPath)) {
-            fs.mkdirSync(directoryPath);
-          }
-        }
-      }),
-    );
-
-    if (subjectType) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${subjectType}`;
-      } else {
-        directoryPath = `${subjectType}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
-
-    if (encounterType) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${encounterType}`;
-      } else {
-        directoryPath = `${encounterType}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
-
-    if (conceptType) {
-      if (directoryPath) {
-        directoryPath = `${directoryPath}/${conceptType}`;
-      } else {
-        directoryPath = `${conceptType}`;
-      }
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-      }
-    }
-
-    return directoryPath;
   }
 }

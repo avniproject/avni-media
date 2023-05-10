@@ -1,6 +1,6 @@
 import { DateTime } from 'aws-sdk/clients/devicefarm';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { Status } from 'src/media-viewer/status.enum';
+import { Status } from '../media-viewer/status.enum';
 
 @Entity()
 export class DownloadJobs {
