@@ -243,10 +243,8 @@ export default function ImageList() {
     }
   }, [address, secondAddress]);
   
-
  useEffect(()=>{
   const fitersData = async () => {
-
     if (date && date.length > 0) {
       setToDate(date[1]);
       setFromDate(date[0]);
