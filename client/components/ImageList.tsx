@@ -233,19 +233,19 @@ export default function ImageList() {
     setSubjectType(data);
   };
 
-useEffect(() => {
-
-  if (address.length > 0 || secondAddress.length > 0) {
-    setAdd([...address, ...secondAddress]);
-  }
-  else{
-    setAdd([])
-  }
-}, [address, secondAddress]);
-
+  useEffect(() => {
+    if (secondAddress.length > 0) {
+      setAdd(secondAddress);
+    } else if (address.length > 0) {
+      setAdd(address);
+    } else {
+      setAdd([]);
+    }
+  }, [address, secondAddress]);
+  
  useEffect(()=>{
+  
   const fitersData = async () => {
-
     if (date && date.length > 0) {
       setToDate(date[1]);
       setFromDate(date[0]);
