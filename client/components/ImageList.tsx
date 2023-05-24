@@ -339,12 +339,7 @@ export default function ImageList() {
             )
           )}
         <Daterange dateRange={dateRange} />
-        {encounterFilter && encounterFilter.length > 0 && (
-          <EncounterType
-            encounterType={encounterType}
-            encounterFilter={encounterFilter}
-          />
-        )}
+
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
@@ -356,6 +351,14 @@ export default function ImageList() {
           <Program programType={programType} 
           programFilter={programFilter} />
         )}
+
+        {encounterFilter && encounterFilter.length > 0 && (
+          <EncounterType
+            encounterType={encounterType}
+            encounterFilter={encounterFilter}
+          />
+        )}
+
         {/* <Concepts concept={concept} />
         <Accounts accountType={accountType} /> */}
       </div>
