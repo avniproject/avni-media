@@ -48,7 +48,6 @@ export default function ImageList() {
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
-  // filters state
   const [concepts, setConcept] = useState<any>();
   const [date, setDateRange] = useState<any[] | null>([]);
   const [encouter, setEncounterType] = useState<any[]>([]);
@@ -184,13 +183,13 @@ export default function ImageList() {
       const newImages = [...prevImages, ...filteredData];
       return newImages.filter(
         ({ uuid }, index) =>
-          newImages.findIndex((image) => image.uuid === uuid) === index // remove duplicates
-          && checkedImage.includes(uuid) // include only checked images
+          newImages.findIndex((image) => image.uuid === uuid) === index 
+          && checkedImage.includes(uuid) 
       );
     });
   }, [checkedImage, imageList]);
   
-  // pagination function
+
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page });
   };

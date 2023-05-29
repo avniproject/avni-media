@@ -1,45 +1,35 @@
 import { useEffect, useState } from "react";
 import { Menu } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
-import { operationalModuleData } from "@/utils/helpers";
-import axios from "axios";
-import { constants } from "buffer";
+import { ChevronDownIcon } from "@heroicons/react/solid";
 interface Option {
   id: number;
   name: string;
 }
 
-
 const concepts: any[] = [];
 interface Prop {
   concept: any;
-  conceptdata: any[]
- 
+  conceptdata: any[];
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-
-export default function Concepts({ concept,conceptdata }: Prop) {
-  const [selectedOptions, setSelectedOptions] = useState([])
- useEffect(()=>{
-  concept(selectedOptions)
- },[selectedOptions])
+export default function Concepts({ concept, conceptdata }: Prop) {
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  useEffect(() => {
+    concept(selectedOptions);
+  }, [selectedOptions]);
   function handleOptionClick(option: any) {
-
-    setSelectedOptions(option)
-    
+    setSelectedOptions(option);
   }
 
   return (
     <Menu as="div" className="menu">
       <div>
-      <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+        <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
           <span>
-            {selectedOptions.length > 0
-              ? selectedOptions
-              : "Concepts"}
+            {selectedOptions.length > 0 ? selectedOptions : "Concepts"}
           </span>
           <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </Menu.Button>
@@ -58,7 +48,6 @@ export default function Concepts({ concept,conceptdata }: Prop) {
                   onClick={() => handleOptionClick(option.name)}
                 >
                   {option.name}
-                 
                 </button>
               )}
             </Menu.Item>

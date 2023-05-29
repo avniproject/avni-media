@@ -13,7 +13,6 @@ interface Props {
 }
 
 const DateRangeComp = ({ dateRange }: Props) => {
-  // date state
   const [date, setDate] = useState<null | string[]>(null);
 
   useEffect(() => {
@@ -30,14 +29,12 @@ const DateRangeComp = ({ dateRange }: Props) => {
           format={dateFormat}
           onChange={(dateValue) => {
             if (dateValue) {
-              // check if dateValue is not null
               setDate(
                 dateValue.map((selectedDte) => {
                   return dayjs(selectedDte).format("YYYY-MM-DD");
                 })
               );
             } else {
-              // handle null case
               setDate(null);
             }
           }}
