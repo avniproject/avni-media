@@ -40,7 +40,7 @@
   text-align: left;
   padding-right: 8px;
   margin-top: 20px;
-  z-index: 1o;
+  z-index: 10;
 }
 .check-button {
   height: 20px; 
