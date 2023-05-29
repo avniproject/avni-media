@@ -1,5 +1,5 @@
 import CheckButton from "./CheckButton";
-import { useState, useEffect, Key, use } from "react";
+import { useState, useEffect, Key } from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -163,7 +163,7 @@ export default function ImageList() {
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<any[]>([]);
-  
+
   const onSelectImage = (value: string, checked: boolean) => {
     if (checked) {
       setCheckedImage((prevCheckedImage) => {
