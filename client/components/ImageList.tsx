@@ -14,14 +14,24 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
-
+import {
+  redirectIfNotValid,
+  getUserUuidFromToken,
+  operationalModuleData,
+  getImageName,
+  imageType,
+} from "@/utils/helpers";
+import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
+import DateConceptFilter from "./FilterComponent/DateConceptFilter";
+import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
+import TexConceptFilter from "./FilterComponent/TextConceptFilter";
+import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 
 export default function ImageList() {
-  const [add, setAdd]= useState<any>([])
-  const[address ,setAddress] = useState<any>([])
-  const[secondAddress, setSecondAddress] = useState<any>([])
-  const [selectedParentId,setSelectedParentId] = useState<any>([])
+  const [add, setAdd] = useState<any>([]);
+  const [address, setAddress] = useState<any>([]);
+  const [secondAddress, setSecondAddress] = useState<any>([]);
+  const [selectedParentId, setSelectedParentId] = useState<any>([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [imageList, setImageList] = useState<any>({ page: 0, data: [] });
@@ -33,29 +43,38 @@ export default function ImageList() {
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLevel] = useState<number>();
-  const [minLevelName, setMinLevelName] = useState<string>('');
+  const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [loction, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
-  // filters state
-  const [concepts, setConcept] = useState<any[]>([]);
-  const [date, setDateRange] = useState<any[]|null>([]);
+  const [concepts, setConcept] = useState<any>();
+  const [date, setDateRange] = useState<any[] | null>([]);
   const [encouter, setEncounterType] = useState<any[]>([]);
   const [program, setProgamType] = useState<any[]>([]);
   const [account, setAcountType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
-  const [dataBody, setDataBody]= useState<any>()
+  const [dataBody, setDataBody] = useState<any>();
+  const [conceptdata, setConceptData] = useState<any>([{}]);
+  const [formsData, setFormsData] = useState<any>([]);
+  const [textConcept, setTextConcept] = useState<any>([])
+  const [codedConcept, setCodedConcept] = useState<any>([])
+  const [noteConcept, setNoteConcept] = useState<any>([])
+  const [toNumericConcept, setToNumericConcept] = useState<any>([])
+  const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
+  const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
 
   useEffect(() => {
+    const userUUID = getUserUuidFromToken();
+    setUserName(userUUID);
     const filterData = async () => {
-      const processedData = await operationalModuleData()
+      const processedData = await operationalModuleData();
 
       setMaxLevel(processedData.maxAddressLevel);
 
       setMinLevel(processedData.minAddressLevel);
 
-      setMinLevelName(processedData.minLevelAddressName)
+      setMinLevelName(processedData.minLevelAddressName);
 
       setMaxtLevelLocation(processedData.maxLevelLocation);
 
@@ -66,14 +85,54 @@ export default function ImageList() {
       setProgramFilter(processedData.programs);
 
       setEncounterFilter(processedData.encounters);
+
+      setFormsData(processedData.forms);
     };
     filterData();
   }, []);
 
   useEffect(() => {
-    const userUUID = getUserUuidFromToken()
-    setUserName(userUUID);
-  }, []);
+    const data = async () => {
+      formsData.map(async (element: { formUUID: any; }) => {
+        const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
+        const forms = formData.data
+
+        const applicableFormElements =
+          forms.formElementGroups[0].applicableFormElements;
+        await Promise.all(
+          applicableFormElements.map(async (element: { concept: { uuid: string; dataType: any; }; }) => {
+            const exists = conceptdata.some(
+              (concept: { uuid: string }) =>
+                concept.uuid === element.concept.uuid
+            );
+            if (!exists) {
+              const dataType = element.concept.dataType;
+              const isDateType = dataType === "Date";
+              const isDateTimeType = dataType === "DateTime";
+              const isNumericType = dataType === "Numeric";
+              const isCodedType = dataType === "Coded";
+              const isNotesType = dataType === "Notes";
+              const isTextType = dataType === "Text";
+              if (
+                isDateType ||
+                isDateTimeType ||
+                isNumericType ||
+                isCodedType ||
+                isNotesType ||
+                isTextType
+              ) {
+                setConceptData((prevConceptData: any) => [
+                  ...prevConceptData,
+                  element.concept,
+                ]);
+              }
+            }
+          })
+        );
+      });
+    };
+    data();
+  }, [formsData]);
 
   useEffect(() => {
     redirectIfNotValid();
@@ -103,12 +162,8 @@ export default function ImageList() {
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<any[]>([]);
-  // checke images function
-  const onSelectImage = (
-    value: string,
-    checked: boolean,
-   
-  ) => {
+
+  const onSelectImage = (value: string, checked: boolean) => {
     if (checked) {
       setCheckedImage((prevCheckedImage) => {
         const updatedCheckedImage = [...prevCheckedImage, value];
@@ -128,13 +183,13 @@ export default function ImageList() {
       const newImages = [...prevImages, ...filteredData];
       return newImages.filter(
         ({ uuid }, index) =>
-          newImages.findIndex((image) => image.uuid === uuid) === index // remove duplicates
-          && checkedImage.includes(uuid) // include only checked images
+          newImages.findIndex((image) => image.uuid === uuid) === index 
+          && checkedImage.includes(uuid) 
       );
     });
   }, [checkedImage, imageList]);
   
-  // pagination function
+
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page });
   };
@@ -150,7 +205,6 @@ export default function ImageList() {
     );
   };
 
-  //  user input form
   const handleOpenModal = () => {
     setShowModal(true);
   };
@@ -164,8 +218,70 @@ export default function ImageList() {
   };
 
   const concept = (data: any[]) => {
-    setConcept(data);
+    const conceptJson = conceptdata.find(
+      (item: { name: any[] }) => item.name === data
+    );
+    setConcept(conceptJson);
   };
+
+  const conceptDate = (data: any[]|null, conceptName: string) => {
+    if(data && data.length>0){
+      setConceptDates([{
+        "conceptName": conceptName,
+        "from": data[0],
+        "to": data[1]
+      }])
+    }
+  };
+
+  const conceptDateTime = (data: any[]|null, conceptName: string) => {
+    if(data && data.length>0){
+      setDateTimeConcept([{
+        "conceptName": conceptName,
+        "from": data[0],
+        "to": data[1]
+      }])
+    }
+  };
+
+  const conceptNumeric = (fromNumber: number, toNumber: number,conceptName: string) =>{
+   setToNumericConcept([{
+    "conceptName": conceptName,
+    "from": fromNumber,
+    "to": toNumber
+   }])
+  }
+
+  const conceptCoded = (data: any, conceptName: string) =>{
+    if(data.length>0){
+      setCodedConcept([{
+        "conceptName": conceptName,
+        "values":data
+       }])
+    }
+  }
+
+  const conceptNote = (data: string) =>{
+
+    if(data && data.length>0){
+      setNoteConcept([{
+        "conceptName": "NoteConcept",
+        "values":data
+      }])
+    }
+   
+  }
+
+  const conceptText = (data: string) =>{
+
+   if(data && data.length>0){
+    setTextConcept([{
+      "conceptName": "TextConcept",
+      "values":data
+     }])
+   }
+  
+  }
 
   const programType = (data: any[]) => {
     setProgamType(data);
@@ -253,6 +369,29 @@ export default function ImageList() {
       setToDate(null);
       setFromDate(null);
     }
+  
+    let conceptfilter = [];
+
+    if (codedConcept && codedConcept.length > 0) {
+      conceptfilter.push(codedConcept[0]);
+    }
+    
+    if (toNumericConcept && toNumericConcept.length > 0) {
+      conceptfilter.push(toNumericConcept[0]);
+    }
+    
+    if (textConcept && textConcept.length > 0) {
+      conceptfilter.push(textConcept[0]);
+    }
+    if (noteConcept && noteConcept.length > 0) {
+      conceptfilter.push(noteConcept[0]);
+    }
+    if(dateTimeConcept && dateTimeConcept.length>0){
+      conceptfilter.push(dateTimeConcept[0])
+    }
+    if(conceptDates && conceptDates.length>0){
+     conceptfilter.push(conceptDates[0])
+    } 
     const body = Object.fromEntries(
       Object.entries({
         subjectTypeNames: subject,
@@ -261,6 +400,7 @@ export default function ImageList() {
         fromDate: fromDate,
         toDate: toDate,
         addresses: add,
+        conceptFilters: conceptfilter
       }).filter(([_, value]) => {
         if (Array.isArray(value)) {
           return value.length > 0;
@@ -272,7 +412,7 @@ export default function ImageList() {
    setDataBody(body)
   }
   fitersData()
- },[date, subject, encouter, program, toDate, fromDate, add]);
+ },[date, subject, encouter, program, toDate, fromDate, add, codedConcept, toNumericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept]);
 
   const handleApplyFilter = async () => {
     redirectIfNotValid();
@@ -359,8 +499,28 @@ export default function ImageList() {
           />
         )}
 
-        {/* <Concepts concept={concept} />
-        <Accounts accountType={accountType} /> */}
+        <Concepts concept={concept} conceptdata={conceptdata} />
+      </div>
+      {/* <Accounts accountType={accountType} /> */}
+      <div className="flex justify-center mx-auto w-center  mr-4 ml-4">
+        {concepts && concepts.dataType === "Coded" ? (
+          <CodedConceptFilter concepts={concepts.conceptAnswers} 
+          conceptCoded={conceptCoded}/>
+        ) : concepts && concepts.dataType === "Date" ? (
+          <DateConceptFilter
+          conceptDate={conceptDate}
+          />
+        ) : concepts && concepts.dataType === "DateTime" ? (
+          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
+        ) : concepts && concepts.dataType === "Text" ? (
+          <TexConceptFilter
+          conceptNote={conceptText} />
+        ) : concepts && concepts.dataType === "Numeric" ? (
+          <NumericConceptFilter conceptNumeric={conceptNumeric} />
+        ) : concepts && concepts.dataType === "Notes" ? (
+          <TexConceptFilter 
+          conceptNote={conceptNote}/>
+        ) : null}
       </div>
 
       <div className="bg-white">
