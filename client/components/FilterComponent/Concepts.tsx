@@ -27,13 +27,9 @@ export default function Concepts({ concept,conceptdata }: Prop) {
   concept(selectedOptions)
  },[selectedOptions])
   function handleOptionClick(option: any) {
-   
+
     setSelectedOptions(option)
-    // if (selectedOptions.includes(option)) {
-    //   setSelectedOptions(selectedOptions.filter((o) => o !== option));
-    // } else {
-    //   setSelectedOptions([...selectedOptions, option]);
-    // }
+    
   }
 
   return (

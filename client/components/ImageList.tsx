@@ -163,7 +163,7 @@ export default function ImageList() {
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<any[]>([]);
-  // checke images function
+  
   const onSelectImage = (value: string, checked: boolean) => {
     if (checked) {
       setCheckedImage((prevCheckedImage) => {

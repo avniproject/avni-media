@@ -44,7 +44,7 @@ export const operationalModuleData = async () => {
       `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}/operationalModules`
     );
     const jsonData =filterResponse.data
-    const forms     = jsonData.formMappings
+    const forms    = jsonData.formMappings
     const programs = jsonData.programs;
     const encounters = jsonData.encounterTypes;
     const subjects = jsonData.subjectTypes;
