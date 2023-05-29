@@ -12,22 +12,34 @@ function classNames(...classes: string[]) {
 }
 
 export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
+
   const [codedData, setCodedData] = useState<any>([]);
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
+
   function handleOptionClick(option: any) {
+
     if (selectedOptions.includes(option)) {
+
       setSelectedOptions(selectedOptions.filter((o) => o !== option));
+
     } else {
+
       setSelectedOptions([...selectedOptions, option]);
+
     }
   }
   useEffect(() => {
+
     const answerConceptData = async () => {
+
       const newData = await Promise.all(
         concepts.map(async (element: any) => {
+
           return element.answerConcept;
+
         })
       );
+      
       setCodedData(newData);
     };
 
@@ -35,7 +47,9 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
   }, [concepts]);
 
   useEffect(() => {
+
     conceptCoded(selectedOptions, "CodedConcept");
+
   }, [selectedOptions]);
 
   return (

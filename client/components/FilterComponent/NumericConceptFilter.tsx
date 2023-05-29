@@ -5,6 +5,7 @@ interface Prop {
 }
 
 export default function NumericConceptFilter({ conceptNumeric }: Prop) {
+
   const [frominputValue, setfromInputValue] = useState("");
   const [toinputValue, settoInputValue] = useState("");
   const [isValidRange, setIsValidRange] = useState(true);
@@ -13,10 +14,12 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
     const isValid =
       frominputValue === "" ||
       toinputValue === "" ||
-      parseFloat(frominputValue) <= parseFloat(toinputValue);
+      parseInt(frominputValue) <= parseInt(toinputValue);
     setIsValidRange(isValid);
     if (frominputValue < toinputValue) {
+
       conceptNumeric(parseInt(frominputValue), parseInt(toinputValue), "NumericConcept");
+
     }
   }, [frominputValue, toinputValue]);
 

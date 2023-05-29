@@ -205,7 +205,6 @@ export default function ImageList() {
     );
   };
 
-  //  user input form
   const handleOpenModal = () => {
     setShowModal(true);
   };
@@ -235,7 +234,7 @@ export default function ImageList() {
     }
   };
 
-  const conceptTimeDate = (data: any[]|null, conceptName: string) => {
+  const conceptDateTime = (data: any[]|null, conceptName: string) => {
     if(data && data.length>0){
       setDateTimeConcept([{
         "conceptName": conceptName,
@@ -512,7 +511,7 @@ export default function ImageList() {
           conceptDate={conceptDate}
           />
         ) : concepts && concepts.dataType === "DateTime" ? (
-          <TimeStampConceptFilter conceptTimeDate={conceptTimeDate} />
+          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
         ) : concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
           conceptNote={conceptText} />

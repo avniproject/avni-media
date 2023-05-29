@@ -5,9 +5,13 @@ interface Prop {
 }
 
 export default function TexConceptFilter({ conceptNote }: Prop) {
+
   const [inputValue, setInputValue] = useState("");
+
   useEffect(() => {
+
     conceptNote(inputValue);
+    
   }, [inputValue]);
 
   return (

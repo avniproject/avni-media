@@ -17,7 +17,7 @@ const DateConceptFilter = ({ conceptDate }: Props) => {
   const [date, setDate] = useState<null | string[]>(null);
 
   useEffect(() => {
-    conceptDate(date,"DateConcept");
+    conceptDate(date, "DateConcept");
   }, [date]);
 
   return (

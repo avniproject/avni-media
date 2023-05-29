@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
 import { Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-interface Option {
-  id: number;
-  name: string;
-}
 
-const concepts: any[] = [];
+
 interface Prop {
   concept: any;
   conceptdata: any[];
 }
+
 function classNames(...classes: string[]) {
+
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Concepts({ concept, conceptdata }: Prop) {
+
   const [selectedOptions, setSelectedOptions] = useState([]);
+
   useEffect(() => {
+
     concept(selectedOptions);
+
   }, [selectedOptions]);
+
   function handleOptionClick(option: any) {
+
     setSelectedOptions(option);
+
   }
 
   return (
