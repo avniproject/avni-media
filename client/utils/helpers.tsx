@@ -41,7 +41,7 @@ export const getUserUuidFromToken = () => {
 
 export const operationalModuleData = async () => {
     const filterResponse = await axios.get(
-      `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}/operationalModules`
+      `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
     );
     const jsonData =filterResponse.data
     const forms    = jsonData.formMappings

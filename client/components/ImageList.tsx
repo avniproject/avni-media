@@ -22,7 +22,7 @@ import {
   imageType,
 } from "@/utils/helpers";
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
-import DateConceptFilter from "./DateConceptFilter";
+import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
 import TexConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
@@ -95,7 +95,7 @@ export default function ImageList() {
   useEffect(() => {
     const data = async () => {
       formsData.map(async (element: { formUUID: any; }) => {
-        const formData = await axios.get(`${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}/form/${element.formUUID}`)
+        const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
         const forms = formData.data
 
         const applicableFormElements =
