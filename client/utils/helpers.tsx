@@ -43,7 +43,7 @@ export const operationalModuleData = async () => {
     const filterResponse = await axios.get(
       `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
     );
-    const jsonData =filterResponse.data
+    const jsonData = filterResponse.data
     const forms    = jsonData.formMappings
     const programs = jsonData.programs;
     const encounters = jsonData.encounterTypes;
