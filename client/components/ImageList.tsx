@@ -98,8 +98,8 @@ export default function ImageList() {
         const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
         const forms = formData.data
 
-        const applicableFormElements =
-          forms.formElementGroups[0].applicableFormElements;
+        const applicableFormElements = forms.formElementGroups[0] ?
+          forms.formElementGroups[0].applicableFormElements : [];
         await Promise.all(
           applicableFormElements.map(async (element: { concept: { uuid: string; dataType: any; }; }) => {
             const exists = conceptdata.some(
@@ -513,6 +513,7 @@ export default function ImageList() {
       
         {/* <Accounts accountType={accountType} /> */}
       
+
         {concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
           conceptCoded={conceptCoded}/>

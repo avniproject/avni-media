@@ -24,7 +24,7 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
   }, [frominputValue, toinputValue]);
 
   return (
-    <div className="w-84 mt-5 flex items-center">
+    <>
       <label className="mr-2 flex-shrink-0">Between:</label>
       <input
         type="number"
@@ -46,6 +46,6 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
       {!isValidRange && (
         <p className="text-red-500 text-sm ml-2">Invalid range</p>
       )}
-    </div>
+    </>
   );
 }
