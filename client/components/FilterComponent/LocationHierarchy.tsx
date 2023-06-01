@@ -26,7 +26,7 @@ interface Prop {
   getSecondLevel: (data: any[], levelType: string) => void;
   getSelectedLocation: (data: any[]) => void;
   getTypeId: (data: any) => void;
-  loction: any[];
+  location: any[];
   otherLocation: any[];
   locationFilter: any[]
   
@@ -43,7 +43,7 @@ function classNames(...classes: string[]) {
 
 export default function LocationHierarchy({
   locationIndex,
-  loction,
+  location,
   getLocation,
   getOtherLocation,
   getTopLevel,
@@ -256,8 +256,8 @@ export default function LocationHierarchy({
         ) : maxLevel !== undefined &&  locationIndex.level === maxLevel-1  ? (
           <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
-              {loction &&
-                loction.map((option: Option) => (
+              {location &&
+                location.map((option: Option) => (
                   <Menu.Item key={option.uuid}>
                     {({ active }) => (
                       <button
