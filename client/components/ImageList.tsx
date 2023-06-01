@@ -450,7 +450,7 @@ export default function ImageList() {
         </div>
       </div>
 
-      <div className="flex justify-center mx-auto w-center mr-4 ml-4">
+      <div className="inline-block justify-center mx-auto w-center mr-4 ml-4">
         {locationFilter &&
           locationFilter.map(
             (
@@ -500,9 +500,8 @@ export default function ImageList() {
         )}
 
         <Concepts concept={concept} conceptdata={conceptdata} />
-      </div>
-      {/* <Accounts accountType={accountType} /> */}
-      <div className="flex justify-center mx-auto w-center  mr-4 ml-4">
+      
+        {/* <Accounts accountType={accountType} /> */}
         {concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
           conceptCoded={conceptCoded}/>
