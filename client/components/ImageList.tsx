@@ -63,6 +63,7 @@ export default function ImageList() {
   const [toNumericConcept, setToNumericConcept] = useState<any>([])
   const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
   const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
+  const [typeId, setTypeId] = useState<any>([])
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -312,7 +313,14 @@ export default function ImageList() {
   const getOtherLocation = (data: any[]) => {
     setOtherLocation(data);
   };
-
+  
+  const getTypeId = (data: any) => {
+    if (typeId.includes(data)) {
+     setTypeId(typeId.filter((o: any) => o !== typeId));
+    } else {
+      setTypeId([...typeId, data]);
+    }
+  }
 
   const getTopLevel = (data: any[],levelname: string) => {
 
@@ -450,34 +458,38 @@ export default function ImageList() {
         </div>
       </div>
 
-      <div className="flex justify-center mx-auto w-center mr-4 ml-4">
-        {locationFilter &&
+      <div className="inline-block justify-center mx-auto w-center mr-4 ml-4">
+      {locationFilter && (
           locationFilter.map(
-            (
-              locationIndex: {
-                name: string;
-                id: number;
-                level: number;
-              },
-              index: Key
-            ) => (
-              <LocationHierarchy
-                key={index}
-                locationIndex={locationIndex}
-                index={index}
-                selectedParentId={selectedParentId}
-                minLevel={minLevel}
-                maxLevel={maxLevel}
-                getLocation={getLocation}
-                loction={loction}
-                getOtherLocation={getOtherLocation}
-                otherLocation={otherLocation}
-                getTopLevel={getTopLevel}
-                getSecondLevel={getSecondLevel}
-                getSelectedLocation={getSelectedLocation}
-              />
-            )
-          )}
+            (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
+              // console.log('index--', index, ' typeId-', typeId, ' locationIndex.id-', locationIndex.parent )
+              console.log("type",typeId,typeId.find(((item: number) => item === locationIndex.id)))
+              if (index === 0 || typeId.find(((item: number) => item === locationIndex.id)) ) {
+                console.log( 'typeId-', typeId, ' locationIndex.id-', locationIndex.id )
+                return (
+                  <LocationHierarchy
+                    key={index}
+                    locationIndex={locationIndex}
+                    index={index}
+                    selectedParentId={selectedParentId}
+                    locationFilter ={locationFilter}
+                    minLevel={minLevel}
+                    maxLevel={maxLevel}
+                    getLocation={getLocation}
+                    loction={loction}
+                    getOtherLocation={getOtherLocation}
+                    otherLocation={otherLocation}
+                    getTopLevel={getTopLevel}
+                    getSecondLevel={getSecondLevel}
+                    getSelectedLocation={getSelectedLocation}
+                    getTypeId = {getTypeId}
+                  />
+                );
+              }
+              return null;
+            }
+          )
+        )}
         <Daterange dateRange={dateRange} />
 
         {subjectFilter && subjectFilter.length > 0 && (
@@ -498,8 +510,9 @@ export default function ImageList() {
             encounterFilter={encounterFilter}
           />
         )}
-
-        <Concepts concept={concept} conceptdata={conceptdata} />
+        { conceptdata && conceptdata.length > 0 &&
+           <Concepts concept={concept} conceptdata={conceptdata} />
+        }
       </div>
       {/* <Accounts accountType={accountType} /> */}
       <div className="flex justify-center mx-auto w-center  mr-4 ml-4">
