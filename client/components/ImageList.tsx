@@ -511,11 +511,6 @@ export default function ImageList() {
             <Concepts concept={concept} conceptdata={conceptdata} />
         }
         {/* <Accounts accountType={accountType} /> */}
-<<<<<<< HEAD
-=======
-      
-
->>>>>>> d45c674ffcb12a13381d00c4d781fb70d7607741
         {concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
           conceptCoded={conceptCoded}/>
