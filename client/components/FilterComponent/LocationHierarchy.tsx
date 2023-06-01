@@ -18,7 +18,7 @@ interface Prop {
   };
   index: Key;
   minLevel: number | undefined;
-  maxLevel: number | undefined;
+  maxLevel: number | undefined ;
   selectedParentId: any[];
   getLocation: (data: any[]) => void;
   getOtherLocation: (data: any[]) => void;
@@ -64,7 +64,6 @@ export default function LocationHierarchy({
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
-  const [secondLevelIndex, setSecondLevelIndex] = useState<number>()
 
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);
@@ -90,8 +89,7 @@ export default function LocationHierarchy({
     if (maxLevel !== undefined) {
       if (locationIndex.level === maxLevel - 1) {
         const secondLevelTypeId = locationIndex.id;
-        setSecondLevelIndex(secondLevelTypeId)
-        // localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
+        localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
 
       }
     }
@@ -100,66 +98,19 @@ export default function LocationHierarchy({
       const typeId = locationIndex.id;
       
       if (locationIndex.level === maxLevel) {
-        // const response = await axios.get(
-        //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
-        // );
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
+        );
 
-        // console.log(
-        //   "Response data for top level ",
-        //   response.data,
-        //   "Response",
-        //   response
-        // );
+        console.log(
+          "Response data for top level ",
+          response.data,
+          "Response",
+          response
+        );
         console.log("index", locationIndex);
-        const jsonDataState = {
-          content: [
-            {
-              level: 2.0,
-              uuid: "c155bfca-b718-484b-b4fc-e84844edcd15",
-              lineage: "182370",
-              title: "MH",
-              typeId: 725,
-              titleLineage: "MH",
-              parentId: null,
-              id: 182370,
-              typeString: "State",
-            },
-            {
-              level: 2.0,
-              uuid: "63cbfbc4-41e8-4952-b2bc-090056ebe7d4",
-              lineage: "182387",
-              title: "RJ",
-              typeId: 725,
-              titleLineage: "RJ",
-              parentId: null,
-              id: 182387,
-              typeString: "State",
-            },
-          ],
-          pageable: {
-            sort: {
-              sorted: true,
-              unsorted: false,
-            },
-            pageSize: 1000,
-            pageNumber: 0,
-            offset: 0,
-            unpaged: false,
-            paged: true,
-          },
-          last: true,
-          totalPages: 1,
-          totalElements: 2,
-          first: true,
-          sort: {
-            sorted: true,
-            unsorted: false,
-          },
-          numberOfElements: 2,
-          size: 1000,
-          number: 0,
-        };
-
+        const jsonDataState = response.data
+          
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
 
@@ -167,68 +118,11 @@ export default function LocationHierarchy({
           localStorage.getItem("secondLevelTypeId");
         if (secondLevelTypeIdString !== null && selectedOption.length > 0) {
           try {
-            // const response = await axios.get(
-            //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
-            // );
-            const distJsonData = {
-              content: [
-                {
-                  level: 1.0,
-                  uuid: "25dd5344-6944-4d7c-856f-5788b101b44b",
-                  lineage: "182387.182411",
-                  title: "Jaipur",
-                  typeId: 741,
-                  titleLineage: "RJ, Jaipur",
-                  parentId: 182387,
-                  id: 182411,
-                  typeString: "Dist",
-                },
-                {
-                  level: 1.0,
-                  uuid: "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
-                  lineage: "182370.182386",
-                  title: "Mumbai",
-                  typeId: 741,
-                  titleLineage: "MH, Mumbai",
-                  parentId: 182370,
-                  id: 182386,
-                  typeString: "Dist",
-                },
-                {
-                  level: 1.0,
-                  uuid: "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
-                  lineage: "182370.182388",
-                  title: "Nagpur",
-                  typeId: 741,
-                  titleLineage: "MH, Nagpur",
-                  parentId: 182370,
-                  id: 182388,
-                  typeString: "Dist",
-                },
-              ],
-              pageable: {
-                sort: {
-                  sorted: true,
-                  unsorted: false,
-                },
-                pageSize: 1000,
-                pageNumber: 0,
-                offset: 0,
-                unpaged: false,
-                paged: true,
-              },
-              last: true,
-              totalPages: 1,
-              totalElements: 3,
-              first: true,
-              sort: {
-                sorted: true,
-                unsorted: false,
-              },
-              numberOfElements: 3,
-              size: 1000,
-              number: 0,
-            };
+            const secondLevelTypeId = parseInt(secondLevelTypeIdString);
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+            );
+            const distJsonData = response.data
             const distData = distJsonData.content;
             getTypeId(distJsonData.content[0].typeId);
             getLocation(distData);
@@ -240,51 +134,17 @@ export default function LocationHierarchy({
         }
       } 
       else {
-        console.log("else part location index ", locationIndex)
-        const typeIds = locationFilter[index+1].id;
-        console.log("typeIdfor third",typeIds, locationFilter,"index",index+1)
+       
+        const typeIds = locationFilter[Number(index) + 1].id;
+        console.log("typeIdfor third",typeIds, locationFilter,"index",[Number(index) + 1])
         try {
           if (selectedOptions.length > 0 && typeId !== null) {
-            // const response = await axios.get(
-            //   `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            // );
+            console.log("optons",selectedOptions)
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            );
 
-            const distJsonDatas ={
-              "content" : [ {
-                "level" : 2.0,
-                "uuid" : "07ac2db9-9654-4b90-94e9-50dfdfabb804",
-                "lineage" : "182370.182388.202657",
-                "title" : "Kuhi",
-                "typeId" : 875,
-                "titleLineage" : "MH, Nagpur, Kuhi",
-                "parentId" : 182388,
-                "id" : 202657,
-                "typeString" : "Block"
-              } ],
-              "pageable" : {
-                "sort" : {
-                  "sorted" : true,
-                  "unsorted" : false
-                },
-                "pageSize" : 1000,
-                "pageNumber" : 0,
-                "offset" : 0,
-                "unpaged" : false,
-                "paged" : true
-              },
-              "last" : true,
-              "totalPages" : 1,
-              "totalElements" : 1,
-              "first" : true,
-              "sort" : {
-                "sorted" : true,
-                "unsorted" : false
-              },
-              "numberOfElements" : 1,
-              "size" : 1000,
-              "number" : 0
-            }
-
+            const distJsonDatas = response.data
             const distDatas = distJsonDatas.content;
             getTypeId(distJsonDatas.content[0].typeId);
             setSecondLevel(distDatas);
@@ -328,10 +188,10 @@ export default function LocationHierarchy({
       getSecondLevel(selectedOptions, secondTypeName.typeString);
     }
   }, [selectedOptions, secondTypeName]);
-  console.log("otherLocation",otherLocation)
+
   return (
     <>
-      <Menu as="div" className="location_menu">
+      <Menu as="div" className="menu">
         <div>
           {maxLevel === locationIndex.level ? (
             <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
@@ -390,7 +250,7 @@ export default function LocationHierarchy({
                 ))}
             </div>
           </Menu.Items>
-        ) : loction !== null ? (
+        ) : maxLevel !== undefined &&  locationIndex.level === maxLevel-1  ? (
           <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               {loction &&
@@ -421,7 +281,7 @@ export default function LocationHierarchy({
                 ))}
             </div>
           </Menu.Items>
-        ) : (
+        ) :otherLocation ? (
           <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               {otherLocation &&
@@ -452,7 +312,7 @@ export default function LocationHierarchy({
                 ))}
             </div>
           </Menu.Items>
-        )}
+        ):null}
       </Menu>
     </>
   );
