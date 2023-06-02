@@ -64,6 +64,8 @@ export default function ImageList() {
   const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
   const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
   const [typeId, setTypeId] = useState<any>([])
+  const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
+  const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -94,46 +96,66 @@ export default function ImageList() {
 
   useEffect(() => {
     const data = async () => {
-      formsData.map(async (element: { formUUID: any; }) => {
-        const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
-        const forms = formData.data
-
-        const applicableFormElements = forms.formElementGroups[0] ?
-          forms.formElementGroups[0].applicableFormElements : [];
+      if (
+        selectedProgramUUID.length > 0 ||
+        selectedSubjectUUID.length > 0
+      ) {
         await Promise.all(
-          applicableFormElements.map(async (element: { concept: { uuid: string; dataType: any; }; }) => {
-            const exists = conceptdata.some(
-              (concept: { uuid: string }) =>
-                concept.uuid === element.concept.uuid
-            );
-            if (!exists) {
-              const dataType = element.concept.dataType;
-              const isDateType = dataType === "Date";
-              const isDateTimeType = dataType === "DateTime";
-              const isNumericType = dataType === "Numeric";
-              const isCodedType = dataType === "Coded";
-              const isNotesType = dataType === "Notes";
-              const isTextType = dataType === "Text";
-              if (
-                isDateType ||
-                isDateTimeType ||
-                isNumericType ||
-                isCodedType ||
-                isNotesType ||
-                isTextType
-              ) {
-                setConceptData((prevConceptData: any) => [
-                  ...prevConceptData,
-                  element.concept,
-                ]);
-              }
+          formsData.map(async (element: any) => {
+            console.log("subject", selectedSubjectUUID, "program", selectedProgramUUID);
+            if (
+              selectedProgramUUID.some((uuid) => uuid === element.programUUID) ||
+              selectedSubjectUUID.some((uuid) => uuid === element.subjectTypeUUID)
+            ) {
+              const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
+              const forms = formData.data
+  
+              const applicableFormElements = forms.formElementGroups[0]
+                ? forms.formElementGroups[0].applicableFormElements
+                : [];
+  
+              await Promise.all(
+                applicableFormElements.map(async (element: {
+                  voided: boolean;
+                  concept: { uuid: string; dataType: any };
+                }) => {
+                  const exists = conceptdata.some(
+                    (concept: { uuid: string }) => concept.uuid === element.concept.uuid
+                  );
+                  if (!exists) {
+                    const dataType = element.concept.dataType;
+                    const isDateType = dataType === "Date";
+                    const isDateTimeType = dataType === "DateTime";
+                    const isNumericType = dataType === "Numeric";
+                    const isCodedType = dataType === "Coded";
+                    const isNotesType = dataType === "Notes";
+                    const isTextType = dataType === "Text";
+  
+                    if (
+                      isDateType ||
+                      isDateTimeType ||
+                      isNumericType ||
+                      isCodedType ||
+                      isNotesType ||
+                      isTextType 
+                    ) {
+                      setConceptData((prevConceptData: any) => [
+                        ...prevConceptData,
+                        element.concept,
+                      ]);
+                    }
+                  }
+                })
+              );
             }
           })
         );
-      });
+      }
     };
+  
     data();
-  }, [formsData]);
+  }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
+  
 
   useEffect(() => {
     redirectIfNotValid();
@@ -284,7 +306,8 @@ export default function ImageList() {
   
   }
 
-  const programType = (data: any[]) => {
+  const programType = (data: any[], programUuid: string[]) => {
+    setSelectedProgramUUId(programUuid);
     setProgamType(data);
   };
 
@@ -353,7 +376,8 @@ export default function ImageList() {
  
   };
 
-  const subjectType = (data: any[]) => {
+  const subjectType = (data: any[], subjectUuid: string[]) => {
+    setSelectedSubjectUUID(subjectUuid)
     setSubjectType(data);
   };
 
