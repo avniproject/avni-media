@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/solid";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 interface Prop {
   concepts: any;
@@ -79,6 +79,12 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
                     onClick={() => handleOptionClick(option.name)}
                   >
                     {option.name}
+                    {selectedOptions.includes(option.name) ? (
+                        <CheckIcon
+                          className="check-button"
+                          aria-hidden="true"
+                        />
+                      ) : null}
                   </button>
                 )}
               </Menu.Item>

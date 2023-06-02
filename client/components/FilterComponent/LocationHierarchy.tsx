@@ -192,7 +192,7 @@ export default function LocationHierarchy({
     <>
       <Menu
         as="div"
-        className="menu"
+        className="location_menu"
       >
         <div>
           {maxLevel === locationIndex.level ? (

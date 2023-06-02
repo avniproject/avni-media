@@ -97,8 +97,8 @@ export default function ImageList() {
         const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
         const forms = formData.data
 
-        const applicableFormElements =
-          forms.formElementGroups[0].applicableFormElements;
+        const applicableFormElements = forms.formElementGroups[0] ?
+          forms.formElementGroups[0].applicableFormElements : [];
         await Promise.all(
           applicableFormElements.map(async (element: { concept: { uuid: string; dataType: any; }; }) => {
             const exists = conceptdata.some(
@@ -450,7 +450,7 @@ export default function ImageList() {
         </div>
       </div>
 
-      <div className="flex justify-center mx-auto w-center mr-4 ml-4">
+      <div className="inline-block justify-center mx-auto w-center mr-4 ml-4">
         {locationFilter &&
           locationFilter.map(
             (
@@ -499,28 +499,8 @@ export default function ImageList() {
           />
         )}
 
-        <Concepts concept={concept} conceptdata={conceptdata} />
-      </div>
-      {/* <Accounts accountType={accountType} /> */}
-      <div className="flex justify-center mx-auto w-center  mr-4 ml-4">
-        {concepts && concepts.dataType === "Coded" ? (
-          <CodedConceptFilter concepts={concepts.conceptAnswers} 
-          conceptCoded={conceptCoded}/>
-        ) : concepts && concepts.dataType === "Date" ? (
-          <DateConceptFilter
-          conceptDate={conceptDate}
-          />
-        ) : concepts && concepts.dataType === "DateTime" ? (
-          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
-        ) : concepts && concepts.dataType === "Text" ? (
-          <TexConceptFilter
-          conceptNote={conceptText} />
-        ) : concepts && concepts.dataType === "Numeric" ? (
-          <NumericConceptFilter conceptNumeric={conceptNumeric} />
-        ) : concepts && concepts.dataType === "Notes" ? (
-          <TexConceptFilter 
-          conceptNote={conceptNote}/>
-        ) : null}
+        {/* <Concepts concept={concept} />
+        <Accounts accountType={accountType} /> */}
       </div>
 
       <div className="bg-white">

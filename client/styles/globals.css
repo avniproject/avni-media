@@ -40,7 +40,15 @@
   text-align: left;
   padding-right: 8px;
   margin-top: 20px;
-  z-index: 1o;
+  z-index: 10;
+}
+.location_menu{
+  position: relative;
+  display: inline-block;
+  text-align: left;
+  padding-right: 8px;
+  margin-top: 20px;
+  z-index: 20;
 }
 .check-button {
   height: 20px; 
