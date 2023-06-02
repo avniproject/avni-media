@@ -45,7 +45,7 @@ export default function ImageList() {
   const [maxLevel, setMaxLevel] = useState<number>();
   const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
-  const [loction, setLocations] = useState<any>([]);
+  const [location, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any>([]);
   const [showPerpage, setShowperpage] = useState(10);
   const [concepts, setConcept] = useState<any>();
@@ -63,6 +63,7 @@ export default function ImageList() {
   const [toNumericConcept, setToNumericConcept] = useState<any>([])
   const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
   const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
+  const [typeId, setTypeId] = useState<any>([])
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -312,7 +313,14 @@ export default function ImageList() {
   const getOtherLocation = (data: any[]) => {
     setOtherLocation(data);
   };
-
+  
+  const getTypeId = (data: any) => {
+    if (typeId.includes(data)) {
+     setTypeId(typeId.filter((o: any) => o !== typeId));
+    } else {
+      setTypeId([...typeId, data]);
+    }
+  }
 
   const getTopLevel = (data: any[],levelname: string) => {
 
@@ -450,35 +458,36 @@ export default function ImageList() {
         </div>
       </div>
 
-      <div className="inline-block justify-center mx-auto w-center mr-4 ml-4">
-        {locationFilter &&
-          locationFilter.map(
-            (
-              locationIndex: {
-                name: string;
-                id: number;
-                level: number;
-              },
-              index: Key
-            ) => (
-              <LocationHierarchy
-                key={index}
-                locationIndex={locationIndex}
-                index={index}
-                selectedParentId={selectedParentId}
-                minLevel={minLevel}
-                maxLevel={maxLevel}
-                getLocation={getLocation}
-                loction={loction}
-                getOtherLocation={getOtherLocation}
-                otherLocation={otherLocation}
-                getTopLevel={getTopLevel}
-                getSecondLevel={getSecondLevel}
-                getSelectedLocation={getSelectedLocation}
-              />
+      <div className="text-center">
+        {locationFilter && (
+            locationFilter.map(
+              (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
+                if (index === 0 || typeId.find(((item: number) => item === locationIndex.id)) ) {
+                  return (
+                    <LocationHierarchy
+                      key={index}
+                      locationIndex={locationIndex}
+                      index={index}
+                      selectedParentId={selectedParentId}
+                      locationFilter ={locationFilter}
+                      minLevel={minLevel}
+                      maxLevel={maxLevel}
+                      getLocation={getLocation}
+                      location={location}
+                      getOtherLocation={getOtherLocation}
+                      otherLocation={otherLocation}
+                      getTopLevel={getTopLevel}
+                      getSecondLevel={getSecondLevel}
+                      getSelectedLocation={getSelectedLocation}
+                      getTypeId = {getTypeId}
+                    />
+                  );
+                }
+                return null;
+              }
             )
-          )}
-        <Daterange dateRange={dateRange} />
+        )}
+       <Daterange dateRange={dateRange} />
 
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
@@ -498,9 +507,28 @@ export default function ImageList() {
             encounterFilter={encounterFilter}
           />
         )}
-
-        {/* <Concepts concept={concept} />
-        <Accounts accountType={accountType} /> */}
+        { conceptdata && conceptdata.length > 0 &&
+            <Concepts concept={concept} conceptdata={conceptdata} />
+        }
+        {/* <Accounts accountType={accountType} /> */}
+        {concepts && concepts.dataType === "Coded" ? (
+          <CodedConceptFilter concepts={concepts.conceptAnswers} 
+          conceptCoded={conceptCoded}/>
+        ) : concepts && concepts.dataType === "Date" ? (
+          <DateConceptFilter
+          conceptDate={conceptDate}
+          />
+        ) : concepts && concepts.dataType === "DateTime" ? (
+          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
+        ) : concepts && concepts.dataType === "Text" ? (
+          <TexConceptFilter
+          conceptNote={conceptText} />
+        ) : concepts && concepts.dataType === "Numeric" ? (
+          <NumericConceptFilter conceptNumeric={conceptNumeric} />
+        ) : concepts && concepts.dataType === "Notes" ? (
+          <TexConceptFilter 
+          conceptNote={conceptNote}/>
+        ) : null}
       </div>
 
       <div className="bg-white">
