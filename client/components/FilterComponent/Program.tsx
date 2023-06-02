@@ -4,9 +4,10 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 interface Option {
   id: number;
   name: string;
+  uuid: string;
 }
 interface Props {
-  programType: (data: any[]) => void;
+  programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
 }
 function classNames(...classes: string[]) {
@@ -15,14 +16,23 @@ function classNames(...classes: string[]) {
 
 export default function Program({ programType, programFilter }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [programUUID, setProgramUUID]       = useState<Option[]>([])
+ 
   useEffect(() => {
-    programType(selectedOptions);
-  }, [programType, selectedOptions]);
-  function handleOptionClick(option: Option) {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+    programType(selectedOptions, programUUID);
+  }, [programType, selectedOptions, programUUID]);
+  function handleOptionClick(option: {
+    uuid: Option; name: Option; 
+}) {
+    if (selectedOptions.includes(option.name)) {
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
     } else {
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.name]);
+    }
+    if (selectedOptions.includes(option.uuid)) {
+      setProgramUUID(programUUID.filter((o) => o !== option.uuid));
+    } else {
+      setProgramUUID([...programUUID, option.uuid]);
     }
   }
 
@@ -53,7 +63,7 @@ export default function Program({ programType, programFilter }: Props) {
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "flex justify-between w-full px-4 py-2 text-sm"
                       )}
-                      onClick={() => handleOptionClick(option.name)}
+                      onClick={() => handleOptionClick(option)}
                     >
                       {option.name}
                       {selectedOptions.includes(option.name) ? (

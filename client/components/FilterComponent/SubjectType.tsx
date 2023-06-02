@@ -5,9 +5,10 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 interface Option {
   id: number;
   name: string;
+  uuid: string;
 }
 interface Prop {
-  subjectType: (data: any[]) => void;
+  subjectType: (data: any[], subjectUuid: any[]) => void;
   subjectFilter: any[];
 }
 function classNames(...classes: string[]) {
@@ -16,15 +17,24 @@ function classNames(...classes: string[]) {
 
 export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [subjectTypeUUID, setSubjectUUID] = useState<Option[]>([])
+  
   useEffect(() => {
-    subjectType(selectedOptions);
-  }, [subjectType, selectedOptions]);
+    subjectType(selectedOptions, subjectTypeUUID);
+  }, [subjectType, selectedOptions, subjectTypeUUID]);
 
-  function handleOptionClick(option: Option) {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+  function handleOptionClick(option: {
+    uuid: Option; name: Option; 
+}) {
+    if (selectedOptions.includes(option.name)) {
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
     } else {
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.name]);
+    }
+    if (selectedOptions.includes(option.uuid)) {
+      setSubjectUUID(subjectTypeUUID.filter((o) => o !== option.uuid));
+    } else {
+      setSubjectUUID([...subjectTypeUUID, option.uuid]);
     }
   }
 
@@ -54,7 +64,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "flex justify-between w-full px-4 py-2 text-sm"
                       )}
-                      onClick={() => handleOptionClick(option.name)}
+                      onClick={() => handleOptionClick(option)}
                     >
                       {option.name}
                       {selectedOptions.includes(option.name) ? (
