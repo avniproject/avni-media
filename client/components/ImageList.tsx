@@ -102,7 +102,6 @@ export default function ImageList() {
       ) {
         await Promise.all(
           formsData.map(async (element: any) => {
-            console.log("subject", selectedSubjectUUID, "program", selectedProgramUUID);
             if (
               selectedProgramUUID.some((uuid) => uuid === element.programUUID) ||
               selectedSubjectUUID.some((uuid) => uuid === element.subjectTypeUUID)
@@ -122,7 +121,7 @@ export default function ImageList() {
                   const exists = conceptdata.some(
                     (concept: { uuid: string }) => concept.uuid === element.concept.uuid
                   );
-                  if (!exists) {
+                  if (!exists && element.voided === false) {
                     const dataType = element.concept.dataType;
                     const isDateType = dataType === "Date";
                     const isDateTimeType = dataType === "DateTime";
