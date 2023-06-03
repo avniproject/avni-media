@@ -59,8 +59,6 @@ export default function LocationHierarchy({
   const [optionSelected, setOptionSelected] = useState<any>();
   const [secondTypeName, setSecondTypeName] = useState<any>();
   const [selectLevelName, setSelectLevelName] = useState(null);
-  const [secondLevelId, setSecondLevelId] = useState<any>();
-
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
