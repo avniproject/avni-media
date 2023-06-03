@@ -109,7 +109,6 @@ export default function LocationHierarchy({
 
         if (selectedOption.length > 0) {
           try {
-            console.log("typeId",secondLevelId,locationFilter[Number(index) + 1].id,"url2", `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`)
             const response = await axios.get(
               `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
             );
