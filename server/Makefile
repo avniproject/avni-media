@@ -16,7 +16,9 @@ start-prod:
 _build-app:
 	cp ./env-templates/$(template) .env
 	npm run build
-	cp ./env-templates/development.template .env
+
+build-app:
+	make _build-app template=development.template
 
 build-app-prod:
 	make _build-app template=production.template
