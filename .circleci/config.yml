@@ -21,27 +21,69 @@ commands:
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install python3-pip
-            sudo pip3 install awscli --upgrade
-            sudo pip3 install ansible
-
-      - run: curl -L https://github.com/avniproject/avni-infra/archive/master.zip >> ~/infra.zip
 
       - run: |
-          cd ~/
-          unzip infra.zip
-          mv avni-infra-master avni-infra
-          rm -rf infra.zip
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-      - run: echo $ANSIBLE_VAULT_PASS > ~/.vault-pass.txt
+      - run:
+          name: Copy artifacts to server
+          command: |
+            scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
+            scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
 
-      - run: |
-#          #TODO add commands to perform deploy of client and server
-#          pwd
-#          cd ~/avni-infra/configure
-#          cp ~/artifacts/<< parameters.env >>-avni-int-admin-app.tgz ~/artifacts/avni-int-admin-app.tgz
-#          VAULT_PASSWORD_FILE=~/.vault-pass.txt web_zip_path=~/artifacts/ make deploy-int-webapp-<< parameters.env >>
+      - run:
+          name: Install node, nest and pm2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            nvm install 19.8.1
+            nvm use v19.8.1
+            npm i -g @nestjs/cli
+            npm install pm2@latest -g
+            EOF
 
-      - run: rm ~/.vault-pass.txt
+      - run:
+          name: Apply client and server artifacts
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            sudo su - avni-media-user
+            cd ~/
+            sudo rm -rf ~/avni-media
+            mkdir -p ~/avni-media/client
+            mkdir -p ~/avni-media/server
+            sudo tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
+            sudo tar -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
+            sudo rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            EOF
+
+      - run:
+          name: Run server
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            cd ~/avni-media/server
+            nvm use v19.8.1
+            pm2 start ./dist/main.js --name "avni-media-server" -p 3010
+            EOF
+
+      - run:
+          name: Build client
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            cd ~/avni-media/client
+            nvm use v19.8.1
+            pm2 start npm --name app1 -- run start -- -p 3000
+            pm2 start npm --name "avni-media-client" -- run start -- -p 3000
+            EOF
+
+      - run:
+          name: Persist apps to ensure they get restarted automatically
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            pm2 startup systemd
+            pm2 save
+            EOF
 
 jobs:
 
@@ -51,11 +93,6 @@ jobs:
 
     working_directory: ~/avni-media
 
-    environment:
-      - ANSIBLE_HOST_KEY_CHECKING: False
-      - ANSIBLE_LOCAL_TEMP: /home/circleci/.ansible/tmp
-      - ANSIBLE_REMOTE_TEMP: /home/circleci/.ansible/tmp
-      - MAVEN_OPTS: -Xmx3200m
 
     steps:
       - checkout
@@ -63,8 +100,6 @@ jobs:
       - run: sudo apt-get install make openssl
 
       - run: mkdir -p ~/artifacts;
-
-      - run: cd ~/avni-media/client
 
       - restore_cache:
           key: dependency-cache-client-{{ checksum "client/package.json" }}
@@ -81,17 +116,15 @@ jobs:
 
       - run: |
           cd ~/avni-media/client
-          make zip-app-staging
-
-      - run: cp ~/avni-media/client/avni-media-client.tgz ~/artifacts/staging-avni-media-client.tgz;
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-client-prod
 
       - run: |
           cd ~/avni-media/client
-          make zip-app-prod
-
-      - run: cp ~/avni-media/client/avni-media-client.tgz ~/artifacts/prod-avni-media-client.tgz;
-
-      - run: cd ~/avni-media/server
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-client-staging
 
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
@@ -107,17 +140,25 @@ jobs:
 
       - run: |
           cd ~/avni-media/server
-          make build-app-staging
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-server-prod
 
       - run: |
           cd ~/avni-media/server
-          make build-app-prod
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-server-staging
+
+      - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
 
       - persist_to_workspace:
           root: ~/artifacts
           paths:
-            - prod-avni-media-client.tgz
-            - staging-avni-media-client.tgz
+            - avni-media-client-staging.tgz
+            - avni-media-server-staging.tgz
+            - avni-media-client-prod.tgz
+            - avni-media-server-prod.tgz
 
       - store_artifacts:
           path: ~/artifacts

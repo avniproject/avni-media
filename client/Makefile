@@ -7,26 +7,16 @@ deps:
 start:
 	npm run dev
 
-_zip-app:
+_build-app:
 	cp ./env-templates/$(template) .env
 	npm run build
-	tar -czvf avni-media-client.tgz  -C .next .
-	cp ./env-templates/development.template .env
 
-_zip-app-only:
-	cp ./env-templates/$(template) .env
-	tar -czvf avni-media-client.tgz  -C .next .
-	cp ./env-templates/development.template .env
+build-app:
+	make _build-app template=development.template
 
-zip-app-prod:
-	make _zip-app template=production.template
+build-app-prod:
+	make _build-app template=production.template
 
-zip-app-staging:
-	make _zip-app template=staging.template
-
-zip-app-only-prod:
-	make _zip-app-only template=production.template
-
-zip-app-only-staging:
-	make _zip-app-only template=staging.template
+build-app-staging:
+	make _build-app template=staging.template
 
