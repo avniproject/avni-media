@@ -141,6 +141,8 @@ jobs:
           cd ~/avni-media
           make zip-app-server-staging
 
+      - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
+
       - persist_to_workspace:
           root: ~/artifacts
           paths:
