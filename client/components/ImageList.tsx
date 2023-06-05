@@ -95,23 +95,15 @@ export default function ImageList() {
   }, []);
 
   useEffect(() => {
+    const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
       if (selectedProgramUUID.length > 0 || selectedSubjectUUID.length > 0) {
         await Promise.all(
           formsData.map(async (element: any) => {
             if (
-              element.formType === "IndividualProfile" ||
-              element.formType === "ProgramEnrolment" ||
-              element.formType === "ProgramEncounter" ||
-              element.formType === "Encounter"
+              formTypeArray.includes(element.formType )
             ) {
-              console.log(
-                "subject",
-                selectedSubjectUUID,
-                "program",
-                selectedProgramUUID,
-                "formType", element.formType
-              );
+              console.log("formTypes",element.formType)
               if (
                 selectedProgramUUID.some(
                   (uuid) => uuid === element.programUUID
@@ -139,7 +131,7 @@ export default function ImageList() {
                         (concept: { uuid: string }) =>
                           concept.uuid === element.concept.uuid
                       );
-                      if (!exists) {
+                      if (!exists && element.voided === false) {
                         const dataType = element.concept.dataType;
                         const isDateType = dataType === "Date";
                         const isDateTimeType = dataType === "DateTime";
