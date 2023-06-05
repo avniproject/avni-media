@@ -95,64 +95,73 @@ export default function ImageList() {
   }, []);
 
   useEffect(() => {
+    const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
-      if (
-        selectedProgramUUID.length > 0 ||
-        selectedSubjectUUID.length > 0
-      ) {
+      if (selectedProgramUUID.length > 0 || selectedSubjectUUID.length > 0) {
         await Promise.all(
           formsData.map(async (element: any) => {
-            console.log("subject", selectedSubjectUUID, "program", selectedProgramUUID);
             if (
-              selectedProgramUUID.some((uuid) => uuid === element.programUUID) ||
-              selectedSubjectUUID.some((uuid) => uuid === element.subjectTypeUUID)
+              formTypeArray.includes(element.formType )
             ) {
-              const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
-              const forms = formData.data
-  
-              const applicableFormElements = forms.formElementGroups[0]
-                ? forms.formElementGroups[0].applicableFormElements
-                : [];
-  
-              await Promise.all(
-                applicableFormElements.map(async (element: {
-                  voided: boolean;
-                  concept: { uuid: string; dataType: any };
-                }) => {
-                  const exists = conceptdata.some(
-                    (concept: { uuid: string }) => concept.uuid === element.concept.uuid
-                  );
-                  if (!exists) {
-                    const dataType = element.concept.dataType;
-                    const isDateType = dataType === "Date";
-                    const isDateTimeType = dataType === "DateTime";
-                    const isNumericType = dataType === "Numeric";
-                    const isCodedType = dataType === "Coded";
-                    const isNotesType = dataType === "Notes";
-                    const isTextType = dataType === "Text";
-  
-                    if (
-                      isDateType ||
-                      isDateTimeType ||
-                      isNumericType ||
-                      isCodedType ||
-                      isNotesType ||
-                      isTextType 
-                    ) {
-                      setConceptData((prevConceptData: any) => [
-                        ...prevConceptData,
-                        element.concept,
-                      ]);
+              if (
+                selectedProgramUUID.some(
+                  (uuid) => uuid === element.programUUID
+                ) ||
+                selectedSubjectUUID.some(
+                  (uuid) => uuid === element.subjectTypeUUID
+                )
+              ) {
+                const formData = await axios.get(
+                  `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
+                );
+                const forms = formData.data;
+
+                const applicableFormElements = forms.formElementGroups[0]
+                  ? forms.formElementGroups[0].applicableFormElements
+                  : [];
+
+                await Promise.all(
+                  applicableFormElements.map(
+                    async (element: {
+                      voided: boolean;
+                      concept: { uuid: string; dataType: any };
+                    }) => {
+                      const exists = conceptdata.some(
+                        (concept: { uuid: string }) =>
+                          concept.uuid === element.concept.uuid
+                      );
+                      if (!exists && element.voided === false) {
+                        const dataType = element.concept.dataType;
+                        const isDateType = dataType === "Date";
+                        const isDateTimeType = dataType === "DateTime";
+                        const isNumericType = dataType === "Numeric";
+                        const isCodedType = dataType === "Coded";
+                        const isNotesType = dataType === "Notes";
+                        const isTextType = dataType === "Text";
+
+                        if (
+                          isDateType ||
+                          isDateTimeType ||
+                          isNumericType ||
+                          isCodedType ||
+                          isNotesType ||
+                          isTextType
+                        ) {
+                          setConceptData((prevConceptData: any) => [
+                            ...prevConceptData,
+                            element.concept,
+                          ]);
+                        }
+                      }
                     }
-                  }
-                })
-              );
+                  )
+                );
+              }
             }
           })
         );
       }
     };
-  
     data();
   }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
   

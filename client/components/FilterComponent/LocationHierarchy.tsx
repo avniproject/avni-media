@@ -59,8 +59,6 @@ export default function LocationHierarchy({
   const [optionSelected, setOptionSelected] = useState<any>();
   const [secondTypeName, setSecondTypeName] = useState<any>();
   const [selectLevelName, setSelectLevelName] = useState(null);
-  const [secondLevel, setSecondLevel] = useState<any>([]);
-
   const [parentId, setParentId] = useState<Option | null>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
@@ -86,14 +84,7 @@ export default function LocationHierarchy({
   }, [optionSelected, selectedOptions, selectedOption, selectLevelName]);
 
   useEffect(() => {
-    if (maxLevel !== undefined) {
-      if (locationIndex.level === maxLevel - 1) {
-        const secondLevelTypeId = locationIndex.id;
-        localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
-
-      }
-    }
-
+    
     const typeIdData = async () => {
       const typeId = locationIndex.id;
       
@@ -114,13 +105,10 @@ export default function LocationHierarchy({
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
 
-        const secondLevelTypeIdString =
-          localStorage.getItem("secondLevelTypeId");
-        if (secondLevelTypeIdString !== null && selectedOption.length > 0) {
+        if (selectedOption.length > 0) {
           try {
-            const secondLevelTypeId = parseInt(secondLevelTypeIdString);
             const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
             );
             const distJsonData = response.data
             const distData = distJsonData.content;
@@ -138,19 +126,17 @@ export default function LocationHierarchy({
         const typeIds = locationFilter[Number(index) + 1].id;
         console.log("typeIdfor third",typeIds, locationFilter,"index",[Number(index) + 1])
         try {
-          if (selectedOptions.length > 0 && typeId !== null) {
-            console.log("optons",selectedOptions)
+          if (selectedOptions.length > 0 && typeIds !== null) {
             const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
             );
 
             const distJsonDatas = response.data
             const distDatas = distJsonDatas.content;
             getTypeId(distJsonDatas.content[0].typeId);
-            setSecondLevel(distDatas);
             getOtherLocation(distDatas);
             console.log(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
             );
           }
         } catch (Error) {

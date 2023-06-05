@@ -98,12 +98,14 @@ export interface imageType {
     encounterTypeName: string;
     programName: string;
     address: string;
-    subjectName: string;
+    subjectFirstName: string;
+    subjectLastName: string
 }
 
 export const getImageName = (image: imageType , minLevelName: string) => {
     const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    return `${image.subjectName ? image.subjectName : ''}
+    return `${image.subjectFirstName ? image.subjectFirstName : ''}
+              ${image.subjectLastName ? '_' + image.subjectLastName: ''}
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
               ${image.programName ? '_' + image.programName : ''}
