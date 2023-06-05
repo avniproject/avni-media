@@ -69,18 +69,24 @@ jobs:
       - restore_cache:
           key: dependency-cache-client-{{ checksum "client/package.json" }}
 
-      - run: npm install --legacy-peer-deps
+      - run:  |
+          cd ~/avni-media/client
+          npm install --legacy-peer-deps
 
       - save_cache:
           key: dependency-cache-client-{{ checksum "client/package.json" }}
           paths:
-            - ./node_modules
+            - ./client/node_modules
 
-      - run: make zip-app-staging
+      - run: |
+          cd ~/avni-media/client
+          make zip-app-staging
 
       - run: cp ~/avni-media/avni-media-client.tgz ~/artifacts/staging-avni-media-client.tgz;
 
-      - run: make zip-app-prod
+      - run: |
+          cd ~/avni-media/client
+          make zip-app-prod
 
       - run: cp ~/avni-media/avni-media-client.tgz ~/artifacts/prod-avni-media-client.tgz;
 
@@ -89,18 +95,24 @@ jobs:
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
 
-      - run: npm install --legacy-peer-deps
+      - run: |
+          cd ~/avni-media/server
+          npm install --legacy-peer-deps
 
       - save_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
           paths:
-            - ./node_modules
+            - ./server/node_modules
 
-      - run: make zip-app-staging
+      - run: |
+          cd ~/avni-media/server
+          make zip-app-staging
 
       - run: cp ~/avni-media/avni-media-server.tgz ~/artifacts/staging-avni-media-server.tgz;
 
-      - run: make zip-app-prod
+      - run: |
+          cd ~/avni-media/server
+          make zip-app-prod
 
       - run: cp ~/avni-media/avni-media-server.tgz ~/artifacts/prod-avni-media-server.tgz;
 
