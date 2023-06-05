@@ -80,10 +80,10 @@ commands:
       - run:
           name: Persist apps to ensure they get restarted automatically
           command: |
-          ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-          pm2 startup systemd
-          pm2 save
-          EOF
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            pm2 startup systemd
+            pm2 save
+            EOF
 
 jobs:
 
