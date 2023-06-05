@@ -162,7 +162,6 @@ export default function ImageList() {
         );
       }
     };
-
     data();
   }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
   
