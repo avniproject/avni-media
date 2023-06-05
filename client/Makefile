@@ -10,12 +10,12 @@ start:
 _zip-app:
 	cp ./env-templates/$(template) .env
 	npm run build
-	tar -czvf avni-media-client.tgz  .
+	tar -czvf avni-media-client.tgz  -C .next .
 	cp ./env-templates/development.template .env
 
 _zip-app-only:
 	cp ./env-templates/$(template) .env
-	tar -czvf avni-media-client.tgz .
+	tar -czvf avni-media-client.tgz  -C .next .
 	cp ./env-templates/development.template .env
 
 zip-app-prod:

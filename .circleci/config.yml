@@ -77,6 +77,7 @@ jobs:
           key: dependency-cache-client-{{ checksum "client/package.json" }}
           paths:
             - ./client/node_modules
+            - ./client/.next/cache/
 
       - run: |
           cd ~/avni-media/client
