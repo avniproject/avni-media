@@ -103,7 +103,6 @@ export default function ImageList() {
             if (
               formTypeArray.includes(element.formType )
             ) {
-              console.log("formTypes",element.formType)
               if (
                 selectedProgramUUID.some(
                   (uuid) => uuid === element.programUUID
