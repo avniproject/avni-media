@@ -114,7 +114,7 @@ export default function ImageList() {
                 const formData = await axios.get(
                   `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
                 );
-                const forms = formData.data;
+                const forms = formData.data
 
                 const applicableFormElements = forms.formElementGroups[0]
                   ? forms.formElementGroups[0].applicableFormElements
@@ -259,7 +259,7 @@ export default function ImageList() {
   const conceptDate = (data: any[]|null, conceptName: string) => {
     if(data && data.length>0){
       setConceptDates([{
-        "conceptName": conceptName,
+        "conceptName":concepts.name,
         "from": data[0],
         "to": data[1]
       }])
@@ -269,7 +269,7 @@ export default function ImageList() {
   const conceptDateTime = (data: any[]|null, conceptName: string) => {
     if(data && data.length>0){
       setDateTimeConcept([{
-        "conceptName": conceptName,
+        "conceptName": concepts.name,
         "from": data[0],
         "to": data[1]
       }])
@@ -278,7 +278,7 @@ export default function ImageList() {
 
   const conceptNumeric = (fromNumber: number, toNumber: number,conceptName: string) =>{
    setToNumericConcept([{
-    "conceptName": conceptName,
+    "conceptName":concepts.name,
     "from": fromNumber,
     "to": toNumber
    }])
@@ -287,7 +287,7 @@ export default function ImageList() {
   const conceptCoded = (data: any, conceptName: string) =>{
     if(data.length>0){
       setCodedConcept([{
-        "conceptName": conceptName,
+        "conceptName": concepts.name,
         "values":data
        }])
     }
@@ -297,7 +297,7 @@ export default function ImageList() {
 
     if(data && data.length>0){
       setNoteConcept([{
-        "conceptName": "NoteConcept",
+        "conceptName": concepts.name,
         "values":data
       }])
     }
@@ -308,7 +308,7 @@ export default function ImageList() {
 
    if(data && data.length>0){
     setTextConcept([{
-      "conceptName": "TextConcept",
+      "conceptName":concepts.name ,
       "values":data
      }])
    }
