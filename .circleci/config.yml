@@ -83,13 +83,13 @@ jobs:
           cd ~/avni-media/client
           make zip-app-staging
 
-      - run: cp ~/avni-media/avni-media-client.tgz ~/artifacts/staging-avni-media-client.tgz;
+      - run: cp ~/avni-media/client/avni-media-client.tgz ~/artifacts/staging-avni-media-client.tgz;
 
       - run: |
           cd ~/avni-media/client
           make zip-app-prod
 
-      - run: cp ~/avni-media/avni-media-client.tgz ~/artifacts/prod-avni-media-client.tgz;
+      - run: cp ~/avni-media/client/avni-media-client.tgz ~/artifacts/prod-avni-media-client.tgz;
 
       - run: cd ~/avni-media/server
 
@@ -107,23 +107,17 @@ jobs:
 
       - run: |
           cd ~/avni-media/server
-          make zip-app-staging
-
-      - run: cp ~/avni-media/avni-media-server.tgz ~/artifacts/staging-avni-media-server.tgz;
+          make build-app-staging
 
       - run: |
           cd ~/avni-media/server
-          make zip-app-prod
-
-      - run: cp ~/avni-media/avni-media-server.tgz ~/artifacts/prod-avni-media-server.tgz;
+          make build-app-prod
 
       - persist_to_workspace:
           root: ~/artifacts
           paths:
             - prod-avni-media-client.tgz
             - staging-avni-media-client.tgz
-            - prod-avni-media-server.tgz
-            - staging-avni-media-server.tgz
 
       - store_artifacts:
           path: ~/artifacts
