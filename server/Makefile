@@ -19,7 +19,7 @@ _build-app:
 	cp ./env-templates/development.template .env
 
 build-app-prod:
-	make _zip-app template=production.template
+	make _build-app template=production.template
 
 build-app-staging:
-	make _zip-app template=staging.template
+	make _build-app template=staging.template
