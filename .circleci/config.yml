@@ -21,8 +21,6 @@ commands:
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install python3-pip
-            sudo pip3 install awscli --upgrade
-            sudo pip3 install ansible
 
       - run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -30,55 +28,62 @@ commands:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-      - run: |
-          nvm install 19.8.1
-          nvm use v19.8.1
-          npm i -g @nestjs/cli
-          npm install pm2@latest -g
-
-      - run: |
-          sudo su - avni-media-user
-          cd ~/
-          mkdir -p ~/avni-media/client
-          mkdir -p ~/avni-media/server
-          exit
-
       - run:
           name: Copy artifacts to server
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
 
-      - run: |
-          sudo su - avni-media-user
-          cd ~/
-          tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
-          tzr -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
+      - run:
+          name: Install node, nest and pm2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            nvm install 19.8.1
+            nvm use v19.8.1
+            npm i -g @nestjs/cli
+            npm install pm2@latest -g
+            EOF
 
-      - run: |
-          cd ~/avni-media/server
-          nvm use v19.8.1
-          npm install --legacy-peer-deps
-          npm run build
+      - run:
+          name: Apply client and server artifacts
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            sudo su - avni-media-user
+            cd ~/
+            sudo rm -rf ~/avni-media
+            mkdir -p ~/avni-media/client
+            mkdir -p ~/avni-media/server
+            sudo tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
+            sudo tar -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
+            sudo rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            EOF
 
-      - run: |
-          cd ~/avni-media/client
-          nvm use v19.8.1
-          npm install --legacy-peer-deps
-          npm run build
+      - run:
+          name: Run server
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            cd ~/avni-media/server
+            nvm use v19.8.1
+            pm2 start ./dist/main.js --name "avni-media-server" -p 3010
+            EOF
 
-      - run: |
-          cd ~/avni-media/server
-          pm2 start ./dist/main.js --name "avni-media-server" -p 3010
+      - run:
+          name: Build client
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            cd ~/avni-media/client
+            nvm use v19.8.1
+            pm2 start npm --name app1 -- run start -- -p 3000
+            pm2 start npm --name "avni-media-client" -- run start -- -p 3000
+            EOF
 
-      - run: |
-          cd ~/avni-media/client
-          pm2 start npm --name app1 -- run start -- -p 3000
-          pm2 start npm --name "avni-media-client" -- run start -- -p 3000
-
-      - run: |
+      - run:
+          name: Persist apps to ensure they get restarted automatically
+          command: |
+          ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
           pm2 startup systemd
           pm2 save
+          EOF
 
 jobs:
 
