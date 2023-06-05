@@ -42,7 +42,7 @@ export default function Concepts({ concept, conceptdata }: Prop) {
 
       <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div className="py-1">
-          {conceptdata && conceptdata.map((option) => (
+          {conceptdata.map((option) => (
             <Menu.Item key={option.id}>
               {({ active }) => (
                 <button

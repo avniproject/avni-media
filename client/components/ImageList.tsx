@@ -102,6 +102,7 @@ export default function ImageList() {
       ) {
         await Promise.all(
           formsData.map(async (element: any) => {
+            console.log("subject", selectedSubjectUUID, "program", selectedProgramUUID);
             if (
               selectedProgramUUID.some((uuid) => uuid === element.programUUID) ||
               selectedSubjectUUID.some((uuid) => uuid === element.subjectTypeUUID)
