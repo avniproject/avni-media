@@ -121,7 +121,7 @@ export default function ImageList() {
                   const exists = conceptdata.some(
                     (concept: { uuid: string }) => concept.uuid === element.concept.uuid
                   );
-                  if (!exists && element.voided === false) {
+                  if (!exists) {
                     const dataType = element.concept.dataType;
                     const isDateType = dataType === "Date";
                     const isDateTimeType = dataType === "DateTime";
