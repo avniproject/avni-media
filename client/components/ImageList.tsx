@@ -95,64 +95,73 @@ export default function ImageList() {
   }, []);
 
   useEffect(() => {
+    const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
-      if (
-        selectedProgramUUID.length > 0 ||
-        selectedSubjectUUID.length > 0
-      ) {
+      if (selectedProgramUUID.length > 0 || selectedSubjectUUID.length > 0) {
         await Promise.all(
           formsData.map(async (element: any) => {
-            console.log("subject", selectedSubjectUUID, "program", selectedProgramUUID);
             if (
-              selectedProgramUUID.some((uuid) => uuid === element.programUUID) ||
-              selectedSubjectUUID.some((uuid) => uuid === element.subjectTypeUUID)
+              formTypeArray.includes(element.formType )
             ) {
-              const formData = await axios.get(`${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`)
-              const forms = formData.data
-  
-              const applicableFormElements = forms.formElementGroups[0]
-                ? forms.formElementGroups[0].applicableFormElements
-                : [];
-  
-              await Promise.all(
-                applicableFormElements.map(async (element: {
-                  voided: boolean;
-                  concept: { uuid: string; dataType: any };
-                }) => {
-                  const exists = conceptdata.some(
-                    (concept: { uuid: string }) => concept.uuid === element.concept.uuid
-                  );
-                  if (!exists) {
-                    const dataType = element.concept.dataType;
-                    const isDateType = dataType === "Date";
-                    const isDateTimeType = dataType === "DateTime";
-                    const isNumericType = dataType === "Numeric";
-                    const isCodedType = dataType === "Coded";
-                    const isNotesType = dataType === "Notes";
-                    const isTextType = dataType === "Text";
-  
-                    if (
-                      isDateType ||
-                      isDateTimeType ||
-                      isNumericType ||
-                      isCodedType ||
-                      isNotesType ||
-                      isTextType 
-                    ) {
-                      setConceptData((prevConceptData: any) => [
-                        ...prevConceptData,
-                        element.concept,
-                      ]);
+              if (
+                selectedProgramUUID.some(
+                  (uuid) => uuid === element.programUUID
+                ) ||
+                selectedSubjectUUID.some(
+                  (uuid) => uuid === element.subjectTypeUUID
+                )
+              ) {
+                const formData = await axios.get(
+                  `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
+                );
+                const forms = formData.data;
+
+                const applicableFormElements = forms.formElementGroups[0]
+                  ? forms.formElementGroups[0].applicableFormElements
+                  : [];
+
+                await Promise.all(
+                  applicableFormElements.map(
+                    async (element: {
+                      voided: boolean;
+                      concept: { uuid: string; dataType: any };
+                    }) => {
+                      const exists = conceptdata.some(
+                        (concept: { uuid: string }) =>
+                          concept.uuid === element.concept.uuid
+                      );
+                      if (!exists && element.voided === false) {
+                        const dataType = element.concept.dataType;
+                        const isDateType = dataType === "Date";
+                        const isDateTimeType = dataType === "DateTime";
+                        const isNumericType = dataType === "Numeric";
+                        const isCodedType = dataType === "Coded";
+                        const isNotesType = dataType === "Notes";
+                        const isTextType = dataType === "Text";
+
+                        if (
+                          isDateType ||
+                          isDateTimeType ||
+                          isNumericType ||
+                          isCodedType ||
+                          isNotesType ||
+                          isTextType
+                        ) {
+                          setConceptData((prevConceptData: any) => [
+                            ...prevConceptData,
+                            element.concept,
+                          ]);
+                        }
+                      }
                     }
-                  }
-                })
-              );
+                  )
+                );
+              }
             }
           })
         );
       }
     };
-  
     data();
   }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
   
@@ -247,38 +256,38 @@ export default function ImageList() {
     setConcept(conceptJson);
   };
 
-  const conceptDate = (data: any[]|null, conceptName: string) => {
+  const conceptDate = (data: any[]|null) => {
     if(data && data.length>0){
       setConceptDates([{
-        "conceptName": conceptName,
+        "conceptName":concepts.name,
         "from": data[0],
         "to": data[1]
       }])
     }
   };
 
-  const conceptDateTime = (data: any[]|null, conceptName: string) => {
+  const conceptDateTime = (data: any[]|null) => {
     if(data && data.length>0){
       setDateTimeConcept([{
-        "conceptName": conceptName,
+        "conceptName": concepts.name,
         "from": data[0],
         "to": data[1]
       }])
     }
   };
 
-  const conceptNumeric = (fromNumber: number, toNumber: number,conceptName: string) =>{
+  const conceptNumeric = (fromNumber: number, toNumber: number) =>{
    setToNumericConcept([{
-    "conceptName": conceptName,
+    "conceptName":concepts.name,
     "from": fromNumber,
     "to": toNumber
    }])
   }
 
-  const conceptCoded = (data: any, conceptName: string) =>{
+  const conceptCoded = (data: any) =>{
     if(data.length>0){
       setCodedConcept([{
-        "conceptName": conceptName,
+        "conceptName": concepts.name,
         "values":data
        }])
     }
@@ -288,7 +297,7 @@ export default function ImageList() {
 
     if(data && data.length>0){
       setNoteConcept([{
-        "conceptName": "NoteConcept",
+        "conceptName": concepts.name,
         "values":data
       }])
     }
@@ -299,7 +308,7 @@ export default function ImageList() {
 
    if(data && data.length>0){
     setTextConcept([{
-      "conceptName": "TextConcept",
+      "conceptName":concepts.name ,
       "values":data
      }])
    }

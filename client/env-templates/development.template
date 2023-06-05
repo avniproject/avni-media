@@ -1,0 +1,4 @@
+NEXT_PUBLIC_IMAGE_LIST_URL=https://localhost:6012/etl/media
+NEXT_PUBLIC_DOWNLOAD_REQUEST_URL=http://localhost:3010/media-viewer/requestDownload
+NEXT_PUBLIC_DOWNLOAD_LIST_URL=http://localhost:3010/media-viewer/allData
+#http://localhost:3010 === NESTjs
