@@ -4,7 +4,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
 interface Prop {
   concepts: any;
-  conceptCoded: (data: any, conceptName: string) => void;
+  conceptCoded: (data: any) => void;
 }
 
 function classNames(...classes: string[]) {
@@ -48,7 +48,7 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
 
   useEffect(() => {
 
-    conceptCoded(selectedOptions, "CodedConcept");
+    conceptCoded(selectedOptions);
 
   }, [selectedOptions]);
 

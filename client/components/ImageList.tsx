@@ -256,7 +256,7 @@ export default function ImageList() {
     setConcept(conceptJson);
   };
 
-  const conceptDate = (data: any[]|null, conceptName: string) => {
+  const conceptDate = (data: any[]|null) => {
     if(data && data.length>0){
       setConceptDates([{
         "conceptName":concepts.name,
@@ -266,7 +266,7 @@ export default function ImageList() {
     }
   };
 
-  const conceptDateTime = (data: any[]|null, conceptName: string) => {
+  const conceptDateTime = (data: any[]|null) => {
     if(data && data.length>0){
       setDateTimeConcept([{
         "conceptName": concepts.name,
@@ -276,7 +276,7 @@ export default function ImageList() {
     }
   };
 
-  const conceptNumeric = (fromNumber: number, toNumber: number,conceptName: string) =>{
+  const conceptNumeric = (fromNumber: number, toNumber: number) =>{
    setToNumericConcept([{
     "conceptName":concepts.name,
     "from": fromNumber,
@@ -284,7 +284,7 @@ export default function ImageList() {
    }])
   }
 
-  const conceptCoded = (data: any, conceptName: string) =>{
+  const conceptCoded = (data: any) =>{
     if(data.length>0){
       setCodedConcept([{
         "conceptName": concepts.name,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 interface Prop {
-  conceptNumeric: (fromNumber: number, toNumber: number, conceptName: string) => void;
+  conceptNumeric: (fromNumber: number, toNumber: number) => void;
 }
 
 export default function NumericConceptFilter({ conceptNumeric }: Prop) {
@@ -18,7 +18,7 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
     setIsValidRange(isValid);
     if (frominputValue < toinputValue) {
 
-      conceptNumeric(parseInt(frominputValue), parseInt(toinputValue), "NumericConcept");
+      conceptNumeric(parseInt(frominputValue), parseInt(toinputValue));
 
     }
   }, [frominputValue, toinputValue]);
