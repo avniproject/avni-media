@@ -67,12 +67,12 @@ jobs:
       - run: cd ~/avni-media/client
 
       - restore_cache:
-          key: dependency-cache-client-{{ checksum "package.json" }}
+          key: dependency-cache-client-{{ checksum "client/package.json" }}
 
       - run: npm install --legacy-peer-deps
 
       - save_cache:
-          key: dependency-cache-client-{{ checksum "package.json" }}
+          key: dependency-cache-client-{{ checksum "client/package.json" }}
           paths:
             - ./node_modules
 
@@ -87,12 +87,12 @@ jobs:
       - run: cd ~/avni-media/server
 
       - restore_cache:
-          key: dependency-cache-server-{{ checksum "package.json" }}
+          key: dependency-cache-server-{{ checksum "server/package.json" }}
 
       - run: npm install --legacy-peer-deps
 
       - save_cache:
-          key: dependency-cache-server-{{ checksum "package.json" }}
+          key: dependency-cache-server-{{ checksum "server/package.json" }}
           paths:
             - ./node_modules
 
