@@ -66,7 +66,7 @@ const ImageCarousel = ({
 
   return (
     <>
-      <div className="fixed z-25 inset-0 overflow-y-auto ">
+      <div className="fixed  inset-0 overflow-y-auto  "style={{ zIndex: 21 }}>
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-0 text-center sm:block sm:p-0">
           <div
             className="fixed inset-0 transition-opacity"
