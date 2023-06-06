@@ -33,7 +33,7 @@ commands:
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
-            scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:~/install.sh
+            scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
 
       - run:
           name: Install node, nest and pm2
@@ -49,15 +49,15 @@ commands:
           name: Deploy client and server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            chmod a+x ~/install.sh
-            sudo ~/install.sh
+            chmod a+x /tmp/install.sh
+            sudo /tmp/install.sh
             EOF
 
       - run:
           name: Delete artifacts from server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm ~/install.sh
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
 
 jobs:
 
@@ -125,7 +125,7 @@ jobs:
           make zip-app-server-staging
 
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
-      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/install.sh
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
 
       - persist_to_workspace:
           root: ~/artifacts
