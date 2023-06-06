@@ -15,9 +15,17 @@ if [ $? -eq 1 ]; then
     echo "avni-media-user ALL = (ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
 fi
 
+#Stop and delete client and server
+sudo su - avni-media-user << EOF
+cd ~/
+nvm use v19.8.1
+pm2 stop all
+pm2 delete all
+rm -rf ~/avni-media
+EOF
+
 #Apply client and server artifacts
 sudo -H -u avni-media-user bash << EOF
-cd ~/ && rm -rf ~/avni-media
 mkdir -p ~/avni-media/client
 mkdir -p ~/avni-media/server
 tar -zxvf /tmp/avni-media-client.tgz --directory ~/avni-media/client
