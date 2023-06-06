@@ -404,17 +404,6 @@ export default function ImageList() {
   }, [selectedSubjectUUID, formsData]);
 
   useEffect(() => {
-    if (selectedProgramUUID.length > 0) {
-      const selectedForms = formsData.filter((formData: { programUUID: any }) =>
-        selectedProgramUUID.includes(formData.programUUID)
-      );
-      setSelectedFormProgram(selectedForms);
-    } else {
-      setSelectedFormProgram(null);
-    }
-  }, [formsData, selectedProgramUUID]);
-
-  useEffect(() => {
     if (secondAddress.length > 0) {
       setAdd(secondAddress);
     } else if (address.length > 0) {
@@ -564,7 +553,7 @@ export default function ImageList() {
           <EncounterType
             encounterType={encounterType}
             encounterFilter={encounterFilter}
-            selectedFormProgram={selectedFormProgram}
+            selectedFormSubject= {selectedFormSubject}
           />
         )}
         { conceptdata && conceptdata.length > 0 &&

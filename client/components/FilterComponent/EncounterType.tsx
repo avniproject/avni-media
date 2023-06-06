@@ -11,7 +11,7 @@ interface Option {
 interface Prop {
   encounterType: (data: any[]) => void;
   encounterFilter: any[];
-  selectedFormProgram: any[];
+  selectedFormSubject: any[];
 }
 
 function classNames(...classes: string[]) {
@@ -21,23 +21,23 @@ function classNames(...classes: string[]) {
 export default function EncounterType({
   encounterType,
   encounterFilter,
-  selectedFormProgram
+  selectedFormSubject
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
   useEffect(() => {
-    if (selectedFormProgram) {
+    if (selectedFormSubject) {
       const formMappingsWithEncounter = encounterFilter.filter((mapping) =>
-        selectedFormProgram.some(
-          (selectedFormProgram) =>
-            selectedFormProgram.encounterTypeUUID === mapping.uuid
+      selectedFormSubject.some(
+          (selectedFormSubject) =>
+          selectedFormSubject.encounterTypeUUID === mapping.uuid
         )
       );
       setShowEncounter(formMappingsWithEncounter);
     } else {
       setShowEncounter([]);
     }
-  }, [encounterFilter, selectedFormProgram]);
+  }, [encounterFilter, selectedFormSubject]);
   useEffect(() => {
     encounterType(selectedOptions);
   }, [encounterType, selectedOptions]);
