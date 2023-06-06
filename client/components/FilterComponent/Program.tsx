@@ -9,7 +9,7 @@ interface Option {
 interface Props {
   programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
-  selectedFormSubject: any[]
+  selectedFormSubject: any[];
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -19,16 +19,19 @@ export default function Program({ programType, programFilter, selectedFormSubjec
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [programUUID, setProgramUUID]       = useState<Option[]>([])
   const [showprogram, setShowProgram]       = useState<any[]>([])
-  useEffect(()=>{
-    if (selectedFormSubject) { 
-      const formMappingsWithProgramUUID = programFilter.filter(mapping =>
-        selectedFormSubject.some(selectedFormSubject => selectedFormSubject.programUUID === mapping.uuid)
+  useEffect(() => {
+    if (selectedFormSubject) {
+      const formMappingsWithProgramUUID = programFilter.filter((mapping) =>
+        selectedFormSubject.some(
+          (selectedFormSubject) =>
+            selectedFormSubject.programUUID === mapping.uuid
+        )
       );
-      setShowProgram(formMappingsWithProgramUUID )
-    }else{
-      setShowProgram([])
+      setShowProgram(formMappingsWithProgramUUID);
+    } else {
+      setShowProgram([]);
     }
-  },[selectedFormSubject, programFilter])
+  }, [selectedFormSubject, programFilter]);
  
   useEffect(() => {
     programType(selectedOptions, programUUID);
