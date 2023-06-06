@@ -122,31 +122,32 @@ export default function LocationHierarchy({
         }
       } 
       else {
-       
+       if(locationFilter[Number(index) + 1].id !== undefined){
         const typeIds = locationFilter[Number(index) + 1].id;
         console.log("typeIdfor third",typeIds, locationFilter,"index",[Number(index) + 1])
         try {
-          if (selectedOptions.length > 0 && typeIds !== null) {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
-            );
+            if (selectedOptions.length > 0 && typeIds !== null) {
+              const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
+              );
 
-            const distJsonDatas = response.data
-            const distDatas = distJsonDatas.content;
-            getTypeId(distJsonDatas.content[0].typeId);
-            getOtherLocation(distDatas);
+              const distJsonDatas = response.data
+              const distDatas = distJsonDatas.content;
+              getTypeId(distJsonDatas.content[0].typeId);
+              getOtherLocation(distDatas);
+              console.log(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
+              );
+            }
+          } catch (Error) {
             console.log(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
+              `error at ${
+                process.env.NEXT_PUBLIC_TOP_ADDRESS
+              }?parentId=${selectedOptions.join(
+                ","
+              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
-        } catch (Error) {
-          console.log(
-            `error at ${
-              process.env.NEXT_PUBLIC_TOP_ADDRESS
-            }?parentId=${selectedOptions.join(
-              ","
-            )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-          );
         }
       }
     };
