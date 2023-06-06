@@ -33,7 +33,7 @@ commands:
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
-            scp -o StrictHostKeyChecking=no ~/artifacts/deploy/install.sh ubuntu@<< parameters.hostname >>:~/deploy/install.sh
+            scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:~/install.sh
 
       - run:
           name: Install node, nest and pm2
@@ -49,15 +49,15 @@ commands:
           name: Deploy client and server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            chmod a+x ~/deploy/install.sh
-            sudo ~/deploy/install.sh
+            chmod a+x ~/install.sh
+            sudo ~/install.sh
             EOF
 
       - run:
           name: Delete artifacts from server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm ~/deploy/install.sh
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm ~/install.sh
 
 jobs:
 
@@ -125,7 +125,7 @@ jobs:
           make zip-app-server-staging
 
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
-      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/deploy/install.sh
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/install.sh
 
       - persist_to_workspace:
           root: ~/artifacts
@@ -134,7 +134,7 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
-            - deploy/install.sh
+            - install.sh
 
       - store_artifacts:
           path: ~/artifacts
