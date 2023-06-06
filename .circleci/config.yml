@@ -170,6 +170,7 @@ workflows:
           requires:
             - build
       - STAGING_deploy:
+          context: non-prod-deploy
           requires:
             - STAGING_approve
       - PRODUCTION_approve:
@@ -177,5 +178,6 @@ workflows:
           requires:
             - build
       - PRODUCTION_deploy:
+          context: prod-deploy
           requires:
             - PRODUCTION_approve
