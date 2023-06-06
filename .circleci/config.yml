@@ -35,6 +35,7 @@ commands:
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
 
+      # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
       - run:
           name: Install node, nest and pm2
           command: |
