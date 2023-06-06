@@ -53,6 +53,12 @@ commands:
             sudo ~/deploy/install.sh
             EOF
 
+      - run:
+          name: Delete artifacts from server
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm ~/deploy/install.sh
+
 jobs:
 
   build:

@@ -20,20 +20,19 @@ sudo -H -u avni-media-user bash << EOF
 cd ~/ && rm -rf ~/avni-media
 mkdir -p ~/avni-media/client
 mkdir -p ~/avni-media/server
-sudo tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
-sudo tar -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
-sudo rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+tar -zxvf /tmp/avni-media-client.tgz --directory ~/avni-media/client
+tar -zxvf /tmp/avni-media-server.tgz --directory ~/avni-media/server
 EOF
 
 #Run server
-sudo -H -u avni-media-user bash << EOF
+sudo su - avni-media-user << EOF
 cd ~/avni-media/server
 nvm use v19.8.1
 pm2 start ./dist/main.js --name "avni-media-server" -p 3010
 EOF
 
 #Build client
-sudo -H -u avni-media-user bash << EOF
+sudo su - avni-media-user << EOF
 cd ~/avni-media/client
 nvm use v19.8.1
 pm2 start npm --name app1 -- run start -- -p 3000
@@ -41,7 +40,7 @@ pm2 start npm --name "avni-media-client" -- run start -- -p 3000
 EOF
 
 #Persist apps to ensure they get restarted automatically
-sudo -H -u avni-media-user bash << EOF
+sudo su - avni-media-user << EOF
 pm2 startup systemd
 pm2 save
 EOF
