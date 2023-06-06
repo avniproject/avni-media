@@ -33,6 +33,7 @@ commands:
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
+            scp -o StrictHostKeyChecking=no ~/artifacts/deploy/install.sh ubuntu@<< parameters.hostname >>:~/deploy/install.sh
 
       - run:
           name: Install node, nest and pm2
@@ -45,44 +46,11 @@ commands:
             EOF
 
       - run:
-          name: Apply client and server artifacts
+          name: Deploy client and server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            sudo su - avni-media-user
-            cd ~/
-            sudo rm -rf ~/avni-media
-            mkdir -p ~/avni-media/client
-            mkdir -p ~/avni-media/server
-            sudo tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
-            sudo tar -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
-            sudo rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
-            EOF
-
-      - run:
-          name: Run server
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            cd ~/avni-media/server
-            nvm use v19.8.1
-            pm2 start ./dist/main.js --name "avni-media-server" -p 3010
-            EOF
-
-      - run:
-          name: Build client
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            cd ~/avni-media/client
-            nvm use v19.8.1
-            pm2 start npm --name app1 -- run start -- -p 3000
-            pm2 start npm --name "avni-media-client" -- run start -- -p 3000
-            EOF
-
-      - run:
-          name: Persist apps to ensure they get restarted automatically
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            pm2 startup systemd
-            pm2 save
+            chmod a+x ~/deploy/install.sh
+            sudo ~/deploy/install.sh
             EOF
 
 jobs:
@@ -151,6 +119,7 @@ jobs:
           make zip-app-server-staging
 
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/deploy/install.sh
 
       - persist_to_workspace:
           root: ~/artifacts
@@ -159,6 +128,7 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
+            - deploy/install.sh
 
       - store_artifacts:
           path: ~/artifacts
