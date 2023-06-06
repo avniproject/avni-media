@@ -66,6 +66,8 @@ export default function ImageList() {
   const [typeId, setTypeId] = useState<any>([])
   const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
   const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
+  const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
+  const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -389,6 +391,28 @@ export default function ImageList() {
     setSelectedSubjectUUID(subjectUuid)
     setSubjectType(data);
   };
+  useEffect(() => {
+    if (selectedSubjectUUID.length > 0) {
+      const selectedForms = formsData.filter(
+        (formData: { subjectTypeUUID: any }) =>
+          selectedSubjectUUID.includes(formData.subjectTypeUUID)
+      );
+      setSelectedFormSubject(selectedForms);
+    } else {
+      setSelectedFormSubject(null);
+    }
+  }, [selectedSubjectUUID, formsData]);
+
+  useEffect(() => {
+    if (selectedProgramUUID.length > 0) {
+      const selectedForms = formsData.filter((formData: { programUUID: any }) =>
+        selectedProgramUUID.includes(formData.programUUID)
+      );
+      setSelectedFormProgram(selectedForms);
+    } else {
+      setSelectedFormProgram(null);
+    }
+  }, [formsData, selectedProgramUUID]);
 
   useEffect(() => {
     if (secondAddress.length > 0) {
@@ -531,13 +555,16 @@ export default function ImageList() {
 
         {programFilter && programFilter.length > 0 && (
           <Program programType={programType} 
-          programFilter={programFilter} />
+          programFilter={programFilter}
+          selectedFormSubject= {selectedFormSubject}
+           />
         )}
 
         {encounterFilter && encounterFilter.length > 0 && (
           <EncounterType
             encounterType={encounterType}
             encounterFilter={encounterFilter}
+            selectedFormProgram={selectedFormProgram}
           />
         )}
         { conceptdata && conceptdata.length > 0 &&
