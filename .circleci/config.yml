@@ -33,7 +33,9 @@ commands:
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
+            scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
 
+      # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
       - run:
           name: Install node, nest and pm2
           command: |
@@ -45,45 +47,18 @@ commands:
             EOF
 
       - run:
-          name: Apply client and server artifacts
+          name: Deploy client and server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            sudo su - avni-media-user
-            cd ~/
-            sudo rm -rf ~/avni-media
-            mkdir -p ~/avni-media/client
-            mkdir -p ~/avni-media/server
-            sudo tar -zxvf /tmp/avni-media-client.tgz ~/avni-media/client
-            sudo tar -zxvf /tmp/avni-media-server.tgz ~/avni-media/server
-            sudo rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            chmod a+x /tmp/install.sh
+            sudo /tmp/install.sh
             EOF
 
       - run:
-          name: Run server
+          name: Delete artifacts from server
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            cd ~/avni-media/server
-            nvm use v19.8.1
-            pm2 start ./dist/main.js --name "avni-media-server" -p 3010
-            EOF
-
-      - run:
-          name: Build client
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            cd ~/avni-media/client
-            nvm use v19.8.1
-            pm2 start npm --name app1 -- run start -- -p 3000
-            pm2 start npm --name "avni-media-client" -- run start -- -p 3000
-            EOF
-
-      - run:
-          name: Persist apps to ensure they get restarted automatically
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            pm2 startup systemd
-            pm2 save
-            EOF
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
 
 jobs:
 
@@ -151,6 +126,7 @@ jobs:
           make zip-app-server-staging
 
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
 
       - persist_to_workspace:
           root: ~/artifacts
@@ -159,6 +135,7 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
+            - install.sh
 
       - store_artifacts:
           path: ~/artifacts
@@ -193,6 +170,7 @@ workflows:
           requires:
             - build
       - STAGING_deploy:
+          context: non-prod-deploy
           requires:
             - STAGING_approve
       - PRODUCTION_approve:
@@ -200,5 +178,6 @@ workflows:
           requires:
             - build
       - PRODUCTION_deploy:
+          context: prod-deploy
           requires:
             - PRODUCTION_approve
