@@ -17,7 +17,7 @@ function classNames(...classes: string[]) {
 
 export default function Program({ programType, programFilter }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [programUUID, setProgramUUID]       = useState<Option[]>([])
+  const [programUUID, setProgramUUID]         = useState<Option[]>([])
   
   useEffect(() => {
     programType(selectedOptions, programUUID);

@@ -101,7 +101,7 @@ export default function LocationHierarchy({
           
             try {
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}??parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
               );
              
               const distJsonData = response.data
@@ -122,7 +122,7 @@ export default function LocationHierarchy({
             if (selectedOptions.length > 0 && typeIds !== null) {
               const parentsId = selectedOptions.slice(-1)[0]
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}??parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
               );
 
               const distJsonDatas = response.data

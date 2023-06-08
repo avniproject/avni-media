@@ -67,7 +67,7 @@ export default function ImageList() {
   const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
   const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
   const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
-  const [showprogram, setShowProgram]       = useState<any[]>([])
+  const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
  
 

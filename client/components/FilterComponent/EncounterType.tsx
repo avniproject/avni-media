@@ -24,7 +24,6 @@ export default function EncounterType({
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
 
-
   useEffect(() => {
     encounterType(selectedOptions);
   }, [encounterType, selectedOptions]);

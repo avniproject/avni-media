@@ -18,7 +18,7 @@ export default function TexConceptFilter({ conceptNote }: Prop) {
     <div className="inline-flex w-52 mt-5">
       <input
         type="text"
-        className=" w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Enter Text Here"
