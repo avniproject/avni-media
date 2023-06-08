@@ -583,11 +583,11 @@ export default function ImageList() {
           <EncounterType
             encounterType={encounterType}
             encounterFilter={showEncounter}
-            selectedFormSubject= {selectedFormSubject}
           />
         )}
         { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata && conceptdata[0] !== null &&
-            <Concepts concept={concept} conceptdata={conceptdata} />
+            <Concepts concept={concept} conceptdata={conceptdata} 
+            selectedFormSubject={selectedFormSubject}/>
         }
         {/* <Accounts accountType={accountType} /> */}
         {concepts && concepts.dataType === "Coded" ? (

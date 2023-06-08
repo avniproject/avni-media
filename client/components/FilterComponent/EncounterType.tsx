@@ -20,8 +20,7 @@ function classNames(...classes: string[]) {
 
 export default function EncounterType({
   encounterType,
-  encounterFilter,
- 
+  encounterFilter
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
 
