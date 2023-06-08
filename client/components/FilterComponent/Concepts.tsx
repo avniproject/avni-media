@@ -16,7 +16,6 @@ function classNames(...classes: string[]) {
 export default function Concepts({ concept, conceptdata }: Prop) {
 
   const [selectedOptions, setSelectedOptions] = useState([]);
-
   useEffect(() => {
 
     concept(selectedOptions);

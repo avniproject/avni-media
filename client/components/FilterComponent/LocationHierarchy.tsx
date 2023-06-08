@@ -24,7 +24,6 @@ interface Prop {
   getOtherLocation: (data: any[]) => void;
   getTopLevel: (data: any[], levelname: string) => void;
   getSecondLevel: (data: any[], levelType: string) => void;
-  getSelectedLocation: (data: any[]) => void;
   getTypeId: (data: any) => void;
   location: any[];
   otherLocation: any[];
@@ -93,32 +92,29 @@ export default function LocationHierarchy({
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
 
-        console.log(
-          "Response data for top level ",
-          response.data,
-          "Response",
-          response
-        );
-        console.log("index", locationIndex);
         const jsonDataState = response.data
-          
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
 
         if (selectedOption.length > 0) {
-          try {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
-            );
-            const distJsonData = response.data
-            const distData = distJsonData.content;
-            getTypeId(distJsonData.content[0].typeId);
-            getLocation(distData);
-          } catch (Error) {
-            console.log(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            );
-          }
+          const parentsId = selectedOption.slice(-1)[0]
+          
+            try {
+              const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}??parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${locationFilter[Number(index) + 1].id}`
+              );
+             
+              const distJsonData = response.data
+              const distData = distJsonData.content;
+              getTypeId(distJsonData.content[0].typeId);
+              getLocation(distData);
+            } catch (Error) {
+              console.log(
+                `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              );
+            }
+         
+         
         }
       } 
       else {
@@ -127,25 +123,22 @@ export default function LocationHierarchy({
         console.log("typeIdfor third",typeIds, locationFilter,"index",[Number(index) + 1])
         try {
             if (selectedOptions.length > 0 && typeIds !== null) {
-              const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
+              const parentsId = selectedOptions.slice(-1)[0]
+                 const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}??parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
               );
 
               const distJsonDatas = response.data
               const distDatas = distJsonDatas.content;
               getTypeId(distJsonDatas.content[0].typeId);
               getOtherLocation(distDatas);
-              console.log(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
-              );
+       
             }
           } catch (Error) {
             console.log(
               `error at ${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${selectedOptions.join(
-                ","
-              )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         }

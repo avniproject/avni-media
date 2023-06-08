@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
 
@@ -11,7 +11,7 @@ interface Option {
 interface Prop {
   encounterType: (data: any[]) => void;
   encounterFilter: any[];
-  selectedFormSubject: any[];
+  
 }
 
 function classNames(...classes: string[]) {
@@ -21,23 +21,11 @@ function classNames(...classes: string[]) {
 export default function EncounterType({
   encounterType,
   encounterFilter,
-  selectedFormSubject
+ 
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [showEncounter, setShowEncounter]  = useState<any[]>([]);
-  useEffect(() => {
-    if (selectedFormSubject) {
-      const formMappingsWithEncounter = encounterFilter.filter((mapping) =>
-      selectedFormSubject.some(
-          (selectedFormSubject) =>
-          selectedFormSubject.encounterTypeUUID === mapping.uuid
-        )
-      );
-      setShowEncounter(formMappingsWithEncounter);
-    } else {
-      setShowEncounter([]);
-    }
-  }, [encounterFilter, selectedFormSubject]);
+
+
   useEffect(() => {
     encounterType(selectedOptions);
   }, [encounterType, selectedOptions]);
@@ -67,8 +55,8 @@ export default function EncounterType({
       </div>
         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            {showEncounter &&
-              showEncounter.map((option) => (
+            {encounterFilter &&
+              encounterFilter.map((option) => (
                 <Menu.Item key={option.id}>
                   {({ active }) => (
                     <button
