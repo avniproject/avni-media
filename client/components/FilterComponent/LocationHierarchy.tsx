@@ -109,7 +109,7 @@ export default function LocationHierarchy({
               getTypeId(distJsonData.content[0].typeId);
               getLocation(distData);
             } catch (Error) {
-              console.log(
+              console.error(
                 `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
               );
             }
@@ -118,7 +118,6 @@ export default function LocationHierarchy({
       else {
        if(locationFilter[Number(index) + 1].id !== undefined){
         const typeIds = locationFilter[Number(index) + 1].id;
-        console.log("typeIdfor third",typeIds, locationFilter,"index",[Number(index) + 1])
         try {
             if (selectedOptions.length > 0 && typeIds !== null) {
               const parentsId = selectedOptions.slice(-1)[0]
@@ -133,7 +132,7 @@ export default function LocationHierarchy({
        
             }
           } catch (Error) {
-            console.log(
+            console.error(
               `error at ${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
               }?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
