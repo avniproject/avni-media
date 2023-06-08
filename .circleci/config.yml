@@ -142,9 +142,7 @@ jobs:
 
   STAGING_deploy:
     docker:
-      - image: circleci/openjdk:11-jdk
-        environment:
-          ANSIBLE_HOST_KEY_CHECKING: no
+      - image: cimg/node:19.8.1
     working_directory: ~/
     steps:
       - deploy:
@@ -153,7 +151,7 @@ jobs:
 
   PRODUCTION_deploy:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: cimg/node:19.8.1
     working_directory: ~/
     steps:
       - deploy:
