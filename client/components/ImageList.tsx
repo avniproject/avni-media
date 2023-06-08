@@ -67,7 +67,9 @@ export default function ImageList() {
   const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
   const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
   const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
-  const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
+  const [showprogram, setShowProgram] = useState<any[]>([])
+  const [showEncounter, setShowEncounter]  = useState<any[]>([]);
+ 
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -167,7 +169,33 @@ export default function ImageList() {
     data();
   }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
   
+  useEffect(() => {
+    if (selectedFormSubject) {
+      const formMappingsWithProgramUUID = programFilter.filter((mapping: { uuid: any; }) =>
+        selectedFormSubject.some(
+          (selectedFormSubject: { programUUID: any; }) =>
+            selectedFormSubject.programUUID === mapping.uuid
+        )
+      );
+      setShowProgram(formMappingsWithProgramUUID);
+    } else {
+      setShowProgram([]);
+    }
+  }, [selectedFormSubject, programFilter]);
 
+  useEffect(() => {
+    if (selectedFormSubject) {
+      const formMappingsWithEncounter = encounterFilter.filter((mapping: { uuid: any; }) =>
+      selectedFormSubject.some(
+          (selectedFormSubject: { encounterTypeUUID: any; }) =>
+          selectedFormSubject.encounterTypeUUID === mapping.uuid
+        )
+      );
+      setShowEncounter(formMappingsWithEncounter);
+    } else {
+      setShowEncounter([]);
+    }
+  }, [encounterFilter, selectedFormSubject]);
   useEffect(() => {
     redirectIfNotValid();
     const fetchImages = async () => {
@@ -336,15 +364,19 @@ export default function ImageList() {
     setAcountType(data);
   };
 
-  const getLocation = (data: any[]) => {
+  const getLocation = async (data: any[]) => {
+    await Promise.all(data.map((locations)=>{
+      setLocation((prevLocationData: any) => [
+        ...prevLocationData,
+        locations,
+      ]);
+    }))
     setLocations(data);
   };
 
-  const getSelectedLocation=(data: any[])=>{
-   console.log("data",data)
-  }
 
   const getOtherLocation = (data: any[]) => {
+   
     setOtherLocation(data);
   };
   
@@ -524,7 +556,6 @@ export default function ImageList() {
                       otherLocation={otherLocation}
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
-                      getSelectedLocation={getSelectedLocation}
                       getTypeId = {getTypeId}
                     />
                   );
@@ -542,22 +573,21 @@ export default function ImageList() {
           />
         )}
 
-        {programFilter && programFilter.length > 0 && (
+        {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
-          programFilter={programFilter}
-          selectedFormSubject= {selectedFormSubject}
+          programFilter={showprogram}
            />
         )}
 
-        {encounterFilter && encounterFilter.length > 0 && (
+        {showEncounter && showEncounter.length > 0 && (
           <EncounterType
             encounterType={encounterType}
-            encounterFilter={encounterFilter}
-            selectedFormSubject= {selectedFormSubject}
+            encounterFilter={showEncounter}
           />
         )}
-        { conceptdata && conceptdata.length > 0 &&
-            <Concepts concept={concept} conceptdata={conceptdata} />
+        { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
+            <Concepts concept={concept} conceptdata={conceptdata} 
+            selectedFormSubject={selectedFormSubject}/>
         }
         {/* <Accounts accountType={accountType} /> */}
         {concepts && concepts.dataType === "Coded" ? (

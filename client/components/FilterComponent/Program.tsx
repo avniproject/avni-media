@@ -9,30 +9,16 @@ interface Option {
 interface Props {
   programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
-  selectedFormSubject: any[];
+ 
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Program({ programType, programFilter, selectedFormSubject }: Props) {
+export default function Program({ programType, programFilter }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [programUUID, setProgramUUID]       = useState<Option[]>([])
-  const [showprogram, setShowProgram]       = useState<any[]>([])
-  useEffect(() => {
-    if (selectedFormSubject) {
-      const formMappingsWithProgramUUID = programFilter.filter((mapping) =>
-        selectedFormSubject.some(
-          (selectedFormSubject) =>
-            selectedFormSubject.programUUID === mapping.uuid
-        )
-      );
-      setShowProgram(formMappingsWithProgramUUID);
-    } else {
-      setShowProgram([]);
-    }
-  }, [selectedFormSubject, programFilter]);
- 
+  const [programUUID, setProgramUUID]         = useState<Option[]>([])
+  
   useEffect(() => {
     programType(selectedOptions, programUUID);
   }, [programType, selectedOptions, programUUID]);
@@ -69,8 +55,8 @@ export default function Program({ programType, programFilter, selectedFormSubjec
 
         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
-            {showprogram &&
-              showprogram.map((option) => (
+            {programFilter &&
+              programFilter.map((option) => (
                 <Menu.Item key={option.id}>
                   {({ active }) => (
                     <button
