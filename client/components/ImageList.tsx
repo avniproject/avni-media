@@ -134,7 +134,8 @@ export default function ImageList() {
                         (concept: { uuid: string }) =>
                           concept.uuid === element.concept.uuid
                       );
-                      if (!exists && element.voided === false) {
+
+                      if (exists === false && element.voided === false) {
                         const dataType = element.concept.dataType;
                         const isDateType = dataType === "Date";
                         const isDateTimeType = dataType === "DateTime";
@@ -151,10 +152,9 @@ export default function ImageList() {
                           isNotesType ||
                           isTextType
                         ) {
-                          setConceptData((prevConceptData: any) => [
-                            ...prevConceptData,
-                            element.concept,
-                          ]);
+                          if(!exists){
+                            setConceptData([...conceptdata, element.concept])
+                          }
                         }
                       }
                     }
@@ -365,14 +365,17 @@ export default function ImageList() {
   };
 
   const getLocation = async (data: any[]) => {
-    await Promise.all(data.map((locations)=>{
-      setLocation((prevLocationData: any) => [
-        ...prevLocationData,
-        locations,
-      ]);
-    }))
-    setLocations(data);
+    const newLocations = data.map((newLocation) => {
+      const exists = location.some(
+        (locations: { uuid: string }) => locations.uuid === newLocation.uuid
+      );
+      if(exists === false){
+        return newLocation;
+      }
+    });
+    setLocations([...location, ...newLocations]);
   };
+  
 
 
   const getOtherLocation = (data: any[]) => {
