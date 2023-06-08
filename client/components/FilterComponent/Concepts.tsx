@@ -14,7 +14,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({ concept, conceptdata ,selectedFormSubject}: Prop) {
+export default function Concepts({ concept, conceptdata, selectedFormSubject}: Prop) {
 
   const [selectedOptions, setSelectedOptions] = useState([]);
   useEffect(() => {

@@ -366,8 +366,8 @@ export default function ImageList() {
 
   const getLocation = async (data: any[]) => {
     await Promise.all(data.map((locations)=>{
-      setLocation((prevConceptData: any) => [
-        ...prevConceptData,
+      setLocation((prevLocationData: any) => [
+        ...prevLocationData,
         locations,
       ]);
     }))
@@ -585,7 +585,7 @@ export default function ImageList() {
             encounterFilter={showEncounter}
           />
         )}
-        { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata && conceptdata[0] !== null &&
+        { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
             <Concepts concept={concept} conceptdata={conceptdata} 
             selectedFormSubject={selectedFormSubject}/>
         }
