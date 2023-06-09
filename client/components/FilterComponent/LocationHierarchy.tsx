@@ -28,6 +28,7 @@ interface Prop {
   location: any[];
   otherLocation: any[];
   locationFilter: any[]
+  resetFilterflag: boolean|undefined;
   
 }
 interface Location {
@@ -52,16 +53,20 @@ export default function LocationHierarchy({
   minLevel,
   index,
   getTypeId,
-  locationFilter
+  locationFilter,
+  resetFilterflag
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [optionSelected, setOptionSelected] = useState<any>();
   const [secondTypeName, setSecondTypeName] = useState<any>();
   const [selectLevelName, setSelectLevelName] = useState(null);
-  const [parentId, setParentId] = useState<Option | null>(null);
+ 
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
-
+  useEffect(()=>{
+    setSelectedOption([]);
+    setSelectedOptions([]);
+  },[resetFilterflag])
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);
     if (selectedOption.includes(option.id)) {
@@ -95,7 +100,6 @@ export default function LocationHierarchy({
         const jsonDataState = response.data
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-
         if (selectedOption.length > 0) {
           const parentsId = selectedOption.slice(-1)[0]
           
@@ -113,6 +117,8 @@ export default function LocationHierarchy({
                 `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
               );
             }
+        } else {
+          getLocation([]);
         }
       } 
       else {
@@ -125,7 +131,161 @@ export default function LocationHierarchy({
                 `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
               );
 
-              const distJsonDatas = response.data
+              const distJsonDatas = {
+                "content" : [ {
+                  "title" : "Ambalappuzha",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "b55359f4-ffce-44c7-a27e-812ba7c02a04",
+                  "lineage" : "182381.182385.182437",
+                  "titleLineage" : "Kerala, Alappuzha, Ambalappuzha",
+                  "id" : 182437,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Aryad",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "c2e2fdf5-299e-4c4b-b291-900d03478226",
+                  "lineage" : "182381.182385.182444",
+                  "titleLineage" : "Kerala, Alappuzha, Aryad",
+                  "id" : 182444,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Bharanicavu",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "bf80c462-6f69-4877-87a2-5d067691f835",
+                  "lineage" : "182381.182385.182452",
+                  "titleLineage" : "Kerala, Alappuzha, Bharanicavu",
+                  "id" : 182452,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Champakulam",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "922ccd5e-2da4-4c01-aded-ff4317dff187",
+                  "lineage" : "182381.182385.182460",
+                  "titleLineage" : "Kerala, Alappuzha, Champakulam",
+                  "id" : 182460,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Chengannur",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "13ebe7da-c93e-41bf-be8c-d290647a66ad",
+                  "lineage" : "182381.182385.182468",
+                  "titleLineage" : "Kerala, Alappuzha, Chengannur",
+                  "id" : 182468,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Harippad",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "4e0b5112-95bd-4d92-b2d5-d8247d2134d2",
+                  "lineage" : "182381.182385.182478",
+                  "titleLineage" : "Kerala, Alappuzha, Harippad",
+                  "id" : 182478,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Kanjikkuzhy",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "d68c2d0e-1ccd-4c0c-a08a-c93d6d4b6d50",
+                  "lineage" : "182381.182385.182487",
+                  "titleLineage" : "Kerala, Alappuzha, Kanjikkuzhy",
+                  "id" : 182487,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Mavelikkara",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "f78436e9-ae2d-4f7c-893a-4cf6687907c0",
+                  "lineage" : "182381.182385.182496",
+                  "titleLineage" : "Kerala, Alappuzha, Mavelikkara",
+                  "id" : 182496,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Muthukulam",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "5a046698-74e7-4021-833d-66bf9862ebea",
+                  "lineage" : "182381.182385.182506",
+                  "titleLineage" : "Kerala, Alappuzha, Muthukulam",
+                  "id" : 182506,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Other",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "3fb5ba98-6f30-4d64-9fa4-3d9d56721de1",
+                  "lineage" : "182381.182385.202731",
+                  "titleLineage" : "Kerala, Alappuzha, Other",
+                  "id" : 202731,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Pattanakkad",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "835303d6-b642-4354-b84a-de90b4a30a08",
+                  "lineage" : "182381.182385.182516",
+                  "titleLineage" : "Kerala, Alappuzha, Pattanakkad",
+                  "id" : 182516,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Thycattussery",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "cc9f7dfe-f173-4ad6-8cb8-f1ba1024c607",
+                  "lineage" : "182381.182385.182524",
+                  "titleLineage" : "Kerala, Alappuzha, Thycattussery",
+                  "id" : 182524,
+                  "typeString" : "Block"
+                }, {
+                  "title" : "Veliyanad",
+                  "level" : 2.0,
+                  "parentId" : 182385,
+                  "typeId" : 679,
+                  "uuid" : "1f8c905c-af49-4335-8c27-8e91c958f0a0",
+                  "lineage" : "182381.182385.182530",
+                  "titleLineage" : "Kerala, Alappuzha, Veliyanad",
+                  "id" : 182530,
+                  "typeString" : "Block"
+                } ],
+                "pageable" : {
+                  "sort" : {
+                    "sorted" : true,
+                    "unsorted" : false
+                  },
+                  "pageNumber" : 0,
+                  "pageSize" : 1000,
+                  "offset" : 0,
+                  "unpaged" : false,
+                  "paged" : true
+                },
+                "last" : true,
+                "totalElements" : 13,
+                "totalPages" : 1,
+                "first" : true,
+                "sort" : {
+                  "sorted" : true,
+                  "unsorted" : false
+                },
+                "numberOfElements" : 13,
+                "size" : 1000,
+                "number" : 0
+              }
               const distDatas = distJsonDatas.content;
               getTypeId(distJsonDatas.content[0].typeId);
               getOtherLocation(distDatas);
@@ -135,7 +295,7 @@ export default function LocationHierarchy({
             console.error(
               `error at ${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId=$&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         }
@@ -148,9 +308,7 @@ export default function LocationHierarchy({
     locationIndex,
     maxLevel,
     minLevel,
-    parentId,
   ]);
-
   function handleOptionClick(option: Option) {
     setSecondTypeName(option);
     if (selectedOptions.includes(option.id)) {
@@ -159,13 +317,12 @@ export default function LocationHierarchy({
       setSelectedOptions([...selectedOptions, option.id]);
     }
   }
-
+  
   useEffect(() => {
     if (selectedOptions !== undefined && secondTypeName !== undefined) {
       getSecondLevel(selectedOptions, secondTypeName.typeString);
     }
   }, [selectedOptions, secondTypeName]);
-
   return (
     <>
       <Menu

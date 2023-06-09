@@ -9,16 +9,20 @@ interface Option {
 interface Props {
   programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
+  resetFilterflag: boolean|undefined;
  
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Program({ programType, programFilter }: Props) {
+export default function Program({ programType, programFilter, resetFilterflag }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [programUUID, setProgramUUID]         = useState<Option[]>([])
   
+  useEffect(()=>{
+      setSelectedOptions([]);
+  },[resetFilterflag])
   useEffect(() => {
     programType(selectedOptions, programUUID);
   }, [programType, selectedOptions, programUUID]);

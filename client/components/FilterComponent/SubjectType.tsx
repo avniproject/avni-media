@@ -10,15 +10,20 @@ interface Option {
 interface Prop {
   subjectType: (data: any[], subjectUuid: any[]) => void;
   subjectFilter: any[];
+  resetFilterflag: boolean|undefined;
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function SubjectType({ subjectType, subjectFilter }: Prop) {
+export default function SubjectType({ subjectType, subjectFilter, resetFilterflag }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [subjectTypeUUID, setSubjectUUID] = useState<Option[]>([])
-  
+ 
+  useEffect(()=>{
+    console.log("fiterflag",resetFilterflag)
+      setSelectedOptions([])
+  },[resetFilterflag])
   useEffect(() => {
     subjectType(selectedOptions, subjectTypeUUID);
   }, [subjectType, selectedOptions, subjectTypeUUID]);
