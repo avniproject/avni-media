@@ -119,7 +119,7 @@ export default function ImageList() {
                 const formData = await axios.get(
                   `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
                 );
-                const forms = formData.data
+                const forms = formData.data;
 
                 const applicableFormElements = forms.formElementGroups[0]
                   ? forms.formElementGroups[0].applicableFormElements
