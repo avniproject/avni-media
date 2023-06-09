@@ -5,7 +5,6 @@ import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
 import Link from "next/link";
 import UserInputModal from "./ImageDescriptionModal";
-import Accounts from "./FilterComponent/Accounts";
 import Concepts from "./FilterComponent/Concepts";
 import Daterange from "./FilterComponent/Daterange";
 import EncounterType from "./FilterComponent/EncounterType";
@@ -46,13 +45,12 @@ export default function ImageList() {
   const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [location, setLocations] = useState<any>([]);
-  const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [otherLocation, setOtherLocation] = useState<any[]>([]);
   const [showPerpage, setShowperpage] = useState(10);
   const [concepts, setConcept] = useState<any>();
   const [date, setDateRange] = useState<any[] | null>([]);
   const [encouter, setEncounterType] = useState<any[]>([]);
   const [program, setProgamType] = useState<any[]>([]);
-  const [account, setAcountType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
   const [dataBody, setDataBody] = useState<any>();
   const [conceptdata, setConceptData] = useState<any>([{}]);
@@ -69,6 +67,7 @@ export default function ImageList() {
   const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
+  const [resetFilterflag, setResetFilterFlag] = useState<boolean>()
  
 
   useEffect(() => {
@@ -360,27 +359,44 @@ export default function ImageList() {
     setEncounterType(data);
   };
 
-  const accountType = (data: any[]) => {
-    setAcountType(data);
-  };
-
   const getLocation = async (data: any[]) => {
-    const newLocations = data.map((newLocation) => {
-      const exists = location.some(
-        (locations: { uuid: string }) => locations.uuid === newLocation.uuid
-      );
-      if(exists === false){
-        return newLocation;
-      }
-    });
-    setLocations([...location, ...newLocations]);
+
+    if(data.length === 0){
+  
+      setLocations(data);
+    }
+    else{
+      const newLocations = data.map((newLocation) => {
+        const exists = location.some(
+          (locations: { uuid: string }) => locations.uuid === newLocation.uuid
+        );
+        if(exists === false){
+          return newLocation;
+        }
+      });
+      if (Array.isArray(newLocations) && newLocations.every(loc => loc !== undefined)) {
+        setLocations([...location, ...newLocations]);
+      } else {
+        setLocations([...location]);
+      }      
+    }
+   
+   
   };
   
-
-
-  const getOtherLocation = (data: any[]) => {
-   
-    setOtherLocation(data);
+  const getOtherLocation = (data: any[], level: any) => {
+    const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
+    if (existingLocation) {
+      const newData = data.filter((item) => {
+        return !existingLocation.data.some((existingItem: { uuid: any; }) => existingItem.uuid === item.uuid);
+      });
+  
+      existingLocation.data = [...existingLocation.data, ...newData];
+      setOtherLocation([...otherLocation]);
+    } else {
+      const newLocation = { level, data };
+      setOtherLocation([...otherLocation, newLocation]);
+    } 
   };
   
   const getTypeId = (data: any) => {
@@ -522,6 +538,10 @@ export default function ImageList() {
     setShowperpage(value);
   };
 
+  const restFilters = () => {
+    setResetFilterFlag(prevFlag => !prevFlag);
+  };
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -560,6 +580,7 @@ export default function ImageList() {
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
                       getTypeId = {getTypeId}
+                      resetFilterflag={resetFilterflag}
                     />
                   );
                 }
@@ -567,18 +588,22 @@ export default function ImageList() {
               }
             )
         )}
-       <Daterange dateRange={dateRange} />
+       <Daterange dateRange={dateRange} 
+        resetFilterflag={resetFilterflag}
+      />
 
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
             subjectFilter={subjectFilter}
+            resetFilterflag={resetFilterflag}
           />
         )}
 
         {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
           programFilter={showprogram}
+          resetFilterflag={resetFilterflag}
            />
         )}
 
@@ -586,16 +611,20 @@ export default function ImageList() {
           <EncounterType
             encounterType={encounterType}
             encounterFilter={showEncounter}
+            resetFilterflag={resetFilterflag}
           />
         )}
         { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
             <Concepts concept={concept} conceptdata={conceptdata} 
-            selectedFormSubject={selectedFormSubject}/>
+            selectedFormSubject={selectedFormSubject}
+            resetFilterflag={resetFilterflag}/>
+          
         }
-        {/* <Accounts accountType={accountType} /> */}
         {concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
-          conceptCoded={conceptCoded}/>
+          conceptCoded={conceptCoded}
+          resetFilterflag={resetFilterflag}
+          />
         ) : concepts && concepts.dataType === "Date" ? (
           <DateConceptFilter
           conceptDate={conceptDate}
@@ -635,6 +664,10 @@ export default function ImageList() {
               name='Available Downloads' onClick={function (): void {}}       
             />
         </Link>
+        <Button
+         onClick={restFilters}  
+         name = "Reset Filters"
+         />
         </div>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">

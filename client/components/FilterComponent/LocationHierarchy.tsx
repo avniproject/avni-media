@@ -21,13 +21,14 @@ interface Prop {
   maxLevel: number | undefined ;
   selectedParentId: any[];
   getLocation: (data: any[]) => void;
-  getOtherLocation: (data: any[]) => void;
+  getOtherLocation: (data: any[], level: any) => void;
   getTopLevel: (data: any[], levelname: string) => void;
   getSecondLevel: (data: any[], levelType: string) => void;
   getTypeId: (data: any) => void;
   location: any[];
   otherLocation: any[];
   locationFilter: any[]
+  resetFilterflag: boolean|undefined;
   
 }
 interface Location {
@@ -52,16 +53,20 @@ export default function LocationHierarchy({
   minLevel,
   index,
   getTypeId,
-  locationFilter
+  locationFilter,
+  resetFilterflag
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [optionSelected, setOptionSelected] = useState<any>();
   const [secondTypeName, setSecondTypeName] = useState<any>();
   const [selectLevelName, setSelectLevelName] = useState(null);
-  const [parentId, setParentId] = useState<Option | null>(null);
+ 
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
-
+  useEffect(()=>{
+    setSelectedOption([]);
+    setSelectedOptions([]);
+  },[resetFilterflag])
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);
     if (selectedOption.includes(option.id)) {
@@ -95,7 +100,6 @@ export default function LocationHierarchy({
         const jsonDataState = response.data
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-
         if (selectedOption.length > 0) {
           const parentsId = selectedOption.slice(-1)[0]
           
@@ -113,10 +117,13 @@ export default function LocationHierarchy({
                 `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
               );
             }
+        } 
+        else {
+          getLocation([]);
         }
       } 
       else {
-       if(locationFilter[Number(index) + 1].id !== undefined){
+       if(locationFilter[Number(index) + 1] !== undefined && locationFilter[Number(index) + 1].id !== undefined ){
         const typeIds = locationFilter[Number(index) + 1].id;
         try {
             if (selectedOptions.length > 0 && typeIds !== null) {
@@ -128,14 +135,15 @@ export default function LocationHierarchy({
               const distJsonDatas = response.data
               const distDatas = distJsonDatas.content;
               getTypeId(distJsonDatas.content[0].typeId);
-              getOtherLocation(distDatas);
+              const level = distJsonDatas.content[0].level
+              getOtherLocation(distDatas, level);
        
             }
           } catch (Error) {
             console.error(
               `error at ${
                 process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${parentId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              }?parentId=$&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
             );
           }
         }
@@ -148,9 +156,7 @@ export default function LocationHierarchy({
     locationIndex,
     maxLevel,
     minLevel,
-    parentId,
   ]);
-
   function handleOptionClick(option: Option) {
     setSecondTypeName(option);
     if (selectedOptions.includes(option.id)) {
@@ -159,19 +165,20 @@ export default function LocationHierarchy({
       setSelectedOptions([...selectedOptions, option.id]);
     }
   }
-
+  
   useEffect(() => {
     if (selectedOptions !== undefined && secondTypeName !== undefined) {
       getSecondLevel(selectedOptions, secondTypeName.typeString);
     }
   }, [selectedOptions, secondTypeName]);
-
+ 
   return (
     <>
       <Menu
         as="div"
         className="location_menu"
       >
+        <>
         <div>
           {maxLevel === locationIndex.level ? (
             <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
@@ -261,38 +268,47 @@ export default function LocationHierarchy({
                 ))}
             </div>
           </Menu.Items>
-        ) :otherLocation ? (
-          <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              {otherLocation &&
-                otherLocation.map((option: Option) => (
-                  <Menu.Item key={option.uuid}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
+        )  :otherLocation ? (
+          otherLocation.map((locationData) => {
+            return (
+              <Menu.Items
+                className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                key={locationData.level}
+              >
+                <div className="py-1">
+                  {locationData.data &&
+                    locationData.data.map((option: Option) => (
+                      <Menu.Item key={option.uuid}>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active
+                                ? "bg-gray-100 text-gray-900"
+                                : "text-gray-700",
+                              "flex justify-between w-full px-4 py-2 text-sm"
+                            )}
+                            onClick={() => {
+                              handleOptionClick(option);
+                            }}
+                          >
+                            {option.title}
+                            {selectedOptions.includes(option.id) ? (
+                              <CheckIcon
+                                className="h-5 w-5 text-teal-500"
+                                aria-hidden="true"
+                              />
+                            ) : null}
+                          </button>
                         )}
-                        onClick={() => {
-                          handleOptionClick(option);
-                        }}
-                      >
-                        {option.title}
-                        {selectedOptions.includes(option.id) ? (
-                          <CheckIcon
-                            className="h-5 w-5 text-teal-500"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
-            </div>
-          </Menu.Items>
-        ):null}
+                      </Menu.Item>
+                    ))}
+                </div>
+              </Menu.Items>
+            );
+          })
+        ) : null
+        }
+        </>
       </Menu>
     </>
   );

@@ -10,10 +10,15 @@ dayjs.extend(customParseFormat);
 const dateFormat = "DD/MM/YYYY";
 interface Props {
   dateRange: (data: any[] | null) => void;
+  resetFilterflag: boolean|undefined;
 }
 
-const DateRangeComp = ({ dateRange }: Props) => {
+const DateRangeComp = ({ dateRange,resetFilterflag }: Props) => {
   const [date, setDate] = useState<null | string[]>(null);
+  
+  useEffect(()=>{
+    setDate(null)
+  },[resetFilterflag])
 
   useEffect(() => {
     dateRange(date);
