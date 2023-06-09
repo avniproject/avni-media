@@ -291,7 +291,7 @@ export default function LocationHierarchy({
                               handleOptionClick(option);
                             }}
                           >
-                            {option.title} {/* Removed unnecessary quotes */}
+                            {option.title}
                             {selectedOptions.includes(option.id) ? (
                               <CheckIcon
                                 className="h-5 w-5 text-teal-500"
