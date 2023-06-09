@@ -45,7 +45,9 @@ export default function ImageList() {
   const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
   const [location, setLocations] = useState<any>([]);
-  const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [otherLocation, setOtherLocation] = useState<any>([{
+    level: Number , data: []
+  }]);
   const [showPerpage, setShowperpage] = useState(10);
   const [concepts, setConcept] = useState<any>();
   const [date, setDateRange] = useState<any[] | null>([]);
@@ -360,9 +362,9 @@ export default function ImageList() {
   };
 
   const getLocation = async (data: any[]) => {
-    console.log("data",data)
+
     if(data.length === 0){
-      console.log("check data")
+  
       setLocations(data);
     }
     else{
@@ -384,8 +386,23 @@ export default function ImageList() {
    
   };
   
-  const getOtherLocation = (data: any[]) => {
-    setOtherLocation(data);
+  const getOtherLocation = (data: any[], level: any) => {
+    const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
+    if(location === null){
+      setOtherLocation([])
+    }else{
+      if (existingLocation) {
+        const newData = data.filter((item) => {
+          return !existingLocation.data.some((existingItem: { uuid: any; }) => existingItem.uuid === item.uuid);
+        });
+    
+        existingLocation.data = [...existingLocation.data, ...newData];
+        setOtherLocation([...otherLocation]);
+      } else {
+        const newLocation = { level, data };
+        setOtherLocation([...otherLocation, newLocation]);
+      }
+    }
   };
   
   const getTypeId = (data: any) => {
