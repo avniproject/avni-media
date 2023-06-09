@@ -269,39 +269,45 @@ export default function LocationHierarchy({
             </div>
           </Menu.Items>
         )  :otherLocation ? (
-          otherLocation.map((locationData)=>{
-            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              {locationData.data &&
-                locationData.data.map((option: Option) => (
-                  <Menu.Item key={option.uuid}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
+          otherLocation.map((locationData) => {
+            return (
+              <Menu.Items
+                className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                key={locationData.level}
+              >
+                <div className="py-1">
+                  {locationData.data &&
+                    locationData.data.map((option: Option) => (
+                      <Menu.Item key={option.uuid}>
+                        {({ active }) => (
+                          <button
+                            className={classNames(
+                              active
+                                ? "bg-gray-100 text-gray-900"
+                                : "text-gray-700",
+                              "flex justify-between w-full px-4 py-2 text-sm"
+                            )}
+                            onClick={() => {
+                              handleOptionClick(option);
+                            }}
+                          >
+                            {option.title} {/* Removed unnecessary quotes */}
+                            {selectedOptions.includes(option.id) ? (
+                              <CheckIcon
+                                className="h-5 w-5 text-teal-500"
+                                aria-hidden="true"
+                              />
+                            ) : null}
+                          </button>
                         )}
-                        onClick={() => {
-                          handleOptionClick(option);
-                        }}
-                      >
-                        {option.title}
-                        {selectedOptions.includes(option.id) ? (
-                          <CheckIcon
-                            className="h-5 w-5 text-teal-500"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
-            </div>
-          </Menu.Items>
+                      </Menu.Item>
+                    ))}
+                </div>
+              </Menu.Items>
+            );
           })
-        ):null}
+        ) : null
+        }
         </>
       </Menu>
     </>
