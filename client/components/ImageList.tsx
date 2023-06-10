@@ -65,6 +65,7 @@ export default function ImageList() {
   const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
   const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
   const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
+  const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
   const [resetFilterflag, setResetFilterFlag] = useState<boolean>()
@@ -183,11 +184,11 @@ export default function ImageList() {
   }, [selectedFormSubject, programFilter]);
 
   useEffect(() => {
-    if (selectedFormSubject) {
+    if (selectedFormProgram) {
       const formMappingsWithEncounter = encounterFilter.filter((mapping: { uuid: any; }) =>
-      selectedFormSubject.some(
-          (selectedFormSubject: { encounterTypeUUID: any; }) =>
-          selectedFormSubject.encounterTypeUUID === mapping.uuid
+      selectedFormProgram.some(
+          (selectedFormProgram: { encounterTypeUUID: any; }) =>
+          selectedFormProgram.encounterTypeUUID === mapping.uuid
         )
       );
       setShowEncounter(formMappingsWithEncounter);
@@ -452,7 +453,16 @@ export default function ImageList() {
     } else {
       setSelectedFormSubject(null);
     }
-  }, [selectedSubjectUUID, formsData]);
+    if (selectedProgramUUID.length > 0) {
+      const selectedForms = formsData.filter(
+        (formData: { programUUID: any }) =>
+        selectedProgramUUID.includes(formData.programUUID)
+      );
+      setSelectedFormProgram(selectedForms);
+    } else {
+      setSelectedFormProgram(null);
+    }
+  }, [selectedSubjectUUID, formsData, selectedProgramUUID]);
 
   useEffect(() => {
     if (secondAddress.length > 0) {
@@ -603,17 +613,19 @@ export default function ImageList() {
         {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
           programFilter={showprogram}
-          resetFilterflag={resetFilterflag}
+          resetFilterflag={resetFilterflag}    
            />
         )}
 
-        {showEncounter && showEncounter.length > 0 && (
+        {((encounterFilter && encounterFilter.length > 0) || (showEncounter && showEncounter.length > 0)) && (
           <EncounterType
             encounterType={encounterType}
-            encounterFilter={showEncounter}
+            encounterFilter={encounterFilter}
+            showEncounter={showEncounter}
             resetFilterflag={resetFilterflag}
           />
         )}
+
         { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
             <Concepts concept={concept} conceptdata={conceptdata} 
             selectedFormSubject={selectedFormSubject}
