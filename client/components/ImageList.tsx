@@ -44,7 +44,7 @@ export default function ImageList() {
   const [maxLevel, setMaxLevel] = useState<number>();
   const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
-  const [location, setLocations] = useState<any>([]);
+  const [locations, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any[]>([]);
   const [showPerpage, setShowperpage] = useState(10);
   const [concepts, setConcept] = useState<any>();
@@ -69,7 +69,6 @@ export default function ImageList() {
   const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
-  const [resetFilterflag, setResetFilterFlag] = useState<boolean>()
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -373,7 +372,7 @@ export default function ImageList() {
     }
     else{
       const newLocations = data.map((newLocation) => {
-        const exists = location.some(
+        const exists = locations.some(
           (locations: { uuid: string }) => locations.uuid === newLocation.uuid
         );
         if(exists === false){
@@ -381,9 +380,9 @@ export default function ImageList() {
         }
       });
       if (Array.isArray(newLocations) && newLocations.every(loc => loc !== undefined)) {
-        setLocations([...location, ...newLocations]);
+        setLocations([...locations, ...newLocations]);
       } else {
-        setLocations([...location]);
+        setLocations([...locations]);
       }      
     }
    
@@ -554,7 +553,9 @@ export default function ImageList() {
   };
 
   const restFilters = () => {
-    setResetFilterFlag(prevFlag => !prevFlag);
+
+    location.reload();
+
   };
 
   return (
@@ -589,13 +590,12 @@ export default function ImageList() {
                       minLevel={minLevel}
                       maxLevel={maxLevel}
                       getLocation={getLocation}
-                      location={location}
+                      location={locations}
                       getOtherLocation={getOtherLocation}
                       otherLocation={otherLocation}
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
                       getTypeId = {getTypeId}
-                      resetFilterflag={resetFilterflag}
                     />
                   );
                 }
@@ -603,22 +603,17 @@ export default function ImageList() {
               }
             )
         )}
-       <Daterange dateRange={dateRange} 
-        resetFilterflag={resetFilterflag}
-      />
-
+        <Daterange dateRange={dateRange} />
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
             subjectFilter={subjectFilter}
-            resetFilterflag={resetFilterflag}
           />
         )}
 
         {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
           programFilter={showprogram}
-          resetFilterflag={resetFilterflag}    
            />
         )}
 
@@ -627,20 +622,17 @@ export default function ImageList() {
             encounterType={encounterType}
             encounterFilter={encounterFilter}
             showEncounter={showEncounter}
-            resetFilterflag={resetFilterflag}
           />
         )}
 
         { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
             <Concepts concept={concept} conceptdata={conceptdata} 
             selectedFormSubject={selectedFormSubject}
-            resetFilterflag={resetFilterflag}/>
-          
+            />
         }
         {concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
           conceptCoded={conceptCoded}
-          resetFilterflag={resetFilterflag}
           />
         ) : concepts && concepts.dataType === "Date" ? (
           <DateConceptFilter

@@ -11,7 +11,6 @@ interface Option {
 interface Prop {
   encounterType: (data: any[]) => void;
   encounterFilter: any[];
-  resetFilterflag: boolean|undefined;
   showEncounter: any[];
 }
 
@@ -22,15 +21,10 @@ function classNames(...classes: string[]) {
 export default function EncounterType({
   encounterType,
   encounterFilter,
-  showEncounter,
-  resetFilterflag
+  showEncounter
 }: Prop) {
   
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-
-  useEffect(()=>{
-    setSelectedOptions([])
-  },[resetFilterflag])
 
   useEffect(() => {
     encounterType(selectedOptions);

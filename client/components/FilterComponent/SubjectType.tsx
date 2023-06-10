@@ -10,20 +10,15 @@ interface Option {
 interface Prop {
   subjectType: (data: any[], subjectUuid: any[]) => void;
   subjectFilter: any[];
-  resetFilterflag: boolean|undefined;
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function SubjectType({ subjectType, subjectFilter, resetFilterflag }: Prop) {
+export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [subjectTypeUUID, setSubjectUUID] = useState<Option[]>([])
  
-  useEffect(()=>{
-    console.log("fiterflag",resetFilterflag)
-      setSelectedOptions([])
-  },[resetFilterflag])
   useEffect(() => {
     subjectType(selectedOptions, subjectTypeUUID);
   }, [subjectType, selectedOptions, subjectTypeUUID]);
@@ -46,7 +41,7 @@ export default function SubjectType({ subjectType, subjectFilter, resetFilterfla
   return (
     <Menu
       as="div"
-      className="location_menu"
+      className="menu"
     >
       <div>
         <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">

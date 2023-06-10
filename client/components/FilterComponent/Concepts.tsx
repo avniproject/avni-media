@@ -7,7 +7,6 @@ interface Prop {
   concept: any;
   conceptdata: any[];
   selectedFormSubject: any[];
-  resetFilterflag: boolean|undefined
 }
 
 function classNames(...classes: string[]) {
@@ -15,12 +14,10 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({ concept, conceptdata, selectedFormSubject, resetFilterflag}: Prop) {
+export default function Concepts({ concept, conceptdata, selectedFormSubject }: Prop) {
 
   const [selectedOptions, setSelectedOptions] = useState([]);
-  useEffect(()=>{
-    setSelectedOptions([])
-  },[resetFilterflag])
+  
   useEffect(() => {
 
     concept(selectedOptions);
