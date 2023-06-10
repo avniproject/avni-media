@@ -9,15 +9,20 @@ interface Option {
 interface Props {
   programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
+  resetFilterflag: boolean|undefined;
+ 
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Program({ programType, programFilter }: Props) {
+export default function Program({ programType, programFilter, resetFilterflag }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [programUUID, setProgramUUID]       = useState<Option[]>([])
- 
+  const [programUUID, setProgramUUID]         = useState<Option[]>([])
+  
+  useEffect(()=>{
+      setSelectedOptions([]);
+  },[resetFilterflag])
   useEffect(() => {
     programType(selectedOptions, programUUID);
   }, [programType, selectedOptions, programUUID]);
@@ -39,7 +44,7 @@ export default function Program({ programType, programFilter }: Props) {
   return (
     <Menu
       as="div"
-      className="menu"
+      className="location_menu"
     >
       <div>
         <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">

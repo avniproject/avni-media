@@ -1,0 +1,7 @@
+NEXT_PUBLIC_IMAGE_LIST_URL=https://localhost:6012/etl/media
+NEXT_PUBLIC_DOWNLOAD_REQUEST_URL=http://localhost:3010/media-viewer/requestDownload
+NEXT_PUBLIC_DOWNLOAD_LIST_URL=http://localhost:3010/media-viewer/allData
+#http://localhost:3010 === NESTjs
+NEXT_PUBLIC_OPERATIONAL_MODULE=http://localhost:8021/web/operationalModules
+NEXT_PUBLIC_FORMS=http://localhost:8021/web/form/
+NEXT_PUBLIC_TOP_ADDRESS=http://localhost:8021/locations/search/find
