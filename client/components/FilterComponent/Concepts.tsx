@@ -7,7 +7,6 @@ interface Prop {
   concept: any;
   conceptdata: any[];
   selectedFormSubject: any[];
-
 }
 
 function classNames(...classes: string[]) {

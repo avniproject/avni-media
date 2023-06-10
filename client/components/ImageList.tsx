@@ -553,8 +553,9 @@ export default function ImageList() {
   };
 
   const restFilters = () => {
-    // setResetFilterFlag(prevFlag => !prevFlag);
+
     location.reload();
+
   };
 
   return (
@@ -602,22 +603,17 @@ export default function ImageList() {
               }
             )
         )}
-       <Daterange dateRange={dateRange} 
-       
-      />
-
+        <Daterange dateRange={dateRange} />
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
             subjectFilter={subjectFilter}
-           
           />
         )}
 
         {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
           programFilter={showprogram}
-        
            />
         )}
 

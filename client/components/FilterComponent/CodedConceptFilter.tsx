@@ -12,7 +12,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function CodedConceptFilter({ concepts, conceptCoded,  }: Prop) {
+export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
 
   const [codedData, setCodedData] = useState<any>([]);
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);

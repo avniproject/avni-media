@@ -13,7 +13,7 @@ interface Props {
   
 }
 
-const DateRangeComp = ({ dateRange}: Props) => {
+const DateRangeComp = ({ dateRange }: Props) => {
   const [date, setDate] = useState<null | string[]>(null);
 
   useEffect(() => {
