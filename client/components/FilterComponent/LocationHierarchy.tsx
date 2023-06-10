@@ -174,142 +174,171 @@ export default function LocationHierarchy({
  
   return (
     <>
-      <Menu
-        as="div"
-        className="location_menu"
-      >
-        <>
+      <Menu as="div" className="location_menu">
         <div>
-          {maxLevel === locationIndex.level ? (
-            <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-              <span>
-                {selectedOption.length > 0
-                  ? selectedOption.length + " selected"
-                  : locationIndex.name}
-              </span>
-              <ChevronDownIcon
-                className="-mr-1 ml-2 h-5 w-5"
-                aria-hidden="true"
-              />
-            </Menu.Button>
-          ) : (
-            <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-              <span>
-                {selectedOptions.length > 0
-                  ? selectedOptions.length + " selected"
-                  : locationIndex.name}
-              </span>
-              <ChevronDownIcon
-                className="-mr-1 ml-2 h-5 w-5"
-                aria-hidden="true"
-              />
-            </Menu.Button>
-          )}
+          <Menu.Button
+            className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500"
+          >
+            <span>
+              {locationIndex.level === maxLevel
+                ? selectedOption.length > 0
+                  ? `${selectedOption.length} selected`
+                  : locationIndex.name
+                : selectedOptions.length > 0
+                ? `${selectedOptions.length} selected`
+                : locationIndex.name}
+            </span>
+            <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+          </Menu.Button>
         </div>
-        {locationIndex.level === maxLevel ? (
-          <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        {(locationIndex.level === maxLevel || locationIndex.level === (maxLevel ?? 0) - 1) && (
+          <Menu.Items
+            className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
             <div className="py-1">
-              {toplevelData &&
-                toplevelData.map((option: Option) => (
-                  <Menu.Item key={option.id}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
-                        )}
-                        onClick={() => {
-                          handleOptionSelect(option);
-                        }}
-                      >
-                        {option.title}
-                        {selectedOption.includes(option.id) ? (
-                          <CheckIcon
-                            className="check-button"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
+              {locationIndex.level === maxLevel
+                ? toplevelData &&
+                  toplevelData.map((option) => (
+                    <Menu.Item key={option.id}>
+                      {({ active }) => (
+                        <button
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "flex justify-between w-full px-4 py-2 text-sm"
+                          )}
+                          onClick={() => {
+                            handleOptionSelect(option);
+                          }}
+                        >
+                          {option.title}
+                          {selectedOption.includes(option.id) ? (
+                            <CheckIcon
+                              className="check-button"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))
+                : location &&
+                  location.map((option) => (
+                    <Menu.Item key={option.uuid}>
+                      {({ active }) => (
+                        <button
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "flex justify-between w-full px-4 py-2 text-sm"
+                          )}
+                          onClick={() => {
+                            handleOptionClick(option);
+                          }}
+                        >
+                          {option.title}
+                          {selectedOptions.includes(option.id) ? (
+                            <CheckIcon
+                              className="h-5 w-5 text-teal-500"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))}
             </div>
           </Menu.Items>
-        ) : maxLevel !== undefined &&  locationIndex.level === maxLevel-1  ? (
-          <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              {location &&
-                location.map((option: Option) => (
-                  <Menu.Item key={option.uuid}>
-                    {({ active }) => (
-                      <button
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "flex justify-between w-full px-4 py-2 text-sm"
-                        )}
-                        onClick={() => {
-                          handleOptionClick(option);
-                        }}
-                      >
-                        {option.title}
-                        {selectedOptions.includes(option.id) ? (
-                          <CheckIcon
-                            className="h-5 w-5 text-teal-500"
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
-            </div>
-          </Menu.Items>
-        )  :otherLocation ? (
+        )}
+        {otherLocation &&
           otherLocation.map((locationData) => {
-            return (
-              <Menu.Items
-                className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                key={locationData.level}
-              >
-                <div className="py-1">
-                  {locationData.data &&
-                    locationData.data.map((option: Option) => (
-                      <Menu.Item key={option.uuid}>
-                        {({ active }) => (
-                          <button
-                            className={classNames(
-                              active
-                                ? "bg-gray-100 text-gray-900"
-                                : "text-gray-700",
-                              "flex justify-between w-full px-4 py-2 text-sm"
-                            )}
-                            onClick={() => {
-                              handleOptionClick(option);
-                            }}
-                          >
-                            {option.title}
-                            {selectedOptions.includes(option.id) ? (
-                              <CheckIcon
-                                className="h-5 w-5 text-teal-500"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                          </button>
-                        )}
-                      </Menu.Item>
-                    ))}
-                </div>
-              </Menu.Items>
-            );
-          })
-        ) : null
-        }
-        </>
+            if (
+              maxLevel !== undefined &&
+              locationData.level === (maxLevel ?? 0) - 2 &&
+              locationIndex.level === (maxLevel ?? 0) - 2
+            ) {
+              return (
+                <Menu.Items
+                  className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  key={locationData.level}
+                >
+                  <div className="py-1">
+                    {locationData.data &&
+                      locationData.data.map((option) => (
+                        <Menu.Item key={option.uuid}>
+                          {({ active }) => (
+                            <button
+                              className={classNames(
+                                active
+                                  ? "bg-gray-100 text-gray-900"
+                                  : "text-gray-700",
+                                "flex justify-between w-full px-4 py-2 text-sm"
+                              )}
+                              onClick={() => {
+                                handleOptionClick(option);
+                              }}
+                            >
+                              {option.title}
+                              {selectedOptions.includes(option.id) ? (
+                                <CheckIcon
+                                  className="h-5 w-5 text-teal-500"
+                                  aria-hidden="true"
+                                />
+                              ) : null}
+                            </button>
+                          )}
+                        </Menu.Item>
+                      ))}
+                  </div>
+                </Menu.Items>
+              );
+            } else if (
+              maxLevel !== undefined &&
+              locationData.level === (maxLevel ?? 0) - 3 &&
+              locationIndex.level === (maxLevel ?? 0) - 3
+            ) {
+              return (
+                <Menu.Items
+                  className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  key={locationData.level}
+                >
+                  <div className="py-1">
+                    {locationData.data &&
+                      locationData.data.map((option) => (
+                        <Menu.Item key={option.uuid}>
+                          {({ active }) => (
+                            <button
+                              className={classNames(
+                                active
+                                  ? "bg-gray-100 text-gray-900"
+                                  : "text-gray-700",
+                                "flex justify-between w-full px-4 py-2 text-sm"
+                              )}
+                              onClick={() => {
+                                handleOptionClick(option);
+                              }}
+                            >
+                              {option.title}
+                              {selectedOptions.includes(option.id) ? (
+                                <CheckIcon
+                                  className="h-5 w-5 text-teal-500"
+                                  aria-hidden="true"
+                                />
+                              ) : null}
+                            </button>
+                          )}
+                        </Menu.Item>
+                      ))}
+                  </div>
+                </Menu.Items>
+              );
+            }
+            return null;
+          })}
       </Menu>
     </>
   );
+  
 }
