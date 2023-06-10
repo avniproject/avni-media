@@ -44,7 +44,7 @@ export default function ImageList() {
   const [maxLevel, setMaxLevel] = useState<number>();
   const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
-  const [location1, setLocations] = useState<any>([]);
+  const [locations, setLocations] = useState<any>([]);
   const [otherLocation, setOtherLocation] = useState<any[]>([]);
   const [showPerpage, setShowperpage] = useState(10);
   const [concepts, setConcept] = useState<any>();
@@ -372,7 +372,7 @@ export default function ImageList() {
     }
     else{
       const newLocations = data.map((newLocation) => {
-        const exists = location1.some(
+        const exists = locations.some(
           (locations: { uuid: string }) => locations.uuid === newLocation.uuid
         );
         if(exists === false){
@@ -380,9 +380,9 @@ export default function ImageList() {
         }
       });
       if (Array.isArray(newLocations) && newLocations.every(loc => loc !== undefined)) {
-        setLocations([...location1, ...newLocations]);
+        setLocations([...locations, ...newLocations]);
       } else {
-        setLocations([...location1]);
+        setLocations([...locations]);
       }      
     }
    
@@ -590,7 +590,7 @@ export default function ImageList() {
                       minLevel={minLevel}
                       maxLevel={maxLevel}
                       getLocation={getLocation}
-                      location={location1}
+                      location={locations}
                       getOtherLocation={getOtherLocation}
                       otherLocation={otherLocation}
                       getTopLevel={getTopLevel}
@@ -675,7 +675,7 @@ export default function ImageList() {
         </Link>
         <Button
          onClick={restFilters}  
-         name = "Refresh Page"
+         name = "Reset Filters"
          />
         </div>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
