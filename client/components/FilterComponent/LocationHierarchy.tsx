@@ -27,9 +27,7 @@ interface Prop {
   getTypeId: (data: any) => void;
   location: any[];
   otherLocation: any[];
-  locationFilter: any[]
-  resetFilterflag: boolean|undefined;
-  
+  locationFilter: any[];
 }
 interface Location {
   id: number;
@@ -53,8 +51,7 @@ export default function LocationHierarchy({
   minLevel,
   index,
   getTypeId,
-  locationFilter,
-  resetFilterflag
+  locationFilter
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [optionSelected, setOptionSelected] = useState<any>();
@@ -63,10 +60,7 @@ export default function LocationHierarchy({
  
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<Option[]>([]);
-  useEffect(()=>{
-    setSelectedOption([]);
-    setSelectedOptions([]);
-  },[resetFilterflag])
+  
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);
     if (selectedOption.includes(option.id)) {

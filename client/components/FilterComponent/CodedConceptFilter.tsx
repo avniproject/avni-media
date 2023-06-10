@@ -5,23 +5,17 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 interface Prop {
   concepts: any;
   conceptCoded: (data: any) => void;
-  resetFilterflag: boolean|undefined;
+
 }
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function CodedConceptFilter({ concepts, conceptCoded, resetFilterflag }: Prop) {
+export default function CodedConceptFilter({ concepts, conceptCoded,  }: Prop) {
 
   const [codedData, setCodedData] = useState<any>([]);
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
-  
-  useEffect(()=>{
-
-    setSelectedOptions([]);
-
-  },[resetFilterflag])
   
   function handleOptionClick(option: any) {
 
