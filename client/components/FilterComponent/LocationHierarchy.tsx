@@ -198,7 +198,7 @@ export default function LocationHierarchy({
             <div className="py-1">
               {locationIndex.level === maxLevel
                 ? toplevelData &&
-                  toplevelData.map((option) => (
+                  toplevelData.map((option: Option) => (
                     <Menu.Item key={option.id}>
                       {({ active }) => (
                         <button
@@ -266,7 +266,7 @@ export default function LocationHierarchy({
                 >
                   <div className="py-1">
                     {locationData.data &&
-                      locationData.data.map((option) => (
+                      locationData.data.map((option: Option) => (
                         <Menu.Item key={option.uuid}>
                           {({ active }) => (
                             <button
@@ -306,7 +306,7 @@ export default function LocationHierarchy({
                 >
                   <div className="py-1">
                     {locationData.data &&
-                      locationData.data.map((option) => (
+                      locationData.data.map((option: Option) => (
                         <Menu.Item key={option.uuid}>
                           {({ active }) => (
                             <button
@@ -339,6 +339,5 @@ export default function LocationHierarchy({
           })}
       </Menu>
     </>
-  );
-  
+  );  
 }
