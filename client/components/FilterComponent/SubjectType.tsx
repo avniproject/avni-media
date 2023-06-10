@@ -11,13 +11,10 @@ interface Option {
 interface Prop {
   subjectType: (data: any[], subjectUuid: any[]) => void;
   subjectFilter: any[];
-  resetFilterflag: boolean|undefined;
-}
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+  
 }
 
-export default function SubjectType({ subjectType, subjectFilter, resetFilterflag }: Prop) {
+export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [subjectTypeUUID, setSubjectUUID] = useState<any[]>([]);
