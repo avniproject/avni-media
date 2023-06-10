@@ -64,12 +64,12 @@ export default function ImageList() {
   const [typeId, setTypeId] = useState<any>([])
   const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
   const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
+  const [nextPageData, setNextPageData] = useState<any>({ page: 0, data: [] });
   const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
   const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
   const [resetFilterflag, setResetFilterFlag] = useState<boolean>()
- 
 
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
@@ -209,7 +209,12 @@ export default function ImageList() {
         `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
         options
       );
+      const nextPageResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page + 1}&size=${showPerpage}`,
+        options
+      );
       setImageList(response.data);
+      setNextPageData(nextPageResponse.data);
     };
 
     fetchImages();
@@ -730,7 +735,7 @@ export default function ImageList() {
         <Pagination
           showperpage={showPerpage}
           pagechange={pagechange}
-          total={imageList.total}
+          nextPageData={nextPageData.data}
         />
       </div>
     </>
