@@ -15,7 +15,7 @@ export default function TexConceptFilter({ conceptNote }: Prop) {
   }, [inputValue]);
 
   return (
-    <div className="w-52 mt-5">
+    <div className="inline-flex w-52 mt-5">
       <input
         type="text"
         className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"

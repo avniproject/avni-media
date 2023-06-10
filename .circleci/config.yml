@@ -1,0 +1,181 @@
+version: 2.1
+
+commands:
+  deploy:
+    description: Deployment of avni-media
+    parameters:
+      hostname:
+        type: string
+        default: "int-staging.avniproject.org"
+      env:
+        type: string
+        default: "staging"
+    steps:
+      - attach_workspace:
+          at: ~/artifacts
+
+      - run: sudo apt-get install make openssl
+
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get -y -qq install python3-pip
+
+      - run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+      - run:
+          name: Copy artifacts to server
+          command: |
+            scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
+            scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
+            scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
+
+      # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
+      - run:
+          name: Install node, nest and pm2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            nvm install 19.8.1
+            nvm use v19.8.1
+            npm i -g @nestjs/cli
+            npm install pm2@latest -g
+            EOF
+
+      - run:
+          name: Deploy client and server
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
+            chmod a+x /tmp/install.sh
+            sudo /tmp/install.sh
+            EOF
+
+      - run:
+          name: Delete artifacts from server
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
+            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
+
+jobs:
+
+  build:
+    docker:
+      - image: cimg/node:19.8.1
+
+    working_directory: ~/avni-media
+
+
+    steps:
+      - checkout
+
+      - run: sudo apt-get install make openssl
+
+      - run: mkdir -p ~/artifacts;
+
+      - restore_cache:
+          key: dependency-cache-client-{{ checksum "client/package.json" }}
+
+      - run:  |
+          cd ~/avni-media/client
+          npm install --legacy-peer-deps
+
+      - save_cache:
+          key: dependency-cache-client-{{ checksum "client/package.json" }}
+          paths:
+            - ./client/node_modules
+            - ./client/.next/cache/
+
+      - run: |
+          cd ~/avni-media/client
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-client-prod
+
+      - run: |
+          cd ~/avni-media/client
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-client-staging
+
+      - restore_cache:
+          key: dependency-cache-server-{{ checksum "server/package.json" }}
+
+      - run: |
+          cd ~/avni-media/server
+          npm install --legacy-peer-deps
+
+      - save_cache:
+          key: dependency-cache-server-{{ checksum "server/package.json" }}
+          paths:
+            - ./server/node_modules
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-server-prod
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-server-staging
+
+      - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
+
+      - persist_to_workspace:
+          root: ~/artifacts
+          paths:
+            - avni-media-client-staging.tgz
+            - avni-media-server-staging.tgz
+            - avni-media-client-prod.tgz
+            - avni-media-server-prod.tgz
+            - install.sh
+
+      - store_artifacts:
+          path: ~/artifacts
+
+  STAGING_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - deploy:
+          hostname: "int-staging.avniproject.org"
+          env: "staging"
+
+  PRODUCTION_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - deploy:
+          hostname: "int-prod.avniproject.org"
+          env: "prod"
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - STAGING_approve:
+          type: approval
+          requires:
+            - build
+      - STAGING_deploy:
+          context: non-prod-deploy
+          requires:
+            - STAGING_approve
+      - PRODUCTION_approve:
+          type: approval
+          requires:
+            - build
+      - PRODUCTION_deploy:
+          context: prod-deploy
+          requires:
+            - PRODUCTION_approve

@@ -6,6 +6,8 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 interface Prop {
   concept: any;
   conceptdata: any[];
+  selectedFormSubject: any[];
+  resetFilterflag: boolean|undefined
 }
 
 function classNames(...classes: string[]) {
@@ -13,10 +15,12 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({ concept, conceptdata }: Prop) {
+export default function Concepts({ concept, conceptdata, selectedFormSubject, resetFilterflag}: Prop) {
 
   const [selectedOptions, setSelectedOptions] = useState([]);
-
+  useEffect(()=>{
+    setSelectedOptions([])
+  },[resetFilterflag])
   useEffect(() => {
 
     concept(selectedOptions);
@@ -34,7 +38,7 @@ export default function Concepts({ concept, conceptdata }: Prop) {
       <div>
         <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
           <span>
-            {selectedOptions.length > 0 ? selectedOptions : "Concepts"}
+            {selectedOptions && selectedOptions.length > 0 ? selectedOptions : "Concepts"}
           </span>
           <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </Menu.Button>
@@ -42,7 +46,7 @@ export default function Concepts({ concept, conceptdata }: Prop) {
 
       <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div className="py-1">
-          {conceptdata.map((option) => (
+          { conceptdata && conceptdata.map((option) => (
             <Menu.Item key={option.id}>
               {({ active }) => (
                 <button
