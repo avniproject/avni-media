@@ -78,7 +78,7 @@ export default function EncounterType({
                       onClick={() => handleOptionClick(option)}
                     >
                       {option.name}
-                      {selectedOptions.includes(option) && (
+                      {selectedOptions.includes(option.name) && (
                         <CheckIcon className="check-button" aria-hidden="true" />
                       )}
                     </button>
