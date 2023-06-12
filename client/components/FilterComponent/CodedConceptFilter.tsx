@@ -8,10 +8,6 @@ interface Prop {
 
 }
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
 
   const [codedData, setCodedData] = useState<any>([]);
@@ -21,13 +17,13 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
   
   function handleOptionClick(option: any) {
 
-    if (selectedOptions.includes(option)) {
+    if (selectedOptions.includes(option.name)) {
 
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
 
     } else {
 
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.name]);
 
     }
   }

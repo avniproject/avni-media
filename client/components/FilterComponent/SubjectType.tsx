@@ -15,7 +15,7 @@ interface Prop {
 }
 
 export default function SubjectType({ subjectType, subjectFilter }: Prop) {
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [subjectTypeUUID, setSubjectUUID] = useState<any[]>([]);
   const dropdownRef = useRef<any>(null);
@@ -25,10 +25,10 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   }, [subjectType, selectedOptions, subjectTypeUUID]);
 
   function handleOptionClick(option: Option) {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+    if (selectedOptions.includes(option.name)) {
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
     } else {
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.name]);
     }
     if (subjectTypeUUID.includes(option.uuid)) {
       setSubjectUUID(subjectTypeUUID.filter((o) => o !== option.uuid));
