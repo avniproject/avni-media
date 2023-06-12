@@ -20,7 +20,7 @@ export default function EncounterType({
   showEncounter
 }: Prop) {
   
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
   
@@ -29,10 +29,10 @@ export default function EncounterType({
   }, [encounterType, selectedOptions]);
   
   function handleOptionClick(option: Option) {
-    if (selectedOptions.includes(option)) {
-      setSelectedOptions(selectedOptions.filter((o) => o !== option));
+    if (selectedOptions.includes(option.name)) {
+      setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
     } else {
-      setSelectedOptions([...selectedOptions, option]);
+      setSelectedOptions([...selectedOptions, option.name]);
     }
   }
   const handleClickOutside = (event: { target: any }) => {
