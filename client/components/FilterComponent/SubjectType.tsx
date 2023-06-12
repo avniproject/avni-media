@@ -83,7 +83,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
                     onClick={() => handleOptionClick(option)}
                   >
                     {option.name}
-                    {selectedOptions.includes(option) && (
+                    {selectedOptions.includes(option.name) && (
                       <CheckIcon className="check-button" aria-hidden="true" />
                     )}
                   </button>
