@@ -8,10 +8,6 @@ interface Prop {
 
 }
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
 
   const [codedData, setCodedData] = useState<any>([]);
