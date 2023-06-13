@@ -25,7 +25,7 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
 
   return (
     <>
-      <div className="mt-4">
+      <div className="mt-4 inline-block ml-2">
         <label className="mr-2 flex-shrink-0">Between:</label>
         <input
           type="number"
