@@ -10,7 +10,7 @@ interface Option {
 
 interface Prop {
   encounterType: (data: any[]) => void;
-  showAllEncounter: any[]
+  showAllEncounter: any[];
   showEncounter: any[];
 }
 
