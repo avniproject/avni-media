@@ -10,13 +10,13 @@ interface Option {
 
 interface Prop {
   encounterType: (data: any[]) => void;
-  encounterFilter: any[];
+  showAllEncounter: any[]
   showEncounter: any[];
 }
 
 export default function EncounterType({
   encounterType,
-  encounterFilter,
+  showAllEncounter,
   showEncounter
 }: Prop) {
   
@@ -24,6 +24,14 @@ export default function EncounterType({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
   
+  const newData = [...showAllEncounter, ...showEncounter];
+  const showUniqueEncounter = Array.from(new Set(newData));
+  useEffect(()=>{
+    if(showEncounter.length === 0){
+      setSelectedOptions([])
+    }
+  },[showEncounter])
+
   useEffect(() => {
     encounterType(selectedOptions);
   }, [encounterType, selectedOptions]);
@@ -63,11 +71,12 @@ export default function EncounterType({
             <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        { encounterFilter.length > 0 && isOpen && (
+        
+        { showUniqueEncounter.length > 0 && isOpen && (
           <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
-              {encounterFilter &&
-                encounterFilter.map((option) => (
+              {showUniqueEncounter &&
+                showUniqueEncounter.map((option) => (
                   <div key={option.id}>
                     <button
                       className={`flex justify-between w-full px-4 py-2 text-sm ${
@@ -79,30 +88,6 @@ export default function EncounterType({
                     >
                       {option.name}
                       {selectedOptions.includes(option.name) && (
-                        <CheckIcon className="check-button" aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-        { showEncounter.length > 0 && isOpen && (
-          <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              {showEncounter &&
-                showEncounter.map((option) => (
-                  <div key={option.id}>
-                    <button
-                      className={`flex justify-between w-full px-4 py-2 text-sm ${
-                        selectedOptions.includes(option)
-                          ? "bg-gray-100 text-gray-900"
-                          : "text-gray-700"
-                      }`}
-                      onClick={() => handleOptionClick(option)}
-                    >
-                      {option.name}
-                      {selectedOptions.includes(option) && (
                         <CheckIcon className="check-button" aria-hidden="true" />
                       )}
                     </button>
