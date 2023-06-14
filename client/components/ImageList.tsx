@@ -69,7 +69,7 @@ export default function ImageList() {
   const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
-
+  const [showAllEncounter,setShowAllEncounter] =useState<any[]>([])
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
     setUserName(userUUID);
@@ -181,6 +181,22 @@ export default function ImageList() {
       setShowProgram([]);
     }
   }, [selectedFormSubject, programFilter]);
+
+  useEffect(()=>{
+    const encounters = formsData.filter((form:any) => {
+      return form.programUUID === undefined && form.subjectTypeUUID !== undefined && form.encounterTypeUUID !== undefined;
+    });
+  
+    if(encounters){
+      const encounterUUIDs = encounters.map((encounter: { encounterTypeUUID: any; }) => encounter.encounterTypeUUID);
+      const filteredEncounters = encounterFilter.filter((mapping: { uuid: any; }) =>
+      encounterUUIDs.includes(mapping.uuid)
+    );
+    
+    setShowAllEncounter([...filteredEncounters])
+    }
+  
+  },[encounterFilter])
 
   useEffect(() => {
     if (selectedFormProgram) {
@@ -617,10 +633,10 @@ export default function ImageList() {
            />
         )}
 
-        {((encounterFilter && encounterFilter.length > 0) || (showEncounter && showEncounter.length > 0)) && (
+        {(showAllEncounter.length > 0 || showEncounter.length > 0) &&(
           <EncounterType
             encounterType={encounterType}
-            encounterFilter={encounterFilter}
+            showAllEncounter={ showAllEncounter}
             showEncounter={showEncounter}
           />
         )}

@@ -21,6 +21,8 @@ export default function Program({ programType, programFilter }: Props) {
   useEffect(() => {
     programType(selectedOptions, programUUID);
   }, [programType, selectedOptions, programUUID]);
+
+
   function handleOptionClick(option: {
     uuid: Option; name: Option; 
 }) {
@@ -29,11 +31,13 @@ export default function Program({ programType, programFilter }: Props) {
     } else {
       setSelectedOptions([...selectedOptions, option.name]);
     }
-    if (selectedOptions.includes(option.uuid)) {
+
+    if (programUUID.includes(option.uuid)) {
       setProgramUUID(programUUID.filter((o) => o !== option.uuid));
     } else {
       setProgramUUID([...programUUID, option.uuid]);
     }
+
   }
 
   const handleClickOutside = (event: { target: any }) => {
