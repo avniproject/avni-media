@@ -42,6 +42,14 @@
   margin-top: 20px;
   z-index: 10;
 }
+.menu_program_subject_encounter{
+  position: relative;
+  display: inline-block;
+  text-align: left;
+  padding-right: 8px;
+  margin-top: 20px;
+  z-index: 15;
+}
 .location_menu{
   position: relative;
   display: inline-block;

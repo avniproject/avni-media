@@ -53,7 +53,7 @@ export default function ImageList() {
   const [program, setProgamType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
   const [dataBody, setDataBody] = useState<any>();
-  const [conceptdata, setConceptData] = useState<any>([{}]);
+  const [conceptdata, setConceptData] = useState<any>([]);
   const [formsData, setFormsData] = useState<any>([]);
   const [textConcept, setTextConcept] = useState<any>([])
   const [codedConcept, setCodedConcept] = useState<any>([])
@@ -114,10 +114,208 @@ export default function ImageList() {
                   (uuid) => uuid === element.subjectTypeUUID
                 )
               ) {
-                const formData = await axios.get(
-                  `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
-                );
-                const forms = formData.data;
+                // const formData = await axios.get(
+                //   `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
+                // );
+                const forms = {
+                  uuid: "878d0f12-2ca1-4ad6-854c-956d5aede7fc",
+                  voided: false,
+                  decisionConcepts: [],
+                  formType: "ProgramEncounter",
+                  formElementGroups: [
+                    {
+                      uuid: "8ea2f26b-a8dc-4e8e-92ea-a99c1e9c664d",
+                      voided: false,
+                      rule: null,
+                      applicableFormElements: [
+                        {
+                          validFormat: null,
+                          mandatory: false,
+                          group: null,
+                          uuid: "33bf5571-8768-46f4-904f-78c31798ba8c",
+                          voided: false,
+                          concept: {
+                            uuid: "fd5cdf17-39d5-4344-98e3-394a1d30fbb1",
+                            voided: false,
+                            dataType: "Numeric",
+                            keyValues: null,
+                            conceptAnswers: [],
+                            highAbsolute: 100.0,
+                            lowAbsolute: null,
+                            highNormal: null,
+                            lowNormal: null,
+                            unit: "kg",
+                            name: "Weight",
+                          },
+                          keyValues: [],
+                          rule: null,
+                          displayOrder: 2.0,
+                          name: "Weight",
+                          type: "SingleSelect",
+                        },
+                        {
+                          validFormat: null,
+                          mandatory: false,
+                          group: null,
+                          uuid: "9149f607-da7c-4a9f-abf1-01490c693697",
+                          voided: false,
+                          concept: {
+                            uuid: "06f013ed-ed12-4402-9d1c-cebe6e34f64f",
+                            voided: false,
+                            dataType: "Image",
+                            keyValues: null,
+                            conceptAnswers: [],
+                            highAbsolute: null,
+                            lowAbsolute: null,
+                            highNormal: null,
+                            lowNormal: null,
+                            unit: null,
+                            name: "Image",
+                          },
+                          keyValues: [],
+                          rule: null,
+                          displayOrder: 1.0,
+                          name: "Image",
+                          type: "SingleSelect",
+                        },
+                        {
+                          validFormat: null,
+                          mandatory: false,
+                          group: null,
+                          uuid: "0b3df310-3ce7-477e-a44b-2ab52e822e73",
+                          voided: false,
+                          concept: {
+                            uuid: "7386510f-ba5e-496a-8901-c7c390cea641",
+                            voided: false,
+                            dataType: "Text",
+                            keyValues: null,
+                            conceptAnswers: [],
+                            highAbsolute: null,
+                            lowAbsolute: null,
+                            highNormal: null,
+                            lowNormal: null,
+                            unit: null,
+                            name: "Food of child",
+                          },
+                          keyValues: [],
+                          rule: null,
+                          displayOrder: 4.0,
+                          name: "Food of child",
+                          type: "SingleSelect",
+                        },
+                        {
+                          validFormat: null,
+                          mandatory: false,
+                          group: null,
+                          uuid: "2978c334-af6d-44b5-972a-3efc0b53ffd8",
+                          voided: false,
+                          concept: {
+                            uuid: "e7076a9f-00b9-4184-b9ec-20e3dc1cffc1",
+                            voided: false,
+                            dataType: "Coded",
+                            keyValues: null,
+                            conceptAnswers: [
+                              {
+                                voided: false,
+                                order: 0.0,
+                                uuid: "6457bb9f-73f2-46ba-bb5b-be88c35d1b7c",
+                                answerConcept: {
+                                  uuid: "8530d7bd-6b93-4d6b-a03a-71b4723e9c28",
+                                  voided: false,
+                                  dataType: "NA",
+                                  keyValues: null,
+                                  highAbsolute: null,
+                                  lowAbsolute: null,
+                                  highNormal: null,
+                                  lowNormal: null,
+                                  unit: null,
+                                  name: "DMF",
+                                },
+                                abnormal: false,
+                                unique: false,
+                                id: 154399,
+                              },
+                              {
+                                voided: false,
+                                order: 3.0,
+                                uuid: "19aa6613-a40d-48cf-ab06-6b613f2414b2",
+                                answerConcept: {
+                                  uuid: "33821832-e9db-48a5-bbd6-b5cb432cd396",
+                                  voided: false,
+                                  dataType: "NA",
+                                  keyValues: null,
+                                  highAbsolute: null,
+                                  lowAbsolute: null,
+                                  highNormal: null,
+                                  lowNormal: null,
+                                  unit: null,
+                                  name: "STSC department",
+                                },
+                                abnormal: false,
+                                unique: false,
+                                id: 154400,
+                              },
+                              {
+                                voided: false,
+                                order: 2.0,
+                                uuid: "65c05c1c-c678-4544-a328-b943a1ec95f8",
+                                answerConcept: {
+                                  uuid: "a733dd52-c788-4855-b9db-e8e16ddfd984",
+                                  voided: false,
+                                  dataType: "NA",
+                                  keyValues: null,
+                                  highAbsolute: null,
+                                  lowAbsolute: null,
+                                  highNormal: null,
+                                  lowNormal: null,
+                                  unit: null,
+                                  name: "WCD department",
+                                },
+                                abnormal: false,
+                                unique: false,
+                                id: 154397,
+                              },
+                              {
+                                voided: false,
+                                order: 1.0,
+                                uuid: "712bc281-8e53-47f0-bb08-788434997314",
+                                answerConcept: {
+                                  uuid: "e77c9259-881f-4fe2-8079-1c7ec6204e58",
+                                  voided: false,
+                                  dataType: "NA",
+                                  keyValues: null,
+                                  highAbsolute: null,
+                                  lowAbsolute: null,
+                                  highNormal: null,
+                                  lowNormal: null,
+                                  unit: null,
+                                  name: "Ombardc",
+                                },
+                                abnormal: false,
+                                unique: false,
+                                id: 154398,
+                              },
+                            ],
+                            highAbsolute: null,
+                            lowAbsolute: null,
+                            highNormal: null,
+                            lowNormal: null,
+                            unit: null,
+                            name: "Is the child going to Creche?",
+                          },
+                          keyValues: [],
+                          rule: null,
+                          displayOrder: 3.0,
+                          name: "Is the child going to Creche?",
+                          type: "SingleSelect",
+                        },
+                      ],
+                      displayOrder: 1.0,
+                      name: "Image Details",
+                    },
+                  ],
+                  name: "Child followup Encounter",
+                };
 
                 const applicableFormElements = forms.formElementGroups[0]
                   ? forms.formElementGroups[0].applicableFormElements
@@ -129,12 +327,7 @@ export default function ImageList() {
                       voided: boolean;
                       concept: { uuid: string; dataType: any };
                     }) => {
-                      const exists = conceptdata.some(
-                        (concept: { uuid: string }) =>
-                          concept.uuid === element.concept.uuid
-                      );
-
-                      if (exists === false && element.voided === false) {
+                      if (element.voided === false) {
                         const dataType = element.concept.dataType;
                         const isDateType = dataType === "Date";
                         const isDateTimeType = dataType === "DateTime";
@@ -151,14 +344,23 @@ export default function ImageList() {
                           isNotesType ||
                           isTextType
                         ) {
-                          if(!exists){
-                            setConceptData([...conceptdata, element.concept])
+                          const exists = conceptdata.some(
+                            (concept: { uuid: string }) =>
+                              concept.uuid === element.concept.uuid
+                          );
+
+                          if (!exists) {
+                            return element.concept; 
                           }
                         }
                       }
                     }
                   )
-                );
+                ).then((filteredConcepts) => {
+                    const uniqueConcepts = [...conceptdata, ...filteredConcepts];
+                    setConceptData(uniqueConcepts);
+                });
+
               }
             }
           })
@@ -300,9 +502,7 @@ export default function ImageList() {
   };
 
   const concept = (data: any[]) => {
-    const conceptJson = conceptdata.find(
-      (item: { name: any[] }) => item.name === data
-    );
+    const conceptJson = conceptdata.find((item: { name: any }) => item && item.name === data);
     setConcept(conceptJson);
   };
 
