@@ -101,70 +101,65 @@ export default function ImageList() {
     const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
       if (selectedProgramUUID.length > 0 || selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
         await Promise.all(
           formsData.map(async (element: any) => {
             if (
               formTypeArray.includes(element.formType )
             ) {
-              if (
-                selectedProgramUUID.some(
-                  (uuid) => uuid === element.programUUID
-                ) ||
-                selectedSubjectUUID.some(
-                  (uuid) => uuid === element.subjectTypeUUID
-                )
-              ) {
+                if (
+                  selectedProgramUUID.some(
+                    (uuid) => uuid === element.programUUID
+                  ) ||
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )
+                ) {
                 const formData = await axios.get(
                   `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
                 );
                 const forms = formData.data
                 const applicableFormElements = forms.formElementGroups[0]
-                  ? forms.formElementGroups[0].applicableFormElements
-                  : [];
-
-                await Promise.all(
-                  applicableFormElements.map(
-                    async (element: {
-                      voided: boolean;
-                      concept: { uuid: string; dataType: any };
-                    }) => {
-                      if (element.voided === false) {
-                        const dataType = element.concept.dataType;
-                        const isDateType = dataType === "Date";
-                        const isDateTimeType = dataType === "DateTime";
-                        const isNumericType = dataType === "Numeric";
-                        const isCodedType = dataType === "Coded";
-                        const isNotesType = dataType === "Notes";
-                        const isTextType = dataType === "Text";
-
-                        if (
-                          isDateType ||
-                          isDateTimeType ||
-                          isNumericType ||
-                          isCodedType ||
-                          isNotesType ||
-                          isTextType
-                        ) {
-                          const exists = conceptdata.some(
+                ? forms.formElementGroups[0].applicableFormElements
+                : [];
+                  await Promise.all(
+                    applicableFormElements.map(
+                      async (element: {
+                        voided: boolean;
+                        concept: { uuid: string; dataType: any };
+                      }) => {
+                        if (element.voided === false) {
+                          const dataType = element.concept.dataType;
+                          const isDateType = dataType === "Date";
+                          const isDateTimeType = dataType === "DateTime";
+                          const isNumericType = dataType === "Numeric";
+                          const isCodedType = dataType === "Coded";
+                          const isNotesType = dataType === "Notes";
+                          const isTextType = dataType === "Text";
+                          if (
+                            isDateType ||
+                            isDateTimeType ||
+                            isNumericType ||
+                            isCodedType ||
+                            isNotesType ||
+                            isTextType
+                          ) {
+                          const exists = filteredConcepts.some(
                             (concept: { uuid: string }) =>
                               concept.uuid === element.concept.uuid
                           );
                           if (!exists) {
-                            return element.concept; 
+                            filteredConcepts.push(element.concept)
                           }
                         }
                       }
                     }
                   )
-                ).then((filteredConcepts) => {
-                    const uniqueConcepts = [...conceptdata, ...filteredConcepts];
-                    setConceptData(uniqueConcepts);
-                });
-
+                ); 
               }
-            }
-          })
-        );
+            }  
+        }));
+        setConceptData(filteredConcepts);
       }
     };
     data();
