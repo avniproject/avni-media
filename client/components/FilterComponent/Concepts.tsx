@@ -15,7 +15,6 @@ function classNames(...classes: string[]) {
 }
 
 export default function Concepts({ concept, conceptdata, selectedFormSubject }: Prop) {
-  console.log("conceptdata",conceptdata)
 
   const [selectedOptions, setSelectedOptions] = useState([]);
   
