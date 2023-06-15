@@ -53,7 +53,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   }, []);
 
   return (
-    <Menu as="div" className="menu">
+    <Menu as="div" className="menu_program_subject_encounter">
      <div ref={dropdownRef}>
       <div>
         <button

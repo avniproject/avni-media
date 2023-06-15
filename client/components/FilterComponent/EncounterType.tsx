@@ -58,7 +58,8 @@ export default function EncounterType({
     };
   }, []);
   return (
-    <Menu as="div" className="menu">
+    <Menu as="div" className="menu_program_subject_encounter
+      ">
        <div ref={dropdownRef}>
         <div>
           <button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500" onClick={() => setIsOpen(!isOpen)}

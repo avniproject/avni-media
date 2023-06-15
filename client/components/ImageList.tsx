@@ -53,7 +53,7 @@ export default function ImageList() {
   const [program, setProgamType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
   const [dataBody, setDataBody] = useState<any>();
-  const [conceptdata, setConceptData] = useState<any>([{}]);
+  const [conceptdata, setConceptData] = useState<any>([]);
   const [formsData, setFormsData] = useState<any>([]);
   const [textConcept, setTextConcept] = useState<any>([])
   const [codedConcept, setCodedConcept] = useState<any>([])
@@ -117,8 +117,7 @@ export default function ImageList() {
                 const formData = await axios.get(
                   `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
                 );
-                const forms = formData.data;
-
+                const forms = formData.data
                 const applicableFormElements = forms.formElementGroups[0]
                   ? forms.formElementGroups[0].applicableFormElements
                   : [];
@@ -129,12 +128,7 @@ export default function ImageList() {
                       voided: boolean;
                       concept: { uuid: string; dataType: any };
                     }) => {
-                      const exists = conceptdata.some(
-                        (concept: { uuid: string }) =>
-                          concept.uuid === element.concept.uuid
-                      );
-
-                      if (exists === false && element.voided === false) {
+                      if (element.voided === false) {
                         const dataType = element.concept.dataType;
                         const isDateType = dataType === "Date";
                         const isDateTimeType = dataType === "DateTime";
@@ -151,14 +145,22 @@ export default function ImageList() {
                           isNotesType ||
                           isTextType
                         ) {
-                          if(!exists){
-                            setConceptData([...conceptdata, element.concept])
+                          const exists = conceptdata.some(
+                            (concept: { uuid: string }) =>
+                              concept.uuid === element.concept.uuid
+                          );
+                          if (!exists) {
+                            return element.concept; 
                           }
                         }
                       }
                     }
                   )
-                );
+                ).then((filteredConcepts) => {
+                    const uniqueConcepts = [...conceptdata, ...filteredConcepts];
+                    setConceptData(uniqueConcepts);
+                });
+
               }
             }
           })
@@ -300,9 +302,7 @@ export default function ImageList() {
   };
 
   const concept = (data: any[]) => {
-    const conceptJson = conceptdata.find(
-      (item: { name: any[] }) => item.name === data
-    );
+    const conceptJson = conceptdata.find((item: { name: any }) => item && item.name === data);
     setConcept(conceptJson);
   };
 

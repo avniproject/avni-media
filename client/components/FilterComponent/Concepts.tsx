@@ -43,20 +43,22 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
 
       <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div className="py-1">
-          { conceptdata && conceptdata.map((option) => (
-            <Menu.Item key={option.id}>
-              {({ active }) => (
-                <button
-                  className={classNames(
-                    active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                    "flex justify-between w-full px-4 py-2 text-sm"
-                  )}
-                  onClick={() => handleOptionClick(option.name)}
-                >
-                  {option.name}
-                </button>
-              )}
-            </Menu.Item>
+        {conceptdata && conceptdata.map((option) => (
+            option !== undefined && (
+              <Menu.Item key={option.id}>
+                {({ active }) => (
+                  <button
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "flex justify-between w-full px-4 py-2 text-sm"
+                    )}
+                    onClick={() => handleOptionClick(option.name)}
+                  >
+                    {option.name}
+                  </button>
+                )}
+              </Menu.Item>
+            )
           ))}
         </div>
       </Menu.Items>
