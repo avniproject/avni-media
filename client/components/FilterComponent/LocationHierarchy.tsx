@@ -178,7 +178,7 @@ export default function LocationHierarchy({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  console.log("other Location",otherLocation)
+  
   return (
     <>
       <Menu as="div" className="location_menu">
