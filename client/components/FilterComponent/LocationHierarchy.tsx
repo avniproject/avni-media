@@ -136,7 +136,6 @@ export default function LocationHierarchy({
                   const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
                   );
-
                   const distJsonDatas = response.data;
                   const distDatas = distJsonDatas.content;
                   getTypeId(distJsonDatas.content[0].typeId);
