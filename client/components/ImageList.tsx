@@ -70,6 +70,7 @@ export default function ImageList() {
   const [showprogram, setShowProgram] = useState<any[]>([])
   const [showEncounter, setShowEncounter]  = useState<any[]>([]);
   const [showAllEncounter,setShowAllEncounter] =useState<any[]>([])
+  const[selectedEncounterTypeUUID ,setSelectedEncounterTypeUUID] = useState<any>([])
   useEffect(() => {
     const userUUID = getUserUuidFromToken();
     setUserName(userUUID);
@@ -96,11 +97,55 @@ export default function ImageList() {
     };
     filterData();
   }, []);
-
+   const getConceptData=async (formUUID: any, filteredConcept: any[] )=>{
+    const formData = await axios.get(
+      `${process.env.NEXT_PUBLIC_FORMS}${formUUID}`
+    );
+    const forms = formData.data
+    const applicableFormElements = forms.formElementGroups[0]
+    ? forms.formElementGroups[0].applicableFormElements
+    : [];
+      await Promise.all(
+        applicableFormElements.map(
+          async (element: {
+            voided: boolean;
+            concept: { uuid: string; dataType: any };
+          }) => {
+            if (element.voided === false) {
+              const dataType = element.concept.dataType;
+              const isDateType = dataType === "Date";
+              const isDateTimeType = dataType === "DateTime";
+              const isNumericType = dataType === "Numeric";
+              const isCodedType = dataType === "Coded";
+              const isNotesType = dataType === "Notes";
+              const isTextType = dataType === "Text";
+              if (
+                isDateType ||
+                isDateTimeType ||
+                isNumericType ||
+                isCodedType ||
+                isNotesType ||
+                isTextType
+              ) {
+              const exists = filteredConcept.some(
+                (concept: { uuid: string }) =>
+                  concept.uuid === element.concept.uuid
+              );
+              if (!exists) {
+                filteredConcept.push(element.concept)
+              }
+             
+            }
+          }
+        }
+      )
+    ); 
+    return filteredConcept
+   }
   useEffect(() => {
     const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
-      if (selectedProgramUUID.length > 0 || selectedSubjectUUID.length > 0) {
+      if (selectedProgramUUID.length > 0 && selectedSubjectUUID.length > 0 && selectedEncounterTypeUUID.length > 0) {
         const filteredConcepts: any[] = [];
         await Promise.all(
           formsData.map(async (element: any) => {
@@ -110,52 +155,77 @@ export default function ImageList() {
                 if (
                   selectedProgramUUID.some(
                     (uuid) => uuid === element.programUUID
-                  ) ||
+                  ) &&
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )&&
+                  selectedEncounterTypeUUID.some(
+                    (uuid: any) => uuid === element.encounterTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+              }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+     else if (selectedProgramUUID.length > 0 && selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  selectedProgramUUID.some(
+                    (uuid) => uuid === element.programUUID
+                  ) &&
                   selectedSubjectUUID.some(
                     (uuid) => uuid === element.subjectTypeUUID
                   )
                 ) {
-                const formData = await axios.get(
-                  `${process.env.NEXT_PUBLIC_FORMS}${element.formUUID}`
-                );
-                const forms = formData.data
-                const applicableFormElements = forms.formElementGroups[0]
-                ? forms.formElementGroups[0].applicableFormElements
-                : [];
-                  await Promise.all(
-                    applicableFormElements.map(
-                      async (element: {
-                        voided: boolean;
-                        concept: { uuid: string; dataType: any };
-                      }) => {
-                        if (element.voided === false) {
-                          const dataType = element.concept.dataType;
-                          const isDateType = dataType === "Date";
-                          const isDateTimeType = dataType === "DateTime";
-                          const isNumericType = dataType === "Numeric";
-                          const isCodedType = dataType === "Coded";
-                          const isNotesType = dataType === "Notes";
-                          const isTextType = dataType === "Text";
-                          if (
-                            isDateType ||
-                            isDateTimeType ||
-                            isNumericType ||
-                            isCodedType ||
-                            isNotesType ||
-                            isTextType
-                          ) {
-                          const exists = filteredConcepts.some(
-                            (concept: { uuid: string }) =>
-                              concept.uuid === element.concept.uuid
-                          );
-                          if (!exists) {
-                            filteredConcepts.push(element.concept)
-                          }
-                        }
-                      }
-                    }
+                  await getConceptData(element.formUUID, filteredConcepts)
+
+                }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+      else if (selectedEncounterTypeUUID.length > 0 && selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  selectedEncounterTypeUUID.some(
+                    (uuid: any) => uuid === element.encounterTypeUUID
+                  ) &&
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
                   )
-                ); 
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+              }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+      else if ( selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
               }
             }  
         }));
@@ -163,7 +233,7 @@ export default function ImageList() {
       }
     };
     data();
-  }, [formsData, selectedProgramUUID, selectedSubjectUUID]);
+  }, [formsData, selectedProgramUUID, selectedSubjectUUID, selectedEncounterTypeUUID]);
   
   useEffect(() => {
     if (selectedFormSubject) {
@@ -183,17 +253,18 @@ export default function ImageList() {
     const encounters = formsData.filter((form:any) => {
       return form.programUUID === undefined && form.subjectTypeUUID !== undefined && form.encounterTypeUUID !== undefined;
     });
-  
-    if(encounters){
-      const encounterUUIDs = encounters.map((encounter: { encounterTypeUUID: any; }) => encounter.encounterTypeUUID);
+    if(encounters && selectedSubjectUUID){
+      const encounterWithSubject = encounters.filter(
+        (encounters: { subjectTypeUUID: any }) =>
+          selectedSubjectUUID.includes(encounters.subjectTypeUUID)
+      );
+      const encounterUUIDs = encounterWithSubject.map((encounter: { encounterTypeUUID: any; }) => encounter.encounterTypeUUID);
       const filteredEncounters = encounterFilter.filter((mapping: { uuid: any; }) =>
       encounterUUIDs.includes(mapping.uuid)
     );
-    
     setShowAllEncounter([...filteredEncounters])
     }
-  
-  },[encounterFilter])
+  },[encounterFilter, selectedSubjectUUID])
 
   useEffect(() => {
     if (selectedFormProgram) {
@@ -371,7 +442,8 @@ export default function ImageList() {
     }
   };
 
-  const encounterType = (data: any[]) => {
+  const encounterType = (data: any[], encounterTypeUUID: any[]) => {
+    setSelectedEncounterTypeUUID(encounterTypeUUID)
     setEncounterType(data);
   };
 

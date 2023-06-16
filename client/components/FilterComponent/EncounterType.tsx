@@ -4,12 +4,13 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
 
 interface Option {
+  uuid: any;
   id: number;
   name: string;
 }
 
 interface Prop {
-  encounterType: (data: any[]) => void;
+  encounterType: (data: any[], encounterTypeUUID: any[]) => void;
   showAllEncounter: any[];
   showEncounter: any[];
 }
@@ -21,6 +22,7 @@ export default function EncounterType({
 }: Prop) {
   
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
+  const [encounterTypeUUID, setEncounterTypeUUID]         = useState<any[]>([])
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
   
@@ -28,19 +30,25 @@ export default function EncounterType({
   const showUniqueEncounter = Array.from(new Set(newData));
   useEffect(()=>{
     if(showEncounter.length === 0){
-      setSelectedOptions([])
+      setSelectedOptions([]);
+      setEncounterTypeUUID([]);
     }
   },[showEncounter])
 
   useEffect(() => {
-    encounterType(selectedOptions);
-  }, [encounterType, selectedOptions]);
+    encounterType(selectedOptions, encounterTypeUUID);
+  }, [encounterTypeUUID, selectedOptions]);
   
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
     } else {
       setSelectedOptions([...selectedOptions, option.name]);
+    }
+    if (encounterTypeUUID.includes(option.uuid)) {
+      setEncounterTypeUUID(encounterTypeUUID.filter((o) => o !== option.uuid));
+    } else {
+      setEncounterTypeUUID([...encounterTypeUUID, option.uuid]);
     }
   }
   const handleClickOutside = (event: { target: any }) => {
