@@ -415,7 +415,7 @@ export default function ImageList() {
     if(data && data.length>0){
       setNoteConcept([{
         "conceptName": concepts.name,
-        "values":data
+        "values":[data]      
       }])
     }
    
@@ -426,7 +426,7 @@ export default function ImageList() {
    if(data && data.length>0){
     setTextConcept([{
       "conceptName":concepts.name ,
-      "values":data
+      "values":[data]
      }])
    }
   
