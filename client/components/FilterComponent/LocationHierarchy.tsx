@@ -97,23 +97,23 @@ export default function LocationHierarchy({
         setTopLevelData(stateData);
         if (selectedOption.length > 0) {
           const parentsId = selectedOption.slice(-1)[0];
-
+          const parentsUUID = locationFilter[Number(index) ].uuid;
+          const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
           try {
-            const response = await axios.get(
-              `${
-                process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${
-                locationFilter[Number(index) + 1].id
-              }`
-            );
-
+            parentsJson.map(async (item)=>{
+              const response = await axios.get(
+                `${
+                  process.env.NEXT_PUBLIC_TOP_ADDRESS
+                }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}` 
+              );
             const distJsonData = response.data;
             const distData = distJsonData.content;
             getTypeId(distJsonData.content[0].typeId);
             getLocation(distData);
+            })
           } catch (Error) {
             console.error(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}`
             );
           }
         } else {
@@ -121,26 +121,28 @@ export default function LocationHierarchy({
         }
       } else {
         if (
-          locationFilter[Number(index) + 1] !== undefined &&
-          locationFilter[Number(index) + 1].id !== undefined
+          locationFilter[Number(index) ] !== undefined &&
+          locationFilter[Number(index) ].uuid !== undefined
         ) {
-          const typeIds = locationFilter[Number(index) + 1].id;
+          const parentsUUID = locationFilter[Number(index) ].uuid;
+          const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
           try {
-            if (selectedOptions.length > 0 && typeIds !== null) {
+            if (selectedOptions.length > 0 ) {
               const parentsId = selectedOptions.slice(-1)[0];
-              const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${typeIds}`
-              );
-
-              const distJsonDatas = response.data;
-              const distDatas = distJsonDatas.content;
-              getTypeId(distJsonDatas.content[0].typeId);
-              const level = distJsonDatas.content[0].level;
-              getOtherLocation(distDatas, level);
+                parentsJson.map(async (item)=>{
+                  const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
+                  );
+                  const distJsonDatas = response.data;
+                  const distDatas = distJsonDatas.content;
+                  getTypeId(distJsonDatas.content[0].typeId);
+                  const level = distJsonDatas.content[0].level;
+                  getOtherLocation(distDatas, level);
+                })
             }
           } catch (Error) {
             console.error(
-              `error at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=$&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+              `error at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}`
             );
           }
         }
@@ -176,7 +178,7 @@ export default function LocationHierarchy({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  
   return (
     <>
       <Menu as="div" className="location_menu">
@@ -257,52 +259,14 @@ export default function LocationHierarchy({
               </div>
             </div>
           )}
-          {otherLocation &&
+          {otherLocation && maxLevel !== undefined &&
             otherLocation.map((locationData) => {
+            for(let i=2 ; i<= maxLevel ; i++)
+            {
               if (
                 maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 2 &&
-                locationIndex.level === (maxLevel ?? 0) - 2
-              ) {
-                return (
-                  isOpen && (
-                    <div
-                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      key={locationData.level}
-                    >
-                      <div className="py-1">
-                        {locationData.data &&
-                          locationData.data.map((option: Option) => (
-                            <div key={option.uuid}>
-                              <button
-                                className={classNames(
-                                  selectedOptions.includes(option.id)
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700",
-                                  "flex justify-between w-full px-4 py-2 text-sm"
-                                )}
-                                onClick={() => {
-                                  handleOptionClick(option);
-                                }}
-                              >
-                                {option.title}
-                                {selectedOptions.includes(option.id) ? (
-                                  <CheckIcon
-                                    className="h-5 w-5 text-teal-500"
-                                    aria-hidden="true"
-                                  />
-                                ) : null}
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )
-                );
-              } else if (
-                maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 3 &&
-                locationIndex.level === (maxLevel ?? 0) - 3
+                locationData.level === (maxLevel ?? 0) - i &&
+                locationIndex.level === (maxLevel ?? 0) - i
               ) {
                 return (
                   isOpen && (
@@ -340,6 +304,7 @@ export default function LocationHierarchy({
                   )
                 );
               }
+            }
               return null;
             })}
         </div>
