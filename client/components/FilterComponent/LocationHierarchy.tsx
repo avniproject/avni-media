@@ -107,55 +107,11 @@ export default function LocationHierarchy({
                 }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}`
                  
               );
-              
-              const distJsonData = {
-                "content" : [ {
-                  "title" : "Mumbai",
-                  "level" : 3.0,
-                  "parentId" : 182370,
-                  "typeId" : 741,
-                  "uuid" : "6edd7b3b-6374-4303-97ea-08d4fb2f0fd4",
-                  "lineage" : "182370.182386",
-                  "titleLineage" : "MH, Mumbai",
-                  "id" : 182386,
-                  "typeString" : "Dist"
-                }, {
-                  "title" : "Nagpur",
-                  "level" : 3.0,
-                  "parentId" : 182370,
-                  "typeId" : 741,
-                  "uuid" : "ef74fdd2-bb73-4c6b-b1ef-3c6481a3487d",
-                  "lineage" : "182370.182388",
-                  "titleLineage" : "MH, Nagpur",
-                  "id" : 182388,
-                  "typeString" : "Dist"
-                } ],
-                "pageable" : {
-                  "sort" : {
-                    "sorted" : true,
-                    "unsorted" : false
-                  },
-                  "pageNumber" : 0,
-                  "pageSize" : 1000,
-                  "offset" : 0,
-                  "unpaged" : false,
-                  "paged" : true
-                },
-                "last" : true,
-                "totalElements" : 2,
-                "totalPages" : 1,
-                "first" : true,
-                "sort" : {
-                  "sorted" : true,
-                  "unsorted" : false
-                },
-                "numberOfElements" : 2,
-                "size" : 1000,
-                "number" : 0
-              }
-              const distData = distJsonData.content;
-              getTypeId(distJsonData.content[0].typeId);
-              getLocation(distData);
+
+            const distJsonData = response.data;
+            const distData = distJsonData.content;
+            getTypeId(distJsonData.content[0].typeId);
+            getLocation(distData);
             })
           } catch (Error) {
             console.error(
