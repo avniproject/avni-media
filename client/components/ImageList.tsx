@@ -97,6 +97,7 @@ export default function ImageList() {
     };
     filterData();
   }, []);
+  
    const getConceptData=async (formUUID: any, filteredConcept: any[] )=>{
     const formData = await axios.get(
       `${process.env.NEXT_PUBLIC_FORMS}${formUUID}`
