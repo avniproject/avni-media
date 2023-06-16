@@ -178,7 +178,7 @@ export default function LocationHierarchy({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  console.log("other Location",otherLocation)
   return (
     <>
       <Menu as="div" className="location_menu">
@@ -259,132 +259,14 @@ export default function LocationHierarchy({
               </div>
             </div>
           )}
-          {otherLocation &&
+          {otherLocation && maxLevel !== undefined &&
             otherLocation.map((locationData) => {
+            for(let i=2 ; i<= maxLevel ; i++)
+            {
               if (
                 maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 2 &&
-                locationIndex.level === (maxLevel ?? 0) - 2
-              ) {
-                return (
-                  isOpen && (
-                    <div
-                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      key={locationData.level}
-                    >
-                      <div className="py-1">
-                        {locationData.data &&
-                          locationData.data.map((option: Option) => (
-                            <div key={option.uuid}>
-                              <button
-                                className={classNames(
-                                  selectedOptions.includes(option.id)
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700",
-                                  "flex justify-between w-full px-4 py-2 text-sm"
-                                )}
-                                onClick={() => {
-                                  handleOptionClick(option);
-                                }}
-                              >
-                                {option.title}
-                                {selectedOptions.includes(option.id) ? (
-                                  <CheckIcon
-                                    className="h-5 w-5 text-teal-500"
-                                    aria-hidden="true"
-                                  />
-                                ) : null}
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )
-                );
-              } else if (
-                maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 3 &&
-                locationIndex.level === (maxLevel ?? 0) - 3
-              ) {
-                return (
-                  isOpen && (
-                    <div
-                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      key={locationData.level}
-                    >
-                      <div className="py-1">
-                        {locationData.data &&
-                          locationData.data.map((option: Option) => (
-                            <div key={option.uuid}>
-                              <button
-                                className={classNames(
-                                  selectedOptions.includes(option.id)
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700",
-                                  "flex justify-between w-full px-4 py-2 text-sm"
-                                )}
-                                onClick={() => {
-                                  handleOptionClick(option);
-                                }}
-                              >
-                                {option.title}
-                                {selectedOptions.includes(option.id) ? (
-                                  <CheckIcon
-                                    className="h-5 w-5 text-teal-500"
-                                    aria-hidden="true"
-                                  />
-                                ) : null}
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )
-                );
-              }else if (
-                maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 4 &&
-                locationIndex.level === (maxLevel ?? 0) - 4
-              ) {
-                return (
-                  isOpen && (
-                    <div
-                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      key={locationData.level}
-                    >
-                      <div className="py-1">
-                        {locationData.data &&
-                          locationData.data.map((option: Option) => (
-                            <div key={option.uuid}>
-                              <button
-                                className={classNames(
-                                  selectedOptions.includes(option.id)
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700",
-                                  "flex justify-between w-full px-4 py-2 text-sm"
-                                )}
-                                onClick={() => {
-                                  handleOptionClick(option);
-                                }}
-                              >
-                                {option.title}
-                                {selectedOptions.includes(option.id) ? (
-                                  <CheckIcon
-                                    className="h-5 w-5 text-teal-500"
-                                    aria-hidden="true"
-                                  />
-                                ) : null}
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )
-                );
-              }else if (
-                maxLevel !== undefined &&
-                locationData.level === (maxLevel ?? 0) - 5 &&
-                locationIndex.level === (maxLevel ?? 0) - 5
+                locationData.level === (maxLevel ?? 0) - i &&
+                locationIndex.level === (maxLevel ?? 0) - i
               ) {
                 return (
                   isOpen && (
@@ -422,6 +304,7 @@ export default function LocationHierarchy({
                   )
                 );
               }
+            }
               return null;
             })}
         </div>
