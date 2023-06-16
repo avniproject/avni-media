@@ -104,10 +104,8 @@ export default function LocationHierarchy({
               const response = await axios.get(
                 `${
                   process.env.NEXT_PUBLIC_TOP_ADDRESS
-                }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}`
-                 
+                }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}` 
               );
-
             const distJsonData = response.data;
             const distData = distJsonData.content;
             getTypeId(distJsonData.content[0].typeId);
@@ -128,7 +126,6 @@ export default function LocationHierarchy({
         ) {
           const parentsUUID = locationFilter[Number(index) ].uuid;
           const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
-        
           try {
             if (selectedOptions.length > 0 ) {
               const parentsId = selectedOptions.slice(-1)[0];
