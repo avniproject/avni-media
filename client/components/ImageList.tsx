@@ -289,12 +289,14 @@ export default function ImageList() {
         },
       };
 
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page + 1}&size=${showPerpage}`,
+        dataBody,
         options
       );
-      const nextPageResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page + 1}&size=${showPerpage}`,
+      const nextPageResponse = await axios.post(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page + 1}&size=${showPerpage}`,
+        dataBody,
         options
       );
       setImageList(response.data);
@@ -376,7 +378,7 @@ export default function ImageList() {
   const conceptDate = (data: any[]|null) => {
     if(data && data.length>0){
       setConceptDates([{
-        "conceptName":concepts.name,
+        "conceptUuid":concepts.uuid,
         "from": data[0],
         "to": data[1]
       }])
@@ -386,7 +388,7 @@ export default function ImageList() {
   const conceptDateTime = (data: any[]|null) => {
     if(data && data.length>0){
       setDateTimeConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "from": data[0],
         "to": data[1]
       }])
@@ -395,7 +397,7 @@ export default function ImageList() {
 
   const conceptNumeric = (fromNumber: number, toNumber: number) =>{
    setToNumericConcept([{
-    "conceptName":concepts.name,
+    "conceptUuid":concepts.uuid,
     "from": fromNumber,
     "to": toNumber
    }])
@@ -404,7 +406,7 @@ export default function ImageList() {
   const conceptCoded = (data: any) =>{
     if(data.length>0){
       setCodedConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "values":data
        }])
     }
@@ -414,7 +416,7 @@ export default function ImageList() {
 
     if(data && data.length>0){
       setNoteConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "values":[data]      
       }])
     }
@@ -425,7 +427,7 @@ export default function ImageList() {
 
    if(data && data.length>0){
     setTextConcept([{
-      "conceptName":concepts.name ,
+      "conceptUuid":concepts.uuid ,
       "values":[data]
      }])
    }
@@ -806,6 +808,7 @@ export default function ImageList() {
             pagination ={pagination}
             checkedImage={checkedImage}
             setCheckedImage={[]}
+            dataBody = {dataBody}
           />
         )}
         <Pagination
