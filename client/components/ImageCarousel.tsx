@@ -14,7 +14,7 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void;
   checkedImage: string[];
   setCheckedImage: string[];
-  dataBady: any;
+  dataBody: any;
 }
 
 const ImageCarousel = ({
@@ -25,7 +25,7 @@ const ImageCarousel = ({
   onClose,
   onSelectImage,
   checkedImage,
-  dataBady
+  dataBody
 }: Props) => {
   const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
@@ -55,7 +55,7 @@ const ImageCarousel = ({
       };
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
-        dataBady,
+        dataBody,
         options
       );
       setImageCarousel(response.data);

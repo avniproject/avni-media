@@ -377,7 +377,7 @@ export default function ImageList() {
   const conceptDate = (data: any[]|null) => {
     if(data && data.length>0){
       setConceptDates([{
-        "conceptName":concepts.name,
+        "conceptUuid":concepts.uuid,
         "from": data[0],
         "to": data[1]
       }])
@@ -387,7 +387,7 @@ export default function ImageList() {
   const conceptDateTime = (data: any[]|null) => {
     if(data && data.length>0){
       setDateTimeConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "from": data[0],
         "to": data[1]
       }])
@@ -396,7 +396,7 @@ export default function ImageList() {
 
   const conceptNumeric = (fromNumber: number, toNumber: number) =>{
    setToNumericConcept([{
-    "conceptName":concepts.name,
+    "conceptUuid":concepts.uuid,
     "from": fromNumber,
     "to": toNumber
    }])
@@ -405,7 +405,7 @@ export default function ImageList() {
   const conceptCoded = (data: any) =>{
     if(data.length>0){
       setCodedConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "values":data
        }])
     }
@@ -415,7 +415,7 @@ export default function ImageList() {
 
     if(data && data.length>0){
       setNoteConcept([{
-        "conceptName": concepts.name,
+        "conceptUuid": concepts.uuid,
         "values":[data]      
       }])
     }
@@ -426,7 +426,7 @@ export default function ImageList() {
 
    if(data && data.length>0){
     setTextConcept([{
-      "conceptName":concepts.name ,
+      "conceptUuid":concepts.uuid ,
       "values":[data]
      }])
    }
@@ -807,6 +807,7 @@ export default function ImageList() {
             pagination ={pagination}
             checkedImage={checkedImage}
             setCheckedImage={[]}
+            dataBody = {dataBody}
           />
         )}
         <Pagination
