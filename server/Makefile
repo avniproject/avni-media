@@ -12,3 +12,16 @@ start-dev:
 
 start-prod:
 	npm run start:prod
+
+_build-app:
+	cp ./env-templates/$(template) .env
+	npm run build
+
+build-app:
+	make _build-app template=development.template
+
+build-app-prod:
+	make _build-app template=production.template
+
+build-app-staging:
+	make _build-app template=staging.template

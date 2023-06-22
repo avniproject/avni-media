@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 interface Props {
   showperpage: number;
   pagechange: (size: number, pageNumber: number) => void;
-  total: number;
+  nextPageData: any[];
 
 }
-  const Pagination = ({ showperpage, pagechange, total }: Props) => {
+  const Pagination = ({ showperpage, pagechange, nextPageData }: Props) => {
   const [counter, setCounter] = useState(1)
 
-  const page = Math.ceil(total / showperpage)
+  const page = Math.ceil(nextPageData.length / showperpage)
 
   useEffect(() => {
-    const value = showperpage * (counter - 1)
+   
     if (counter == page) {
       pagechange(showperpage, counter - 1)
     }
@@ -22,7 +22,7 @@ interface Props {
     }
   }, [counter, showperpage])
 
-
+ 
   const onButtonclick = (type: string) => {
     if (type == "previous") {
       if (counter == 1) {
@@ -33,11 +33,11 @@ interface Props {
       }
     }
     else if (type == "next") {
-      if (Math.ceil(total / showperpage) === counter) {
-        setCounter(counter)
+      if (nextPageData.length >= 1) {
+        setCounter(counter + 1)
       }
-      else {
-        setCounter(counter + 1);
+      else{
+        setCounter(counter);
       }
     }
   }
@@ -46,6 +46,7 @@ interface Props {
       <div className="mt-px w-0 flex-1 flex justify-end">
         <button
           onClick={() => onButtonclick("previous")}
+          disabled={counter === 1}
           className="border-t-2 border-transparent pt-1 pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 ">
           <ArrowNarrowLeftIcon className="mr-3 h-5 w-5" aria-hidden="true" />
           Previous
@@ -66,6 +67,7 @@ interface Props {
       <div className="-mt-px w-0 flex-1 flex justify-start">
         <button
           onClick={() => onButtonclick("next")}
+          disabled={nextPageData.length === 0}
           className="border-t-2 border-transparent pt-1 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
         >
           Next

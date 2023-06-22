@@ -11,9 +11,9 @@ export class DownloadMediaTask {
   @Cron(CronExpression.EVERY_MINUTE)
   async runTask() {
     try {
-      this.logger.debug('Starting running the cron.');
-      const result = await this.mediaViewerService.getMediaData();
-      this.logger.debug(`Cron complete: ${JSON.stringify(result)}`);
+      this.logger.log('Starting running the cron.');
+      const result = await this.mediaViewerService.createZipOfMediaFiles();
+      this.logger.log(`Cron complete: ${JSON.stringify(result)}`);
     } catch (error) {
       this.logger.error(`Error downloading media: ${error}`);
     }

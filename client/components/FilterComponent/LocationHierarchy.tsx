@@ -1,5 +1,5 @@
-import {Key,useEffect, useState } from "react";
-import { Menu} from "@headlessui/react";
+import { Key, useEffect, useRef, useState } from "react";
+import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import axios from "axios";
 
@@ -17,21 +17,17 @@ interface Prop {
     level: number;
   };
   index: Key;
-  minLevel: number |undefined;
-  maxLevel: number|undefined ;
-  selectedParentId : any[];
-  getLocation:(data : any[])=>void;
-  getOtherLocation:(data : any[])=>void;
-  getTopLevel:(data : any[],levelname: string)=>void;
-  getSecondLevel:(data : any[],levelType: string )=>void;
-  getSelectedLocation: (data: any[])=>void
-  loction: any[];
-  otherLocation:any[];
-}
-interface Location {
-  id: number;
-  name: string;
-  children: Location[];
+  minLevel: number | undefined;
+  maxLevel: number | undefined;
+  selectedParentId: any[];
+  getLocation: (data: any[]) => void;
+  getOtherLocation: (data: any[], level: any) => void;
+  getTopLevel: (data: any[], levelname: string) => void;
+  getSecondLevel: (data: any[], levelType: string) => void;
+  getTypeId: (data: any) => void;
+  location: any[];
+  otherLocation: any[];
+  locationFilter: any[];
 }
 
 function classNames(...classes: string[]) {
@@ -40,30 +36,29 @@ function classNames(...classes: string[]) {
 
 export default function LocationHierarchy({
   locationIndex,
-  index,
-  loction,
-  selectedParentId,
+  location,
   getLocation,
   getOtherLocation,
   getTopLevel,
-  getSelectedLocation,
   getSecondLevel,
   maxLevel,
   otherLocation,
   minLevel,
+  index,
+  getTypeId,
+  locationFilter,
 }: Prop) {
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [optionSelected, setOptionSelected] = useState<any>()
-  const [secondTypeName, setSecondTypeName] = useState<any>()
-  const [selectLevelName, setSelectLevelName] = useState(null)
-  const [secondLevel, setSecondLevel] = useState<any>([]);
-  
-  const [parentId, setParentId] = useState<Option | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
+  const [optionSelected, setOptionSelected] = useState<any>();
+  const [secondTypeName, setSecondTypeName] = useState<any>();
+  const [selectLevelName, setSelectLevelName] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<any>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
-  const [selectedOption, setSelectedOption] = useState<Option[]>([]);
+  const [selectedOption, setSelectedOption] = useState<any[]>([]);
 
   function handleOptionSelect(option: Option) {
-    setOptionSelected(option)
+    setOptionSelected(option);
     if (selectedOption.includes(option.id)) {
       setSelectedOption(selectedOption.filter((o) => o !== option.id));
     } else {
@@ -73,23 +68,22 @@ export default function LocationHierarchy({
 
   useEffect(() => {
     if (optionSelected !== undefined) {
-      setSelectLevelName(optionSelected.typeString)
+      setSelectLevelName(optionSelected.typeString);
     } else {
-      setSelectLevelName(null)
+      setSelectLevelName(null);
     }
     if (optionSelected !== undefined && selectLevelName !== null) {
-   getTopLevel(selectedOption,selectLevelName)}
-
-  }, [optionSelected,selectedOptions,selectedOption,selectLevelName])
-  
-  useEffect(() => {
-    if (maxLevel !== undefined){
-      if ( locationIndex.level === maxLevel - 1) {
-        const secondLevelTypeId = locationIndex.id;
-        localStorage.setItem("secondLevelTypeId", secondLevelTypeId.toString());
-      }
+      getTopLevel(selectedOption, selectLevelName);
     }
-    
+  }, [optionSelected, selectedOptions, selectedOption, selectLevelName]);
+
+  useEffect(() => {
+    if (selectedOption.length === 0) {
+      setSelectedOptions([]);
+    }
+  }, [selectedOption]);
+
+  useEffect(() => {
     const typeIdData = async () => {
       const typeId = locationIndex.id;
 
@@ -98,225 +92,222 @@ export default function LocationHierarchy({
           `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
 
-        console.log(
-          "Response data for top level ",
-          response.data,
-          "Response",
-          response
-        );
-        console.log("index", locationIndex);
-        const jsonDataState =response.data
-
+        const jsonDataState = response.data;
         const stateData = jsonDataState.content;
         setTopLevelData(stateData);
-        
-        const secondLevelTypeIdString =
-          localStorage.getItem("secondLevelTypeId");
-        if ( secondLevelTypeIdString !== null && selectedOption.length > 0) {
+        if (selectedOption.length > 0) {
+          const parentsId = selectedOption.slice(-1)[0];
+          const parentsUUID = locationFilter[Number(index) ].uuid;
+          const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
           try {
-              const secondLevelTypeId = parseInt(secondLevelTypeIdString);
+            parentsJson.map(async (item)=>{
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page0&size=1000&sort=id,DESC&typeId=${secondLevelTypeId }`
+                `${
+                  process.env.NEXT_PUBLIC_TOP_ADDRESS
+                }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}` 
               );
-              const distJsonData = response.data
-              const distData = distJsonData.content;
-              getLocation(distData)
-                         
+            const distJsonData = response.data;
+            const distData = distJsonData.content;
+            getTypeId(distJsonData.content[0].typeId);
+            getLocation(distData);
+            })
           } catch (Error) {
-            console.log(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId[${selectedOption}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+            console.error(
+              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}`
             );
           }
+        } else {
+          getLocation([]);
         }
       } else {
-        const typeId = locationIndex.id;
-
-
-        try {
-          if (selectedOptions.length > 0 && typeId!==null) {
-            const response = await axios.get(
-              `${
-                process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-            );
-
-            const distJsonData = response.data;
-           
-            const distData = distJsonData.content;
-           
-            setSecondLevel(distData);
-            getOtherLocation(secondLevel)
-            console.log(
-              `${
-                process.env.NEXT_PUBLIC_TOP_ADDRESS
-              }?parentId[${selectedOptions}]&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
+        if (
+          locationFilter[Number(index) ] !== undefined &&
+          locationFilter[Number(index) ].uuid !== undefined
+        ) {
+          const parentsUUID = locationFilter[Number(index) ].uuid;
+          const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
+          try {
+            if (selectedOptions.length > 0 ) {
+              const parentsId = selectedOptions.slice(-1)[0];
+                parentsJson.map(async (item)=>{
+                  const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
+                  );
+                  const distJsonDatas = response.data;
+                  const distDatas = distJsonDatas.content;
+                  getTypeId(distJsonDatas.content[0].typeId);
+                  const level = distJsonDatas.content[0].level;
+                  getOtherLocation(distDatas, level);
+                })
+            }
+          } catch (Error) {
+            console.error(
+              `error at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}`
             );
           }
-        } catch (Error) {
-          console.log(
-            `error at ${
-              process.env.NEXT_PUBLIC_TOP_ADDRESS
-            }?parentId=${selectedOptions.join(
-              ","
-            )}&page=0&size=1000&sort=id,DESC&typeId=${typeId}`
-          );
         }
       }
     };
     typeIdData();
-  }, [
-    selectedOptions,
-    selectedOption,
-    locationIndex,
-    maxLevel,
-    minLevel,
-    parentId,
-  ]);
-
+  }, [selectedOptions, selectedOption, locationIndex, maxLevel, minLevel]);
   function handleOptionClick(option: Option) {
-    setSecondTypeName(option)
+    setSecondTypeName(option);
     if (selectedOptions.includes(option.id)) {
       setSelectedOptions(selectedOptions.filter((o) => o !== option.id));
     } else {
       setSelectedOptions([...selectedOptions, option.id]);
     }
   }
-  
-  useEffect(()=>{
-    if(selectedOptions !== undefined && secondTypeName !== undefined){
-      getSecondLevel(selectedOptions, secondTypeName.typeString)
-    }
-  },[selectedOptions, secondTypeName])
 
+  useEffect(() => {
+    if (selectedOptions !== undefined && secondTypeName !== undefined) {
+      getSecondLevel(selectedOptions, secondTypeName.typeString);
+    }
+  }, [selectedOptions, secondTypeName]);
+
+  const handleClickOutside = (event: { target: any }) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
   return (
     <>
-      <Menu
-        as="div"
-        className="menu"
-      >
-        <div>
-          {maxLevel === locationIndex.level ? (
-            <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+      <Menu as="div" className="location_menu">
+        <div ref={dropdownRef}>
+          <div>
+            <button
+              className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500"
+              onClick={() => setIsOpen(!isOpen)}
+            >
               <span>
-                {selectedOption.length > 0
-                  ? selectedOption.length+" selected"
+                {locationIndex.level === maxLevel
+                  ? selectedOption.length > 0
+                    ? `${selectedOption.length} selected`
+                    : locationIndex.name
+                  : selectedOptions.length > 0
+                  ? `${selectedOptions.length} selected`
                   : locationIndex.name}
               </span>
               <ChevronDownIcon
                 className="-mr-1 ml-2 h-5 w-5"
                 aria-hidden="true"
               />
-            </Menu.Button>
-          ) : (
-            <Menu.Button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
-              <span>
-                {selectedOptions.length > 0
-                  ? selectedOptions.length + " selected"
-                  : locationIndex.name}
-              </span>
-              <ChevronDownIcon
-                className="-mr-1 ml-2 h-5 w-5"
-                aria-hidden="true"
-              />
-            </Menu.Button>
-          )}
-        </div>     
-          {locationIndex.level === maxLevel ? (
-            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            </button>
+          </div>
+          {locationIndex.level === maxLevel && isOpen && (
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {toplevelData &&
                   toplevelData.map((option: Option) => (
-                    <Menu.Item key={option.id}>
-                      {({ active }) => (
-                        <button
-                          className={classNames(
-                            active
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-700",
-                            "flex justify-between w-full px-4 py-2 text-sm"
-                          )}
-                          onClick={() => {handleOptionSelect(option);
-                          }}
-                        >
-                          {option.title}
-                          {selectedOption.includes(option.id) ? (
-                            <CheckIcon
-                              className="check-button"
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                        </button>
-                      )}
-                    </Menu.Item>
+                    <div key={option.id}>
+                      <button
+                        className={`flex justify-between w-full px-4 py-2 text-sm ${
+                          selectedOption.includes(option.id)
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700"
+                        }`}
+                        onClick={() => handleOptionSelect(option)}
+                      >
+                        {option.title}
+                        {selectedOption.includes(option.id) && (
+                          <CheckIcon
+                            className="check-button"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </button>
+                    </div>
                   ))}
               </div>
-            </Menu.Items>
-          ) : loction !== null ? (
-            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="py-1">
-                {loction &&
-                  loction.map((option: Option) => (
-                    <Menu.Item key={option.uuid}>
-                      {({ active }) => (
-                        <button
-                          className={classNames(
-                            active
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-700",
-                            "flex justify-between w-full px-4 py-2 text-sm"
-                          )}
-                          onClick={() => {
-                            handleOptionClick(option);
-                          }}
-                        >
-                          {option.title}
-                          {selectedOptions.includes(option.id)? (
-                            <CheckIcon
-                              className="h-5 w-5 text-teal-500"
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  ))}
-              </div>
-            </Menu.Items>
-          ) : (
-            // This is the default block, which will be executed if neither of the above conditions is true
-            <Menu.Items className="origin-top-right absolute center-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="py-1">
-                {/* Display third level options */}
-                {otherLocation &&
-                  otherLocation.map((option: Option) => (
-                    <Menu.Item key={option.uuid}>
-                      {({ active }) => (
-                        <button
-                          className={classNames(
-                            active
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-700",
-                            "flex justify-between w-full px-4 py-2 text-sm"
-                          )}
-                          onClick={() => {
-                            handleOptionClick(option);
-                           
-                          }}
-                        >
-                          {option.title}
-                          {selectedOptions.includes(option.id) ? (
-                            <CheckIcon
-                              className="h-5 w-5 text-teal-500"
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  ))}
-              </div>
-            </Menu.Items>
+            </div>
           )}
+          {isOpen && locationIndex.level === (maxLevel ?? 0) - 1 && (
+            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {location.map((option) => (
+                  <div key={option.uuid}>
+                    <button
+                      className={classNames(
+                        selectedOptions.includes(option.id)
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-700",
+                        "flex justify-between w-full px-4 py-2 text-sm"
+                      )}
+                      onClick={() => {
+                        handleOptionClick(option);
+                      }}
+                    >
+                      {option.title}
+                      {selectedOptions.includes(option.id) ? (
+                        <CheckIcon
+                          className="h-5 w-5 text-teal-500"
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {otherLocation && maxLevel !== undefined &&
+            otherLocation.map((locationData) => {
+            for(let i=2 ; i<= maxLevel ; i++)
+            {
+              if (
+                maxLevel !== undefined &&
+                locationData.level === (maxLevel ?? 0) - i &&
+                locationIndex.level === (maxLevel ?? 0) - i
+              ) {
+                return (
+                  isOpen && (
+                    <div
+                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                      key={locationData.level}
+                    >
+                      <div className="py-1">
+                        {locationData.data &&
+                          locationData.data.map((option: Option) => (
+                            <div key={option.uuid}>
+                              <button
+                                className={classNames(
+                                  selectedOptions.includes(option.id)
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700",
+                                  "flex justify-between w-full px-4 py-2 text-sm"
+                                )}
+                                onClick={() => {
+                                  handleOptionClick(option);
+                                }}
+                              >
+                                {option.title}
+                                {selectedOptions.includes(option.id) ? (
+                                  <CheckIcon
+                                    className="h-5 w-5 text-teal-500"
+                                    aria-hidden="true"
+                                  />
+                                ) : null}
+                              </button>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )
+                );
+              }
+            }
+              return null;
+            })}
+        </div>
       </Menu>
     </>
   );

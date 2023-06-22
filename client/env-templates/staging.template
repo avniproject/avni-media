@@ -1,0 +1,6 @@
+NEXT_PUBLIC_IMAGE_LIST_URL=https://int-staging.avniproject.org/etl/media
+NEXT_PUBLIC_DOWNLOAD_REQUEST_URL=https://int-staging.avniproject.org/media-viewer/requestDownload
+NEXT_PUBLIC_DOWNLOAD_LIST_URL=https://int-staging.avniproject.org/media-viewer/allData
+NEXT_PUBLIC_OPERATIONAL_MODULE=https://staging.avniproject.org/web/operationalModules
+NEXT_PUBLIC_FORMS=https://staging.avniproject.org/web/form/
+NEXT_PUBLIC_TOP_ADDRESS=https://staging.avniproject.org/locations/search/find

@@ -1,4 +1,6 @@
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { Carousel } from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import { useEffect, useState } from "react";
@@ -14,6 +16,7 @@ interface Props {
   onSelectImage: (value: string, checked: boolean) => void;
   checkedImage: string[];
   setCheckedImage: string[];
+  dataBody: any;
 }
 
 const ImageCarousel = ({
@@ -24,6 +27,7 @@ const ImageCarousel = ({
   onClose,
   onSelectImage,
   checkedImage,
+  dataBody
 }: Props) => {
   const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
@@ -51,8 +55,9 @@ const ImageCarousel = ({
           "AUTH-TOKEN": localStorage.getItem("authToken"),
         },
       };
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${pagination.size}`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+        dataBody,
         options
       );
       setImageCarousel(response.data);
@@ -66,7 +71,7 @@ const ImageCarousel = ({
 
   return (
     <>
-      <div className="fixed z-10 inset-0 overflow-y-auto ">
+      <div className="fixed  inset-0 overflow-y-auto  "style={{ zIndex: 21 }}>
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-0 text-center sm:block sm:p-0">
           <div
             className="fixed inset-0 transition-opacity"
@@ -101,6 +106,30 @@ const ImageCarousel = ({
             </div>
             <div className="flex  w-full h-full">
               <Carousel
+                renderArrowPrev={(clickHandler, hasPrev) => {
+                  return (
+                    <div
+                      className={`${
+                        hasPrev ? "absolute" : "hidden"
+                      } top-0 bottom-20 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      onClick={clickHandler}
+                    >
+                      <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
+                    </div>
+                  );
+                }}
+                renderArrowNext={(clickHandler, hasNext) => {
+                  return (
+                    <div
+                      className={`${
+                        hasNext ? "absolute" : "hidden"
+                      } top-0 bottom-20 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      onClick={clickHandler}
+                    >
+                      <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
+                    </div>
+                  );
+                }}
                 selectedItem={index}
                 showArrows={true}
                 showThumbs={false}

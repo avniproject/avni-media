@@ -43,8 +43,8 @@ export const operationalModuleData = async () => {
     const filterResponse = await axios.get(
       `${process.env.NEXT_PUBLIC_OPERATIONAL_MODULE}`
     );
-    const jsonData =  filterResponse.data
-
+    const jsonData = filterResponse.data
+    const forms    = jsonData.formMappings
     const programs = jsonData.programs;
     const encounters = jsonData.encounterTypes;
     const subjects = jsonData.subjectTypes;
@@ -84,11 +84,13 @@ export const operationalModuleData = async () => {
         sortedAddressLevel,
         subjects,
         programs,
-        encounters
+        encounters,
+        forms
     };
 };
 
 export interface imageType {
+    programEnrolment: string;
     signedUrl: string;
     signedThumbnailUrl: string;
     uuid: string;
@@ -97,15 +99,17 @@ export interface imageType {
     encounterTypeName: string;
     programName: string;
     address: string;
-    subjectName: string;
+    subjectFirstName: string;
+    subjectLastName: string
 }
 
 export const getImageName = (image: imageType , minLevelName: string) => {
     const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    return `${image.subjectName ? image.subjectName : ''}
+    return `${image.subjectFirstName ? image.subjectFirstName : ''}
+              ${image.subjectLastName ? '_' + image.subjectLastName: ''}
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
-              ${image.programName ? '_' + image.programName : ''}
+              ${image.programEnrolment ? '_' + image.programEnrolment : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
 }
 

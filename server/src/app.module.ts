@@ -9,6 +9,7 @@ import { S3Service } from './s3/s3.Service';
 import { DownloadJobs } from './entity/media.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { FileUtility } from './utils/file-utility';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ConfigService } from '@nestjs/config';
     MediaViewerService,
     S3Service,
     ConfigService,
+    FileUtility,
   ],
 })
 export class AppModule {}

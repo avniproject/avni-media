@@ -5,7 +5,6 @@ import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
 import Link from "next/link";
 import UserInputModal from "./ImageDescriptionModal";
-import Accounts from "./FilterComponent/Accounts";
 import Concepts from "./FilterComponent/Concepts";
 import Daterange from "./FilterComponent/Daterange";
 import EncounterType from "./FilterComponent/EncounterType";
@@ -14,14 +13,24 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import { redirectIfNotValid, getUserUuidFromToken, operationalModuleData, getImageName, imageType} from '@/utils/helpers'
-
+import {
+  redirectIfNotValid,
+  getUserUuidFromToken,
+  operationalModuleData,
+  getImageName,
+  imageType,
+} from "@/utils/helpers";
+import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
+import DateConceptFilter from "./FilterComponent/DateConceptFilter";
+import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
+import TexConceptFilter from "./FilterComponent/TextConceptFilter";
+import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 
 export default function ImageList() {
-  const [add, setAdd]= useState<any>([])
-  const[address ,setAddress] = useState<any>([])
-  const[secondAddress, setSecondAddress] = useState<any>([])
-  const [selectedParentId,setSelectedParentId] = useState<any>([])
+  const [add, setAdd] = useState<any>([]);
+  const [address, setAddress] = useState<any>([]);
+  const [secondAddress, setSecondAddress] = useState<any>([]);
+  const [selectedParentId, setSelectedParentId] = useState<any>([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [imageList, setImageList] = useState<any>({ page: 0, data: [] });
@@ -33,29 +42,46 @@ export default function ImageList() {
   const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
   const [minLevel, setMinLevel] = useState<number>();
   const [maxLevel, setMaxLevel] = useState<number>();
-  const [minLevelName, setMinLevelName] = useState<string>('');
+  const [minLevelName, setMinLevelName] = useState<string>("");
   const [encounterFilter, setEncounterFilter] = useState<any>([]);
-  const [loction, setLocations] = useState<any>([]);
-  const [otherLocation, setOtherLocation] = useState<any>([]);
+  const [locations, setLocations] = useState<any>([]);
+  const [otherLocation, setOtherLocation] = useState<any[]>([]);
   const [showPerpage, setShowperpage] = useState(10);
-  // filters state
-  const [concepts, setConcept] = useState<any[]>([]);
-  const [date, setDateRange] = useState<any[]|null>([]);
+  const [concepts, setConcept] = useState<any>();
+  const [date, setDateRange] = useState<any[] | null>([]);
   const [encouter, setEncounterType] = useState<any[]>([]);
   const [program, setProgamType] = useState<any[]>([]);
-  const [account, setAcountType] = useState<any[]>([]);
   const [subject, setSubjectType] = useState<any[]>([]);
-  const [dataBody, setDataBody]= useState<any>()
-
+  const [dataBody, setDataBody] = useState<any>();
+  const [conceptdata, setConceptData] = useState<any>([]);
+  const [formsData, setFormsData] = useState<any>([]);
+  const [textConcept, setTextConcept] = useState<any>([])
+  const [codedConcept, setCodedConcept] = useState<any>([])
+  const [noteConcept, setNoteConcept] = useState<any>([])
+  const [toNumericConcept, setToNumericConcept] = useState<any>([])
+  const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
+  const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
+  const [typeId, setTypeId] = useState<any>([])
+  const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
+  const [selectedSubjectUUID, setSelectedSubjectUUID] =  useState<any[]>([]);
+  const [nextPageData, setNextPageData] = useState<any>({ page: 0, data: [] });
+  const [selectedFormSubject, setSelectedFormSubject] = useState<any>([]);
+  const [selectedFormProgram, setSelectedFormProgram] = useState<any>([]);
+  const [showprogram, setShowProgram] = useState<any[]>([])
+  const [showEncounter, setShowEncounter]  = useState<any[]>([]);
+  const [showAllEncounter,setShowAllEncounter] =useState<any[]>([])
+  const[selectedEncounterTypeUUID ,setSelectedEncounterTypeUUID] = useState<any>([])
   useEffect(() => {
+    const userUUID = getUserUuidFromToken();
+    setUserName(userUUID);
     const filterData = async () => {
-      const processedData = await operationalModuleData()
+      const processedData = await operationalModuleData();
 
       setMaxLevel(processedData.maxAddressLevel);
 
       setMinLevel(processedData.minAddressLevel);
 
-      setMinLevelName(processedData.minLevelAddressName)
+      setMinLevelName(processedData.minLevelAddressName);
 
       setMaxtLevelLocation(processedData.maxLevelLocation);
 
@@ -66,15 +92,194 @@ export default function ImageList() {
       setProgramFilter(processedData.programs);
 
       setEncounterFilter(processedData.encounters);
+
+      setFormsData(processedData.forms);
     };
     filterData();
   }, []);
+  
+   const getConceptData=async (formUUID: any, filteredConcept: any[] )=>{
+    const formData = await axios.get(
+      `${process.env.NEXT_PUBLIC_FORMS}${formUUID}`
+    );
+    const forms = formData.data
+    const applicableFormElements = forms.formElementGroups[0]
+    ? forms.formElementGroups[0].applicableFormElements
+    : [];
+      await Promise.all(
+        applicableFormElements.map(
+          async (element: {
+            voided: boolean;
+            concept: { uuid: string; dataType: any };
+          }) => {
+            if (element.voided === false) {
+              const dataType = element.concept.dataType;
+              const isDateType = dataType === "Date";
+              const isDateTimeType = dataType === "DateTime";
+              const isNumericType = dataType === "Numeric";
+              const isCodedType = dataType === "Coded";
+              const isNotesType = dataType === "Notes";
+              const isTextType = dataType === "Text";
+              if (
+                isDateType ||
+                isDateTimeType ||
+                isNumericType ||
+                isCodedType ||
+                isNotesType ||
+                isTextType
+              ) {
+              const exists = filteredConcept.some(
+                (concept: { uuid: string }) =>
+                  concept.uuid === element.concept.uuid
+              );
+              if (!exists) {
+                filteredConcept.push(element.concept)
+              }
+             
+            }
+          }
+        }
+      )
+    ); 
+    return filteredConcept
+   }
+  useEffect(() => {
+    const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
+    const data = async () => {
+      if (selectedProgramUUID.length > 0 && selectedSubjectUUID.length > 0 && selectedEncounterTypeUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  selectedProgramUUID.some(
+                    (uuid) => uuid === element.programUUID
+                  ) &&
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )&&
+                  selectedEncounterTypeUUID.some(
+                    (uuid: any) => uuid === element.encounterTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+              }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+     else if (selectedProgramUUID.length > 0 && selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  selectedProgramUUID.some(
+                    (uuid) => uuid === element.programUUID
+                  ) &&
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+
+                }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+      else if (selectedEncounterTypeUUID.length > 0 && selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  selectedEncounterTypeUUID.some(
+                    (uuid: any) => uuid === element.encounterTypeUUID
+                  ) &&
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+              }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+      else if ( selectedSubjectUUID.length > 0) {
+        const filteredConcepts: any[] = [];
+        await Promise.all(
+          formsData.map(async (element: any) => {
+            if (
+              formTypeArray.includes(element.formType )
+            ) {
+                if (
+                  
+                  selectedSubjectUUID.some(
+                    (uuid) => uuid === element.subjectTypeUUID
+                  )
+                ) {
+                  await getConceptData(element.formUUID, filteredConcepts)
+              }
+            }  
+        }));
+        setConceptData(filteredConcepts);
+      }
+    };
+    data();
+  }, [formsData, selectedProgramUUID, selectedSubjectUUID, selectedEncounterTypeUUID]);
+  
+  useEffect(() => {
+    if (selectedFormSubject) {
+      const formMappingsWithProgramUUID = programFilter.filter((mapping: { uuid: any; }) =>
+        selectedFormSubject.some(
+          (selectedFormSubject: { programUUID: any; }) =>
+            selectedFormSubject.programUUID === mapping.uuid
+        )
+      );
+      setShowProgram(formMappingsWithProgramUUID);
+    } else {
+      setShowProgram([]);
+    }
+  }, [selectedFormSubject, programFilter]);
+
+  useEffect(()=>{
+    const encounters = formsData.filter((form:any) => {
+      return form.programUUID === undefined && form.subjectTypeUUID !== undefined && form.encounterTypeUUID !== undefined;
+    });
+    if(encounters && selectedSubjectUUID){
+      const encounterWithSubject = encounters.filter(
+        (encounters: { subjectTypeUUID: any }) =>
+          selectedSubjectUUID.includes(encounters.subjectTypeUUID)
+      );
+      const encounterUUIDs = encounterWithSubject.map((encounter: { encounterTypeUUID: any; }) => encounter.encounterTypeUUID);
+      const filteredEncounters = encounterFilter.filter((mapping: { uuid: any; }) =>
+      encounterUUIDs.includes(mapping.uuid)
+    );
+    setShowAllEncounter([...filteredEncounters])
+    }
+  },[encounterFilter, selectedSubjectUUID])
 
   useEffect(() => {
-    const userUUID = getUserUuidFromToken()
-    setUserName(userUUID);
-  }, []);
-
+    if (selectedFormProgram) {
+      const formMappingsWithEncounter = encounterFilter.filter((mapping: { uuid: any; }) =>
+      selectedFormProgram.some(
+          (selectedFormProgram: { encounterTypeUUID: any; }) =>
+          selectedFormProgram.encounterTypeUUID === mapping.uuid
+        )
+      );
+      setShowEncounter(formMappingsWithEncounter);
+    } else {
+      setShowEncounter([]);
+    }
+  }, [encounterFilter, selectedFormSubject]);
   useEffect(() => {
     redirectIfNotValid();
     const fetchImages = async () => {
@@ -84,11 +289,18 @@ export default function ImageList() {
         },
       };
 
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}?page=${pagination.page}&size=${showPerpage}`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${showPerpage}`,
+        dataBody,
+        options
+      );
+      const nextPageResponse = await axios.post(
+        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page + 1}&size=${showPerpage}`,
+        dataBody,
         options
       );
       setImageList(response.data);
+      setNextPageData(nextPageResponse.data);
     };
 
     fetchImages();
@@ -103,12 +315,8 @@ export default function ImageList() {
 
   const [checkedImage, setCheckedImage] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<any[]>([]);
-  // checke images function
-  const onSelectImage = (
-    value: string,
-    checked: boolean,
-   
-  ) => {
+
+  const onSelectImage = (value: string, checked: boolean) => {
     if (checked) {
       setCheckedImage((prevCheckedImage) => {
         const updatedCheckedImage = [...prevCheckedImage, value];
@@ -128,13 +336,13 @@ export default function ImageList() {
       const newImages = [...prevImages, ...filteredData];
       return newImages.filter(
         ({ uuid }, index) =>
-          newImages.findIndex((image) => image.uuid === uuid) === index // remove duplicates
-          && checkedImage.includes(uuid) // include only checked images
+          newImages.findIndex((image) => image.uuid === uuid) === index 
+          && checkedImage.includes(uuid) 
       );
     });
   }, [checkedImage, imageList]);
   
-  // pagination function
+
   const pagechange = (size: number, page: number) => {
     setPagination({ size: size, page: page });
   };
@@ -150,7 +358,6 @@ export default function ImageList() {
     );
   };
 
-  //  user input form
   const handleOpenModal = () => {
     setShowModal(true);
   };
@@ -164,10 +371,71 @@ export default function ImageList() {
   };
 
   const concept = (data: any[]) => {
-    setConcept(data);
+    const conceptJson = conceptdata.find((item: { name: any }) => item && item.name === data);
+    setConcept(conceptJson);
   };
 
-  const programType = (data: any[]) => {
+  const conceptDate = (data: any[]|null) => {
+    if(data && data.length>0){
+      setConceptDates([{
+        "conceptUuid":concepts.uuid,
+        "from": data[0],
+        "to": data[1]
+      }])
+    }
+  };
+
+  const conceptDateTime = (data: any[]|null) => {
+    if(data && data.length>0){
+      setDateTimeConcept([{
+        "conceptUuid": concepts.uuid,
+        "from": data[0],
+        "to": data[1]
+      }])
+    }
+  };
+
+  const conceptNumeric = (fromNumber: number, toNumber: number) =>{
+   setToNumericConcept([{
+    "conceptUuid":concepts.uuid,
+    "from": fromNumber,
+    "to": toNumber
+   }])
+  }
+
+  const conceptCoded = (data: any) =>{
+    if(data.length>0){
+      setCodedConcept([{
+        "conceptUuid": concepts.uuid,
+        "values":data
+       }])
+    }
+  }
+
+  const conceptNote = (data: string) =>{
+
+    if(data && data.length>0){
+      setNoteConcept([{
+        "conceptUuid": concepts.uuid,
+        "values":[data]      
+      }])
+    }
+   
+  }
+
+  const conceptText = (data: string) =>{
+
+   if(data && data.length>0){
+    setTextConcept([{
+      "conceptUuid":concepts.uuid ,
+      "values":[data]
+     }])
+   }
+  
+  }
+
+  const programType = (data: any[], programUuid: string[]) => {
+    setSelectedProgramUUId(programUuid);
     setProgamType(data);
   };
 
@@ -177,26 +445,58 @@ export default function ImageList() {
     }
   };
 
-  const encounterType = (data: any[]) => {
+  const encounterType = (data: any[], encounterTypeUUID: any[]) => {
+    setSelectedEncounterTypeUUID(encounterTypeUUID)
     setEncounterType(data);
   };
 
-  const accountType = (data: any[]) => {
-    setAcountType(data);
-  };
+  const getLocation = async (data: any[]) => {
 
-  const getLocation = (data: any[]) => {
-    setLocations(data);
+    if(data.length === 0){
+  
+      setLocations(data);
+    }
+    else{
+      const newLocations = data.map((newLocation) => {
+        const exists = locations.some(
+          (locations: { uuid: string }) => locations.uuid === newLocation.uuid
+        );
+        if(exists === false){
+          return newLocation;
+        }
+      });
+      if (Array.isArray(newLocations) && newLocations.every(loc => loc !== undefined)) {
+        setLocations([...locations, ...newLocations]);
+      } else {
+        setLocations([...locations]);
+      }      
+    }
+   
+   
   };
-
-  const getSelectedLocation=(data: any[])=>{
-   console.log("data",data)
+  
+  const getOtherLocation = (data: any[], level: any) => {
+    const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
+    if (existingLocation) {
+      const newData = data.filter((item) => {
+        return !existingLocation.data.some((existingItem: { uuid: any; }) => existingItem.uuid === item.uuid);
+      });
+  
+      existingLocation.data = [...existingLocation.data, ...newData];
+      setOtherLocation([...otherLocation]);
+    } else {
+      const newLocation = { level, data };
+      setOtherLocation([...otherLocation, newLocation]);
+    } 
+  };
+  
+  const getTypeId = (data: any) => {
+    if (typeId.includes(data)) {
+     setTypeId(typeId.filter((o: any) => o !== typeId));
+    } else {
+      setTypeId([...typeId, data]);
+    }
   }
-
-  const getOtherLocation = (data: any[]) => {
-    setOtherLocation(data);
-  };
-
 
   const getTopLevel = (data: any[],levelname: string) => {
 
@@ -229,23 +529,44 @@ export default function ImageList() {
  
   };
 
-  const subjectType = (data: any[]) => {
+  const subjectType = (data: any[], subjectUuid: string[]) => {
+    setSelectedSubjectUUID(subjectUuid)
     setSubjectType(data);
   };
+  useEffect(() => {
+    if (selectedSubjectUUID.length > 0) {
+      const selectedForms = formsData.filter(
+        (formData: { subjectTypeUUID: any }) =>
+          selectedSubjectUUID.includes(formData.subjectTypeUUID)
+      );
+      setSelectedFormSubject(selectedForms);
+    } else {
+      setSelectedFormSubject(null);
+    }
+    if (selectedProgramUUID.length > 0) {
+      const selectedForms = formsData.filter(
+        (formData: { programUUID: any }) =>
+        selectedProgramUUID.includes(formData.programUUID)
+      );
+      setSelectedFormProgram(selectedForms);
+    } else {
+      setSelectedFormProgram(null);
+    }
+  }, [selectedSubjectUUID, formsData, selectedProgramUUID]);
 
-useEffect(() => {
-
-  if (address.length > 0 || secondAddress.length > 0) {
-    setAdd([...address, ...secondAddress]);
-  }
-  else{
-    setAdd([])
-  }
-}, [address, secondAddress]);
-
+  useEffect(() => {
+    if (secondAddress.length > 0) {
+      setAdd(secondAddress);
+    } else if (address.length > 0) {
+      setAdd(address);
+    } else {
+      setAdd([]);
+    }
+  }, [address, secondAddress]);
+  
  useEffect(()=>{
+  
   const fitersData = async () => {
-
     if (date && date.length > 0) {
       setToDate(date[1]);
       setFromDate(date[0]);
@@ -253,6 +574,29 @@ useEffect(() => {
       setToDate(null);
       setFromDate(null);
     }
+  
+    let conceptfilter = [];
+
+    if (codedConcept && codedConcept.length > 0) {
+      conceptfilter.push(codedConcept[0]);
+    }
+    
+    if (toNumericConcept && toNumericConcept.length > 0) {
+      conceptfilter.push(toNumericConcept[0]);
+    }
+    
+    if (textConcept && textConcept.length > 0) {
+      conceptfilter.push(textConcept[0]);
+    }
+    if (noteConcept && noteConcept.length > 0) {
+      conceptfilter.push(noteConcept[0]);
+    }
+    if(dateTimeConcept && dateTimeConcept.length>0){
+      conceptfilter.push(dateTimeConcept[0])
+    }
+    if(conceptDates && conceptDates.length>0){
+     conceptfilter.push(conceptDates[0])
+    } 
     const body = Object.fromEntries(
       Object.entries({
         subjectTypeNames: subject,
@@ -261,6 +605,7 @@ useEffect(() => {
         fromDate: fromDate,
         toDate: toDate,
         addresses: add,
+        conceptFilters: conceptfilter
       }).filter(([_, value]) => {
         if (Array.isArray(value)) {
           return value.length > 0;
@@ -272,7 +617,7 @@ useEffect(() => {
    setDataBody(body)
   }
   fitersData()
- },[date, subject, encouter, program, toDate, fromDate, add]);
+ },[date, subject, encouter, program, toDate, fromDate, add, codedConcept, toNumericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept]);
 
   const handleApplyFilter = async () => {
     redirectIfNotValid();
@@ -293,6 +638,12 @@ useEffect(() => {
     setShowperpage(value);
   };
 
+  const restFilters = () => {
+
+    location.reload();
+
+  };
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -310,41 +661,35 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="flex justify-center mx-auto w-center mr-4 ml-4">
-        {locationFilter &&
-          locationFilter.map(
-            (
-              locationIndex: {
-                name: string;
-                id: number;
-                level: number;
-              },
-              index: Key
-            ) => (
-              <LocationHierarchy
-                key={index}
-                locationIndex={locationIndex}
-                index={index}
-                selectedParentId={selectedParentId}
-                minLevel={minLevel}
-                maxLevel={maxLevel}
-                getLocation={getLocation}
-                loction={loction}
-                getOtherLocation={getOtherLocation}
-                otherLocation={otherLocation}
-                getTopLevel={getTopLevel}
-                getSecondLevel={getSecondLevel}
-                getSelectedLocation={getSelectedLocation}
-              />
+      <div className="text-center">
+        {locationFilter && (
+            locationFilter.map(
+              (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
+                if (index === 0 || typeId.find(((item: number) => item === locationIndex.id)) ) {
+                  return (
+                    <LocationHierarchy
+                      key={index}
+                      locationIndex={locationIndex}
+                      index={index}
+                      selectedParentId={selectedParentId}
+                      locationFilter ={locationFilter}
+                      minLevel={minLevel}
+                      maxLevel={maxLevel}
+                      getLocation={getLocation}
+                      location={locations}
+                      getOtherLocation={getOtherLocation}
+                      otherLocation={otherLocation}
+                      getTopLevel={getTopLevel}
+                      getSecondLevel={getSecondLevel}
+                      getTypeId = {getTypeId}
+                    />
+                  );
+                }
+                return null;
+              }
             )
-          )}
-        <Daterange dateRange={dateRange} />
-        {encounterFilter && encounterFilter.length > 0 && (
-          <EncounterType
-            encounterType={encounterType}
-            encounterFilter={encounterFilter}
-          />
         )}
+        <Daterange dateRange={dateRange} />
         {subjectFilter && subjectFilter.length > 0 && (
           <SubjectType
             subjectType={subjectType}
@@ -352,12 +697,44 @@ useEffect(() => {
           />
         )}
 
-        {programFilter && programFilter.length > 0 && (
+        {showprogram && showprogram.length > 0 && (
           <Program programType={programType} 
-          programFilter={programFilter} />
+          programFilter={showprogram}
+           />
         )}
-        {/* <Concepts concept={concept} />
-        <Accounts accountType={accountType} /> */}
+
+        {(showAllEncounter.length > 0 || showEncounter.length > 0) &&(
+          <EncounterType
+            encounterType={encounterType}
+            showAllEncounter={ showAllEncounter}
+            showEncounter={showEncounter}
+          />
+        )}
+
+        { selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
+            <Concepts concept={concept} conceptdata={conceptdata} 
+            selectedFormSubject={selectedFormSubject}
+            />
+        }
+        {concepts && concepts.dataType === "Coded" ? (
+          <CodedConceptFilter concepts={concepts.conceptAnswers} 
+          conceptCoded={conceptCoded}
+          />
+        ) : concepts && concepts.dataType === "Date" ? (
+          <DateConceptFilter
+          conceptDate={conceptDate}
+          />
+        ) : concepts && concepts.dataType === "DateTime" ? (
+          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
+        ) : concepts && concepts.dataType === "Text" ? (
+          <TexConceptFilter
+          conceptNote={conceptText} />
+        ) : concepts && concepts.dataType === "Numeric" ? (
+          <NumericConceptFilter conceptNumeric={conceptNumeric} />
+        ) : concepts && concepts.dataType === "Notes" ? (
+          <TexConceptFilter 
+          conceptNote={conceptNote}/>
+        ) : null}
       </div>
 
       <div className="bg-white">
@@ -382,6 +759,10 @@ useEffect(() => {
               name='Available Downloads' onClick={function (): void {}}       
             />
         </Link>
+        <Button
+         onClick={restFilters}  
+         name = "Reset Filters"
+         />
         </div>
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
@@ -427,12 +808,13 @@ useEffect(() => {
             pagination ={pagination}
             checkedImage={checkedImage}
             setCheckedImage={[]}
+            dataBody = {dataBody}
           />
         )}
         <Pagination
           showperpage={showPerpage}
           pagechange={pagechange}
-          total={imageList.total}
+          nextPageData={nextPageData.data}
         />
       </div>
     </>
