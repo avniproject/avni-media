@@ -111,7 +111,7 @@ const ImageCarousel = ({
                     <div
                       className={`${
                         hasPrev ? "absolute" : "hidden"
-                      } top-0 bottom-0 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      } top-0 bottom-20 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                       onClick={clickHandler}
                     >
                       <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
@@ -123,7 +123,7 @@ const ImageCarousel = ({
                     <div
                       className={`${
                         hasNext ? "absolute" : "hidden"
-                      } top-0 bottom-0 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      } top-0 bottom-20 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                       onClick={clickHandler}
                     >
                       <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
@@ -133,7 +133,7 @@ const ImageCarousel = ({
                 selectedItem={index}
                 showArrows={true}
                 showThumbs={false}
-                width={500}
+                width={510}
                 showIndicators={false}
                 dynamicHeight={false}
                 useKeyboardArrows={true}
