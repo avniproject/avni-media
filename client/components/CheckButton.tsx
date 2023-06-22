@@ -1,4 +1,5 @@
 import{DownloadOutlined} from '@ant-design/icons';
+import { parse } from 'url';
 interface prop {
   name: string,
   id: string,
@@ -29,11 +30,14 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
       ],
       { type: "image/*" }
     );
+    const parsedUrl = parse(image_url);
+    const pathname = parsedUrl.pathname;
+    const filename = pathname ? "" + pathname.split("/").pop() : "";
     element.href = URL.createObjectURL(file);
-    element.download = "image.jpg";
+    element.download = filename;
     element.click();
   };
-
+  
   const isChecked = checkedImage.includes(id.toString());
 
   return (
