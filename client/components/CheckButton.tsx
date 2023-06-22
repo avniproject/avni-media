@@ -51,9 +51,9 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
           />
         </div>
         <div className="mr-8">
-          <a href=''   onClick={() => download()} >
-            <DownloadOutlined />
-        </a>
+          <a href='' onClick={() => download()} >
+              <DownloadOutlined />
+          </a>
         </div>
       </div>
       <div className="mt-1 text-sm">
