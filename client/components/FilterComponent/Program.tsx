@@ -22,6 +22,12 @@ export default function Program({ programType, programFilter }: Props) {
     programType(selectedOptions, programUUID);
   }, [programType, selectedOptions, programUUID]);
 
+  useEffect(()=>{
+    const updatedOptionsArray = programFilter
+    .filter(programs => selectedOptions.includes(programs.name))
+    .map(programs => programs.name);
+    setSelectedOptions(updatedOptionsArray)
+  })
 
   function handleOptionClick(option: {
     uuid: Option; name: Option; 
