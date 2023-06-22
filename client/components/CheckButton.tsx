@@ -21,6 +21,19 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
     }
   }
 
+  const download = () => {
+    var element = document.createElement("a");
+    var file = new Blob(
+      [
+        image_url
+      ],
+      { type: "image/*" }
+    );
+    element.href = URL.createObjectURL(file);
+    element.download = "image.jpg";
+    element.click();
+  };
+
   const isChecked = checkedImage.includes(id.toString());
 
   return (
@@ -38,9 +51,9 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
           />
         </div>
         <div className="mr-8">
-          <a href={image_url}>
+          <a href=''   onClick={() => download()} >
             <DownloadOutlined />
-          </a>
+        </a>
         </div>
       </div>
       <div className="mt-1 text-sm">
