@@ -1,4 +1,6 @@
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import { Carousel } from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import { useEffect, useState } from "react";
@@ -104,6 +106,30 @@ const ImageCarousel = ({
             </div>
             <div className="flex  w-full h-full">
               <Carousel
+                renderArrowPrev={(clickHandler, hasPrev) => {
+                  return (
+                    <div
+                      className={`${
+                        hasPrev ? "absolute" : "hidden"
+                      } top-0 bottom-0 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      onClick={clickHandler}
+                    >
+                      <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
+                    </div>
+                  );
+                }}
+                renderArrowNext={(clickHandler, hasNext) => {
+                  return (
+                    <div
+                      className={`${
+                        hasNext ? "absolute" : "hidden"
+                      } top-0 bottom-0 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                      onClick={clickHandler}
+                    >
+                      <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white" />
+                    </div>
+                  );
+                }}
                 selectedItem={index}
                 showArrows={true}
                 showThumbs={false}
