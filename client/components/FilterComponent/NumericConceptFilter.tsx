@@ -17,8 +17,7 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
       parseInt(frominputValue) <= parseInt(toinputValue);
     setIsValidRange(isValid);
     if (isValid) {
-      console.log("formn",frominputValue)
-
+     
       conceptNumeric(parseInt(frominputValue), parseInt(toinputValue));
 
     }
