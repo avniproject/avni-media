@@ -99,54 +99,50 @@ export default function ImageList() {
   }, []);
   
    const getConceptData=async (formUUID: any, filteredConcept: any[] )=>{
-     const formData = await axios.get(
-       `${process.env.NEXT_PUBLIC_FORMS}${formUUID}`
-     );
-     const forms = formData.data;
-     const formElementGroups = forms.formElementGroups;
-     await Promise.all(
-       formElementGroups.map(
-         async (formjson: { applicableFormElements: any }) => {
-           let applicableFormElements = formjson.applicableFormElements;
-           await Promise.all(
-             applicableFormElements.map(
-               async (element: {
-                 voided: boolean;
-                 concept: { uuid: string; dataType: any };
-               }) => {
-                 if (element.voided === false) {
-                   const dataType = element.concept.dataType;
-                   const isDateType = dataType === "Date";
-                   const isDateTimeType = dataType === "DateTime";
-                   const isNumericType = dataType === "Numeric";
-                   const isCodedType = dataType === "Coded";
-                   const isNotesType = dataType === "Notes";
-                   const isTextType = dataType === "Text";
-                    if (
-                        isDateType ||
-                        isDateTimeType ||
-                        isNumericType ||
-                        isCodedType ||
-                        isNotesType ||
-                        isTextType
-                    ) {
-                        const exists = filteredConcept.some(
-                        (concept: { uuid: string }) =>
-                            concept.uuid === element.concept.uuid
-                        );
-                        if (!exists) {
-                        filteredConcept.push(element.concept);
-                        }
-                    }
-                 }
-               }
-             )
-            );
+    const formData = await axios.get(
+      `${process.env.NEXT_PUBLIC_FORMS}${formUUID}`
+    );
+    const forms = formData.data
+    const applicableFormElements = forms.formElementGroups[0]
+    ? forms.formElementGroups[0].applicableFormElements
+    : [];
+      await Promise.all(
+        applicableFormElements.map(
+          async (element: {
+            voided: boolean;
+            concept: { uuid: string; dataType: any };
+          }) => {
+            if (element.voided === false) {
+              const dataType = element.concept.dataType;
+              const isDateType = dataType === "Date";
+              const isDateTimeType = dataType === "DateTime";
+              const isNumericType = dataType === "Numeric";
+              const isCodedType = dataType === "Coded";
+              const isNotesType = dataType === "Notes";
+              const isTextType = dataType === "Text";
+              if (
+                isDateType ||
+                isDateTimeType ||
+                isNumericType ||
+                isCodedType ||
+                isNotesType ||
+                isTextType
+              ) {
+              const exists = filteredConcept.some(
+                (concept: { uuid: string }) =>
+                  concept.uuid === element.concept.uuid
+              );
+              if (!exists) {
+                filteredConcept.push(element.concept)
+              }
+             
+            }
           }
-        )
-     );
-     return filteredConcept;
-    }
+        }
+      )
+    ); 
+    return filteredConcept
+   }
   useEffect(() => {
     const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
     const data = async () => {
