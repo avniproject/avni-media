@@ -141,7 +141,8 @@ export default function ImageList() {
                  }
                }
              )
-           );}
+            );
+          }
         )
      );
      return filteredConcept;
