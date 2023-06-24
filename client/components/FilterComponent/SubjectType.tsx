@@ -22,7 +22,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
 
   useEffect(() => {
     subjectType(selectedOptions, subjectTypeUUID);
-  }, [subjectType, selectedOptions, subjectTypeUUID]);
+  }, [selectedOptions, subjectTypeUUID]);
 
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {
