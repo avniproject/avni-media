@@ -1,6 +1,7 @@
 import {  useEffect, useRef, useState } from "react";
 import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
+import { isEqual } from 'lodash'
 interface Option {
   id: number;
   name: string;
@@ -21,22 +22,25 @@ export default function Program({ programType, programFilter }: Props) {
   useEffect(() => {
     programType(selectedOptions, programUUID);
   }, [ selectedOptions, programUUID]);
+ 
+  useEffect(() => {
+   
+    const updatedOptionsArray = programFilter.filter((programs) =>
+      programUUID.includes(programs.uuid)
+    );
+  
+    const uuidArray = updatedOptionsArray.map((option) => option.uuid);
+    const nameArray = updatedOptionsArray.map((option) => option.name);
+    if (!isEqual(selectedOptions, nameArray)) {
+      setSelectedOptions(nameArray);
+    }
 
-  useEffect(()=>{
-    const updatedOptionsArray = programFilter
-    .filter(programs => selectedOptions.includes(programs.name))
-    .map(programs => programs.name);
-    setSelectedOptions(updatedOptionsArray)
-
-  },[programFilter, selectedOptions])
-  useEffect(()=>{
-    const updatedOptionsArrayUuid = programFilter
-    .filter(programs => programUUID.includes(programs.uuid))
-    .map(programs => programs.uuid);
-    setProgramUUID(updatedOptionsArrayUuid)
-    
-  },[programFilter, programUUID])
-
+    if (!isEqual(programUUID, uuidArray)) {
+      setProgramUUID(uuidArray);
+    }
+   
+  }, [programFilter]);
+  
   function handleOptionClick(option: {
     uuid: Option; name: Option; 
 }) {

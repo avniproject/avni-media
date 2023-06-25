@@ -44,7 +44,7 @@ export default function EncounterType({
     .filter(encounterType => selectedOptions.includes(encounterType.name))
     .map(encounterType => encounterType.name);
     setSelectedOptions(updatedOptionsArray)
-  },[showUniqueEncounter])
+  },[showEncounter, showAllEncounter])
   
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {
@@ -58,6 +58,7 @@ export default function EncounterType({
       setEncounterTypeUUID([...encounterTypeUUID, option.uuid]);
     }
   }
+
   const handleClickOutside = (event: { target: any }) => {
     
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
