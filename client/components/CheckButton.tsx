@@ -1,5 +1,6 @@
 import{DownloadOutlined} from '@ant-design/icons';
 import { parse } from 'url';
+import { saveAs } from 'file-saver'
 interface prop {
   name: string,
   id: string,
@@ -21,23 +22,7 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
       onSelectImageCarousel(value, checked)
     }
   }
-
-  const download = () => {
-    var element = document.createElement("a");
-    var file = new Blob(
-      [
-        image_url
-      ],
-      { type: "image/*" }
-    );
-    const parsedUrl = parse(image_url);
-    const pathname = parsedUrl.pathname;
-    const filename = pathname ? "" + pathname.split("/").pop() : "";
-    element.href = URL.createObjectURL(file);
-    element.download = filename;
-    element.click();
-  };
-  
+ 
   const isChecked = checkedImage.includes(id.toString());
 
   return (
@@ -55,7 +40,7 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
           />
         </div>
         <div className="mr-8">
-          <a href='' onClick={() => download()} >
+          <a href={image_url} target ="_blank" >
               <DownloadOutlined />
           </a>
         </div>
