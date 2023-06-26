@@ -22,7 +22,7 @@ export default function EncounterType({
 }: Prop) {
   
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
-  const [encounterTypeUUID, setEncounterTypeUUID]         = useState<any[]>([])
+  const [encounterTypeUUID, setEncounterTypeUUID] = useState<any[]>([])
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
   
@@ -38,6 +38,13 @@ export default function EncounterType({
   useEffect(() => {
     encounterType(selectedOptions, encounterTypeUUID);
   }, [encounterTypeUUID, selectedOptions]);
+
+  useEffect(()=>{
+    const updatedOptionsArray = showUniqueEncounter
+    .filter(encounterType => selectedOptions.includes(encounterType.name))
+    .map(encounterType => encounterType.name);
+    setSelectedOptions(updatedOptionsArray)
+  },[showEncounter, showAllEncounter])
   
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {
@@ -51,6 +58,7 @@ export default function EncounterType({
       setEncounterTypeUUID([...encounterTypeUUID, option.uuid]);
     }
   }
+
   const handleClickOutside = (event: { target: any }) => {
     
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

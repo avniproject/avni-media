@@ -16,8 +16,8 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
       toinputValue === "" ||
       parseInt(frominputValue) <= parseInt(toinputValue);
     setIsValidRange(isValid);
-    if (frominputValue < toinputValue) {
-
+    if (isValid) {
+     
       conceptNumeric(parseInt(frominputValue), parseInt(toinputValue));
 
     }
