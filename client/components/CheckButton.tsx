@@ -1,6 +1,4 @@
 import{DownloadOutlined} from '@ant-design/icons';
-import { parse } from 'url';
-import { saveAs } from 'file-saver'
 interface prop {
   name: string,
   id: string,
