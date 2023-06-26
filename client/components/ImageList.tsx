@@ -772,7 +772,7 @@ export default function ImageList() {
           <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
             {imageList.data.map(
               (image: imageType) => (
-                <div key={image.uuid}>
+                <div key={image.id}>
                   <div className="relative">
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
                       <button>
