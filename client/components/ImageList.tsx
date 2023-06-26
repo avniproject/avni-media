@@ -1,5 +1,5 @@
 import CheckButton from "./CheckButton";
-import { useState, useEffect, Key } from "react";
+import { useState, useEffect, Key, useId} from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -773,6 +773,7 @@ export default function ImageList() {
             {imageList.data.map(
               (image: imageType) => (
                 <div key={image.id}>
+                <div key={useId()}>
                   <div className="relative">
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
                       <button>
