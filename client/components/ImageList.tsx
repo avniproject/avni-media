@@ -720,22 +720,22 @@ export default function ImageList() {
             selectedFormSubject={selectedFormSubject}
             />
         }
-        {concepts && concepts.dataType === "Coded" ? (
+        {  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Coded" ? (
           <CodedConceptFilter concepts={concepts.conceptAnswers} 
           conceptCoded={conceptCoded}
           />
-        ) : concepts && concepts.dataType === "Date" ? (
+        ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Date" ? (
           <DateConceptFilter
           conceptDate={conceptDate}
           />
-        ) : concepts && concepts.dataType === "DateTime" ? (
+        ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "DateTime" ? (
           <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
-        ) : concepts && concepts.dataType === "Text" ? (
+        ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
           conceptNote={conceptText} />
-        ) : concepts && concepts.dataType === "Numeric" ? (
+        ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
           <NumericConceptFilter conceptNumeric={conceptNumeric} />
-        ) : concepts && concepts.dataType === "Notes" ? (
+        ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Notes" ? (
           <TexConceptFilter 
           conceptNote={conceptNote}/>
         ) : null}
