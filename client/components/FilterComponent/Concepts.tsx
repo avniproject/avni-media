@@ -42,7 +42,7 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
       </div>
 
       <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-        <div className="py-1">
+        <div className="py-1 w-full">
         {conceptdata && conceptdata.map((option) => (
             option !== undefined && (
               <Menu.Item key={option.id}>
@@ -50,7 +50,7 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
                   <button
                     className={classNames(
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "text-start  ml-2 py-4 text-sm"
+                      " flex text-start px-4 py-4 text-sm"
                     )}
                     onClick={() => handleOptionClick(option.name)}
                   >
