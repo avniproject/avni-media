@@ -50,7 +50,7 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
                   <button
                     className={classNames(
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "flex justify-between w-full px-4 py-2 text-sm"
+                      "text-start  ml-2 py-4 text-sm"
                     )}
                     onClick={() => handleOptionClick(option.name)}
                   >
