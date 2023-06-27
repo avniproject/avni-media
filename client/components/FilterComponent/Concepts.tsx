@@ -16,13 +16,20 @@ function classNames(...classes: string[]) {
 
 export default function Concepts({ concept, conceptdata, selectedFormSubject }: Prop) {
 
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   
   useEffect(() => {
 
     concept(selectedOptions);
 
   }, [selectedOptions]);
+
+  useEffect(() => {
+    const isNameExists = conceptdata.some((item) => selectedOptions.includes(item.name));
+    if(!isNameExists ){
+      setSelectedOptions([])
+    }
+  }, [conceptdata, selectedFormSubject]);
 
   function handleOptionClick(option: any) {
 
