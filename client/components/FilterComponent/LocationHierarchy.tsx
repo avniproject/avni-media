@@ -2,6 +2,7 @@ import { Key, useEffect, useRef, useState } from "react";
 import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import axios from "axios";
+import { isEqual } from 'lodash'
 
 interface Option {
   uuid: any;
@@ -20,8 +21,8 @@ interface Prop {
   minLevel: number | undefined;
   maxLevel: number | undefined;
   selectedParentId: any[];
-  getLocation: (data: any[]) => void;
-  getOtherLocation: (data: any[], level: any) => void;
+  getLocation: (data: any[], selectedOption: any[]) => void;
+  getOtherLocation: (data: any[], level: any, selectedParent: any[]) => void;
   getTopLevel: (data: any[], levelname: string) => void;
   getSecondLevel: (data: any[], levelType: string) => void;
   getTypeId: (data: any) => void;
@@ -78,10 +79,35 @@ export default function LocationHierarchy({
   }, [optionSelected, selectedOptions, selectedOption, selectLevelName]);
 
   useEffect(() => {
-    if (selectedOption.length === 0) {
-      setSelectedOptions([]);
+        const newLocation = location.filter((items:any)=>selectedOptions.includes(items.id))
+        const uuidArray = newLocation.map((option) => option.id);
+        if (!isEqual(selectedOptions, uuidArray)) {
+          setSelectedOptions(uuidArray);
+        }
+  }, [location]);
+
+  useEffect(()=>{
+    if( maxLevel && locationIndex.level < maxLevel-1){
+    const extractedData = otherLocation.reduce((result, locations) => {
+      const filteredData = locations.data.filter((item: {id : any; }) =>
+        selectedOptions.includes(item.id)
+      );
+      if (filteredData.length > 0) {
+        result.push({
+          data: filteredData,
+          level: locations.level,
+        });
+      }
+      return result;
+    }, []);
+   
+    const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
+
+    if (!isEqual(selectedOptions, updatedSelectedOptions)) {
+      setSelectedOptions(updatedSelectedOptions);
     }
-  }, [selectedOption]);
+   }
+},[otherLocation])
 
   useEffect(() => {
     const typeIdData = async () => {
@@ -109,7 +135,7 @@ export default function LocationHierarchy({
             const distJsonData = response.data;
             const distData = distJsonData.content;
             getTypeId(distJsonData.content[0].typeId);
-            getLocation(distData);
+            getLocation(distData, selectedOption);
             })
           } catch (Error) {
             console.error(
@@ -117,7 +143,7 @@ export default function LocationHierarchy({
             );
           }
         } else {
-          getLocation([]);
+          getLocation([],[]);
         }
       } else {
         if (
@@ -137,7 +163,7 @@ export default function LocationHierarchy({
                   const distDatas = distJsonDatas.content;
                   getTypeId(distJsonDatas.content[0].typeId);
                   const level = distJsonDatas.content[0].level;
-                  getOtherLocation(distDatas, level);
+                  getOtherLocation(distDatas, level, selectedOptions);
                 })
             }
           } catch (Error) {
