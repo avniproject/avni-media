@@ -17,6 +17,7 @@ function classNames(...classes: string[]) {
 export default function Concepts({ concept, conceptdata, selectedFormSubject }: Prop) {
 
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   
   useEffect(() => {
 
@@ -36,7 +37,14 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
     setSelectedOptions(option);
 
   }
+  function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchTerm(event.target.value);
+  }
 
+  const filteredConcepts = conceptdata.filter((option) =>
+    option.name.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
+  );
+  
   return (
     <Menu as="div" className="menu">
       <div>
@@ -50,8 +58,17 @@ export default function Concepts({ concept, conceptdata, selectedFormSubject }: 
 
       <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div className="py-1 w-full">
-        {conceptdata && conceptdata.map((option) => (
-            option !== undefined && (
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full px-4 py-2 text-sm border-gray-300 focus:ring-teal-500 focus:border-teal-500"
+            placeholder="Search..."
+          />
+          {filteredConcepts.length === 0 ? (
+            <div className="p-4 text-gray-500">No concepts found.</div>
+          ) : (
+            filteredConcepts.map((option) => (
               <Menu.Item key={option.id}>
                 {({ active }) => (
                   <button
