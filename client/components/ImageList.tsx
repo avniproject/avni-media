@@ -27,6 +27,10 @@ import TexConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 
 export default function ImageList() {
+  const [parentid, setParentId] =useState<any[]>([])
+  const [otherLevelParent, setOtherLevelParent] = useState<any>({selectedParentId: [] ,level:0 })
+  const [otherLocationPassData, setOtherLocationPassData] = useState<any[]>([])
+  const [distloc, setDistloc] =useState<any[]>([])
   const [add, setAdd] = useState<any>([]);
   const [address, setAddress] = useState<any>([]);
   const [secondAddress, setSecondAddress] = useState<any>([]);
@@ -453,9 +457,16 @@ export default function ImageList() {
     setSelectedEncounterTypeUUID(encounterTypeUUID)
     setEncounterType(data);
   };
+  
+  useEffect(()=>{
+   
+    const filteredLoc = locations.filter((locationItem: { parentId: any; })=>parentid.includes(locationItem.parentId))
+    setDistloc(filteredLoc)
+  },[parentid])
 
-  const getLocation = async (data: any[]) => {
-
+  const getLocation = async (data: any[],parentsIdArray: any[]) => {
+  
+    setParentId(parentsIdArray)
     if(data.length === 0){
   
       setLocations(data);
@@ -475,11 +486,28 @@ export default function ImageList() {
         setLocations([...locations]);
       }      
     }
-   
-   
   };
   
-  const getOtherLocation = (data: any[], level: any) => {
+  useEffect(()=>{
+    const updateData = (parentId: any[], level: any) => {
+        return otherLocation.map((obj) => {
+          const updatedData = obj.data.map((item: { parentId: any; level: any; }) => {
+            if (parentId.includes(item.parentId) && item.level === level) {
+              return { ...item, level };
+            } 
+          }).filter((item: undefined) => item !== undefined);
+      
+          return { ...obj, data: updatedData };
+        });
+      };
+      
+      const updatedArray = updateData(otherLevelParent.selectedParentId, otherLevelParent.level);
+      setOtherLocationPassData(updatedArray);
+      
+  },[otherLevelParent])
+  
+  const getOtherLocation = (data: any[], level: any, selectedParentId: any[]) => {
+    setOtherLevelParent({selectedParentId,level})
     const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
     if (existingLocation) {
       const newData = data.filter((item) => {
@@ -680,9 +708,9 @@ export default function ImageList() {
                       minLevel={minLevel}
                       maxLevel={maxLevel}
                       getLocation={getLocation}
-                      location={locations}
+                      location={distloc}
                       getOtherLocation={getOtherLocation}
-                      otherLocation={otherLocation}
+                      otherLocation={otherLocationPassData}
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
                       getTypeId = {getTypeId}
