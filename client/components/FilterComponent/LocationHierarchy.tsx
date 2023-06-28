@@ -22,7 +22,8 @@ interface Prop {
   maxLevel: number | undefined;
   selectedParentId: any[];
   getLocation: (data: any[], selectedOption: any[]) => void;
-  getOtherLocation: (data: any[], level: any, selectedParent: any[]) => void;
+  getDiffArray: (diffArray: any[])=>void;
+  getOtherLocation: (data: any[], level: any) => void;
   getTopLevel: (data: any[], levelname: string) => void;
   getSecondLevel: (data: any[], levelType: string) => void;
   getTypeId: (data: any) => void;
@@ -48,6 +49,7 @@ export default function LocationHierarchy({
   index,
   getTypeId,
   locationFilter,
+  getDiffArray
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [optionSelected, setOptionSelected] = useState<any>();
@@ -57,6 +59,7 @@ export default function LocationHierarchy({
   const dropdownRef = useRef<any>(null);
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<any[]>([]);
+  const [preserverSelectedOption, setPreseveSelectedOption] = useState<any[]>([]);
 
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);
@@ -86,11 +89,31 @@ export default function LocationHierarchy({
         }
   }, [location]);
   
-  useEffect(() => {
+  useEffect(()=>{
     if (selectedOption.length === 0) {
       setSelectedOptions([]);
     }
-  }, [selectedOption]);
+    if( maxLevel && locationIndex.level < maxLevel-1){
+    const extractedData = otherLocation.reduce((result, locations) => {
+      const filteredData = locations.data.filter((item: {id : any; }) =>
+        selectedOptions.includes(item.id)
+      );
+      if (filteredData.length > 0) {
+        result.push({
+          data: filteredData,
+          level: locations.level,
+        });
+      }
+      return result;
+    }, []);
+   
+    const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
+
+    if (!isEqual(selectedOptions, updatedSelectedOptions)) {
+      setSelectedOptions(updatedSelectedOptions);
+    }
+   }
+},[otherLocation])
 
   useEffect(() => {
     const typeIdData = async () => {
@@ -146,7 +169,11 @@ export default function LocationHierarchy({
                   const distDatas = distJsonDatas.content;
                   getTypeId(distJsonDatas.content[0].typeId);
                   const level = distJsonDatas.content[0].level;
-                  getOtherLocation(distDatas, level, selectedOptions);
+                  getOtherLocation(distDatas, level);
+                  if(!isEqual(preserverSelectedOption,selectedOptions)){
+                    const diffArray = preserverSelectedOption.filter((item)=> !selectedOptions.includes(item))
+                    getDiffArray(diffArray)
+                  }
                 })
             }
           } catch (Error) {
@@ -158,6 +185,7 @@ export default function LocationHierarchy({
       }
     };
     typeIdData();
+    setPreseveSelectedOption(selectedOptions)
   }, [selectedOptions, selectedOption, locationIndex, maxLevel, minLevel]);
   function handleOptionClick(option: Option) {
     setSecondTypeName(option);
