@@ -85,29 +85,12 @@ export default function LocationHierarchy({
           setSelectedOptions(uuidArray);
         }
   }, [location]);
-
-  useEffect(()=>{
-    if( maxLevel && locationIndex.level < maxLevel-1){
-    const extractedData = otherLocation.reduce((result, locations) => {
-      const filteredData = locations.data.filter((item: {id : any; }) =>
-        selectedOptions.includes(item.id)
-      );
-      if (filteredData.length > 0) {
-        result.push({
-          data: filteredData,
-          level: locations.level,
-        });
-      }
-      return result;
-    }, []);
-   
-    const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
-
-    if (!isEqual(selectedOptions, updatedSelectedOptions)) {
-      setSelectedOptions(updatedSelectedOptions);
+  
+  useEffect(() => {
+    if (selectedOption.length === 0) {
+      setSelectedOptions([]);
     }
-   }
-},[otherLocation])
+  }, [selectedOption]);
 
   useEffect(() => {
     const typeIdData = async () => {

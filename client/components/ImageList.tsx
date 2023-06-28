@@ -488,23 +488,6 @@ export default function ImageList() {
     }
   };
   
-  useEffect(()=>{
-    const updateData = (parentId: any[], level: any) => {
-        return otherLocation.map((obj) => {
-          const updatedData = obj.data.map((item: { parentId: any; level: any; }) => {
-            if (parentId.includes(item.parentId) && item.level === level) {
-              return { ...item, level };
-            } 
-          }).filter((item: undefined) => item !== undefined);
-      
-          return { ...obj, data: updatedData };
-        });
-      };
-      
-      const updatedArray = updateData(otherLevelParent.selectedParentId, otherLevelParent.level);
-      setOtherLocationPassData(updatedArray);
-      
-  },[otherLevelParent])
   
   const getOtherLocation = (data: any[], level: any, selectedParentId: any[]) => {
     setOtherLevelParent({selectedParentId,level})
@@ -710,7 +693,7 @@ export default function ImageList() {
                       getLocation={getLocation}
                       location={distloc}
                       getOtherLocation={getOtherLocation}
-                      otherLocation={otherLocationPassData}
+                      otherLocation={otherLocation}
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
                       getTypeId = {getTypeId}
