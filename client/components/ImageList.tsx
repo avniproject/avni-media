@@ -488,9 +488,22 @@ export default function ImageList() {
     }
   };
   
-  
-  const getOtherLocation = (data: any[], level: any, selectedParentId: any[]) => {
-    setOtherLevelParent({selectedParentId,level})
+  const getDiffArray = (diffArray:any[])=>{
+    const filteredData = otherLocation.map((loc) => {
+      return {
+        ...loc,
+        data: loc.data.filter((item: { parentId: any; level: any; }) => {
+          if (item.parentId && loc.level && item.level) {
+            return !diffArray.includes(item.parentId) && loc.level === item.level;
+          }
+          return false;
+        }),
+      };
+    });
+   setOtherLocation(filteredData)
+  }
+
+  const getOtherLocation = (data: any[], level: any) => {
     const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
     if (existingLocation) {
       const newData = data.filter((item) => {
@@ -697,6 +710,7 @@ export default function ImageList() {
                       getTopLevel={getTopLevel}
                       getSecondLevel={getSecondLevel}
                       getTypeId = {getTypeId}
+                      getDiffArray = {getDiffArray}
                     />
                   );
                 }
