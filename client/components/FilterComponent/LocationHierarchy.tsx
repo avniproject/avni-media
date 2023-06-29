@@ -168,11 +168,11 @@ export default function LocationHierarchy({
                   getTypeId(distJsonDatas.content[0].typeId);
                   const level = distJsonDatas.content[0].level;
                   getOtherLocation(distDatas, level);
-                  if(!isEqual(preserverSelectedOption,selectedOptions)){
-                    const diffArray = preserverSelectedOption.filter((item)=> !selectedOptions.includes(item))
-                    getDiffArray(diffArray)
-                  }
-                })
+              })
+            }
+            if(!isEqual(preserverSelectedOption,selectedOptions)){
+              const diffArray = preserverSelectedOption.filter((item)=> !selectedOptions.includes(item))
+              getDiffArray(diffArray)
             }
           } catch (Error) {
             console.error(
