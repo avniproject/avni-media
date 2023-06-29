@@ -489,6 +489,7 @@ export default function ImageList() {
   };
   
   const getDiffArray = (diffArray:any[])=>{
+   if(diffArray.length > 0){
     const filteredData = otherLocation.map((loc) => {
       return {
         ...loc,
@@ -501,6 +502,7 @@ export default function ImageList() {
       };
     });
    setOtherLocation(filteredData)
+   }
   }
 
   const getOtherLocation = (data: any[], level: any) => {
