@@ -90,9 +90,7 @@ export default function LocationHierarchy({
   }, [location]);
   
   useEffect(()=>{
-    if (selectedOption.length === 0) {
-      setSelectedOptions([]);
-    }
+    
     if( maxLevel && locationIndex.level < maxLevel-1){
     const extractedData = otherLocation.reduce((result, locations) => {
       const filteredData = locations.data.filter((item: {id : any; }) =>
