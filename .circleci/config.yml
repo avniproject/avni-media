@@ -28,31 +28,6 @@ commands:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-      - run: |
-          cd ~/avni-media/client
-          make build-app-<< parameters.env >>
-          cd ~/avni-media
-          make zip-app-client-<< parameters.env >>
-
-      - run: |
-          cd ~/avni-media/server
-          make build-app-<< parameters.env >>
-          cd ~/avni-media
-          make zip-app-server-<< parameters.env >>
-
-      - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
-      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
-
-      - persist_to_workspace:
-          root: ~/artifacts
-          paths:
-            - avni-media-client-<< parameters.env >>.tgz
-            - avni-media-server-<< parameters.env >>.tgz
-            - install.sh
-
-      - store_artifacts:
-          path: ~/artifacts
-
       - run:
           name: Copy artifacts to server
           command: |
@@ -114,6 +89,18 @@ jobs:
             - ./client/node_modules
             - ./client/.next/cache/
 
+      - run: |
+          cd ~/avni-media/client
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-client-prod
+
+      - run: |
+          cd ~/avni-media/client
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-client-staging
+
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
 
@@ -125,6 +112,33 @@ jobs:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
           paths:
             - ./server/node_modules
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-prod
+          cd ~/avni-media
+          make zip-app-server-prod
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-staging
+          cd ~/avni-media
+          make zip-app-server-staging
+
+      - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
+      - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
+
+      - persist_to_workspace:
+          root: ~/artifacts
+          paths:
+            - avni-media-client-staging.tgz
+            - avni-media-server-staging.tgz
+            - avni-media-client-prod.tgz
+            - avni-media-server-prod.tgz
+            - install.sh
+
+      - store_artifacts:
+          path: ~/artifacts
 
   STAGING_deploy:
     docker:
