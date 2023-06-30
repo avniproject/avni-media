@@ -149,6 +149,15 @@ jobs:
           hostname: "int-staging.avniproject.org"
           env: "staging"
 
+  PRERELEASE_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - deploy:
+          hostname: "int-prerelease.avniproject.org"
+          env: "prerelease"
+
   PRODUCTION_deploy:
     docker:
       - image: cimg/node:19.8.1
@@ -171,6 +180,14 @@ workflows:
           context: non-prod-deploy
           requires:
             - STAGING_approve
+      - PRERELEASE_approve:
+          type: approval
+          requires:
+            - build
+      - PRERELEASE_deploy:
+          context: non-prod-deploy
+          requires:
+            - PRERELEASE_approve
       - PRODUCTION_approve:
           type: approval
           requires:
