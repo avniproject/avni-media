@@ -9,7 +9,7 @@ fi
 
 id ${USERID}
 if [ $? -eq 1 ]; then
-    useradd -g avni-media-user avni-media-user
+    useradd -m -g avni-media-user avni-media-user
     useradd -g avni-media-user ubuntu
     usermod -aG wheel avni-media-user
     echo "avni-media-user ALL = (ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
