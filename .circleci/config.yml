@@ -11,8 +11,7 @@ commands:
         type: string
         default: "staging"
     steps:
-      - attach_workspace:
-          at: ~/artifacts
+      - checkout
 
       - run: sudo apt-get install make openssl
 
