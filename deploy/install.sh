@@ -9,7 +9,7 @@ fi
 
 id ${USERID}
 if [ $? -eq 1 ]; then
-    useradd -m -g avni-media-user avni-media-user
+    useradd -m --shell /bin/bash -g avni-media-user avni-media-user
     useradd -g avni-media-user ubuntu
     usermod -aG wheel avni-media-user
     echo "avni-media-user ALL = (ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
@@ -25,11 +25,11 @@ rm -rf ~/avni-media
 EOF
 
 #Apply client and server artifacts
-sudo -H -u avni-media-user bash << EOF
+sudo su -u avni-media-user << EOF
 mkdir -p ~/avni-media/client
 mkdir -p ~/avni-media/server
-tar -zxvf /tmp/avni-media-client.tgz --directory ~/avni-media/client
-tar -zxvf /tmp/avni-media-server.tgz --directory ~/avni-media/server
+tar -zxf /tmp/avni-media-client.tgz --directory ~/avni-media/client
+tar -zxf /tmp/avni-media-server.tgz --directory ~/avni-media/server
 EOF
 
 #Run server
