@@ -25,3 +25,6 @@ build-app-prod:
 
 build-app-staging:
 	make _build-app template=staging.template
+
+build-app-prerelease:
+	make _build-app template=prerelease.template
