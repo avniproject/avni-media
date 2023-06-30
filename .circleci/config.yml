@@ -37,13 +37,6 @@ commands:
 
       # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
       - run:
-          name: Install nvm
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-            EOF
-
-      - run:
           name: Install node, nest and pm2
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
