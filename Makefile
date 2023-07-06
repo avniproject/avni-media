@@ -16,8 +16,14 @@ zip-app-client-prod:
 zip-app-client-staging:
 	make _zip-app-client env=staging
 
+zip-app-client-prerelease:
+	make _zip-app-client env=prerelease
+
 zip-app-server-prod:
 	make _zip-app-server env=prod
 
 zip-app-server-staging:
 	make _zip-app-server env=staging
+
+zip-app-server-prerelease:
+	make _zip-app-server env=prerelease

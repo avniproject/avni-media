@@ -90,6 +90,7 @@ export const operationalModuleData = async () => {
 };
 
 export interface imageType {
+    programEnrolment: string;
     signedUrl: string;
     signedThumbnailUrl: string;
     uuid: string;
@@ -108,7 +109,7 @@ export const getImageName = (image: imageType , minLevelName: string) => {
               ${image.subjectLastName ? '_' + image.subjectLastName: ''}
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
-              ${image.programName ? '_' + image.programName : ''}
+              ${image.programEnrolment ? '_' + image.programEnrolment : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
 }
 

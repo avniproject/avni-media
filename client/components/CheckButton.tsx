@@ -20,7 +20,7 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
       onSelectImageCarousel(value, checked)
     }
   }
-
+ 
   const isChecked = checkedImage.includes(id.toString());
 
   return (
@@ -38,8 +38,8 @@ export default function CheckButton({ name, id, onSelectImage, checkedImage, onS
           />
         </div>
         <div className="mr-8">
-          <a href={image_url}>
-            <DownloadOutlined />
+          <a href={image_url} target ="_blank" >
+              <DownloadOutlined />
           </a>
         </div>
       </div>

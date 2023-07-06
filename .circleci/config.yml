@@ -84,6 +84,12 @@ jobs:
           cd ~/avni-media
           make zip-app-client-staging
 
+      - run: |
+          cd ~/avni-media/client
+          make build-app-prerelease
+          cd ~/avni-media
+          make zip-app-client-prerelease
+
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
 
@@ -108,6 +114,12 @@ jobs:
           cd ~/avni-media
           make zip-app-server-staging
 
+      - run: |
+          cd ~/avni-media/server
+          make build-app-prerelease
+          cd ~/avni-media
+          make zip-app-server-prerelease
+
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
       - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
 
@@ -118,6 +130,8 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
+            - avni-media-client-prerelease.tgz
+            - avni-media-server-prerelease.tgz
             - install.sh
 
       - store_artifacts:
@@ -131,6 +145,15 @@ jobs:
       - deploy:
           hostname: "int-staging.avniproject.org"
           env: "staging"
+
+  PRERELEASE_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - deploy:
+          hostname: "int-prerelease.avniproject.org"
+          env: "prerelease"
 
   PRODUCTION_deploy:
     docker:
@@ -154,6 +177,14 @@ workflows:
           context: non-prod-deploy
           requires:
             - STAGING_approve
+      - PRERELEASE_approve:
+          type: approval
+          requires:
+            - build
+      - PRERELEASE_deploy:
+          context: non-prod-deploy
+          requires:
+            - PRERELEASE_approve
       - PRODUCTION_approve:
           type: approval
           requires:

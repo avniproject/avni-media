@@ -32,14 +32,12 @@ const TimeStampConceptFilter = ({ conceptDateTime }: Props) => {
           format={dateFormat}
           onChange={(dateValue) => {
             if (dateValue) {
-              // check if dateValue is not null
               setDate(
                 dateValue.map((selectedDte) => {
                   return dayjs(selectedDte).format("YYYY-MM-DD HH:mm:ss");
                 })
               );
             } else {
-              // handle null case
               setDate(null);
             }
           }}

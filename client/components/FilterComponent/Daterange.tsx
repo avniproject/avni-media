@@ -10,6 +10,7 @@ dayjs.extend(customParseFormat);
 const dateFormat = "DD/MM/YYYY";
 interface Props {
   dateRange: (data: any[] | null) => void;
+  
 }
 
 const DateRangeComp = ({ dateRange }: Props) => {
