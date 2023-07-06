@@ -22,12 +22,6 @@ commands:
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install python3-pip
 
-      - run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
       - run:
           name: Copy artifacts to server
           command: |
@@ -36,16 +30,6 @@ commands:
             scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
 
       # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
-      - run:
-          name: Install node, nest and pm2
-          command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> \<< EOF
-            nvm install 19.8.1
-            nvm use v19.8.1
-            npm i -g @nestjs/cli
-            npm install pm2@latest -g
-            EOF
-
       - run:
           name: Deploy client and server
           command: |
