@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e -x
 
 USERID=avni-media-user
 GROUPID=avni-media-user
