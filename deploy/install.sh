@@ -9,27 +9,11 @@ fi
 
 id ${USERID}
 if [ $? -eq 1 ]; then
-    useradd -m --shell /bin/bash -g avni-media-user avni-media-user
+    useradd -g avni-media-user avni-media-user
     useradd -g avni-media-user ubuntu
     usermod -aG wheel avni-media-user
     echo "avni-media-user ALL = (ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
 fi
-
-#Install nvm
-sudo su - avni-media-user << EOF
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-EOF
-
-#Install node, nest, pm2
-sudo su - avni-media-user << EOF
-nvm install 19.8.1
-nvm use v19.8.1
-npm i -g @nestjs/cli
-npm install pm2@latest -g
-EOF
 
 #Stop and delete client and server
 sudo su - avni-media-user << EOF
@@ -41,11 +25,11 @@ rm -rf ~/avni-media
 EOF
 
 #Apply client and server artifacts
-sudo su -u avni-media-user << EOF
+sudo -H -u avni-media-user bash << EOF
 mkdir -p ~/avni-media/client
 mkdir -p ~/avni-media/server
-tar -zxf /tmp/avni-media-client.tgz --directory ~/avni-media/client
-tar -zxf /tmp/avni-media-server.tgz --directory ~/avni-media/server
+tar -zxvf /tmp/avni-media-client.tgz --directory ~/avni-media/client
+tar -zxvf /tmp/avni-media-server.tgz --directory ~/avni-media/server
 EOF
 
 #Run server
