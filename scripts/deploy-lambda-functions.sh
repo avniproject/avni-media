@@ -10,34 +10,33 @@ then
   exit 1
 fi
 
+if [ -z "$1" ]; then
+  ENV="staging"
+else
+  ENV=$1
+fi
+
+echo "Deploying thumbnail lambdas for ${ENV}"
+
+BUCKET_NAME="${ENV}-user-media"
+CODE_DEPLOY_BUCKET_NAME="avni-lambdas"
+
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 AVNI_MEDIA_AWS_REGION="ap-south-1"
-ROLE_NAME="lambda-execution-role"
+ROLE_NAME="${ENV}-thumbnail-lambda-execution-role"
 ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
 
-FUNCTION_NAME="generate-thumbnails-instantly"
-FUNCTION_NAME_BULK="generate-thumbnails-bulk"
+FUNCTION_NAME="${ENV}-generate-thumbnails-instantly"
+FUNCTION_NAME_BULK="${ENV}-generate-thumbnails-bulk"
 FUNCTION_ARN="arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}"
 HANDLER="index.handler"
 MEMORY_SIZE="128"
 TIMEOUT="10"
 TIMEOUT_BULK="300"
-STATEMENT_ID="lambda-for-thumbnails"
+STATEMENT_ID="${ENV}-lambda-for-thumbnails"
 
-if [ -z "$1" ]; then
-  BUCKET_NAME="staging-user-media"
-else
-  BUCKET_NAME=$1
-fi
-
-if [ -z "$2" ]; then
-  CODE_DEPLOY_BUCKET_NAME="avni-staging-lambda"
-else
-  CODE_DEPLOY_BUCKET_NAME=$2
-fi
-
-S3_KEY="generate-thumbnails.zip"
-S3_KEY_BULK="generate-thumbnails-bulk.zip"
+S3_KEY="${ENV}-generate-thumbnails.zip"
+S3_KEY_BULK="${ENV}-generate-thumbnails-bulk.zip"
 
 role_status=""
 
@@ -65,16 +64,38 @@ else
   aws iam create-role \
     --role-name "${ROLE_NAME}" \
     --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Sid": "","Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}' || { echo "Failed to create an IAM role for the Lambda function"; exit 1; }
+  sleep 15
+  echo "Role creation process complete, proceeding with next step"
 fi
 
-sleep 15
+BUCKET_ACCESS_POLICY_NAME="${ENV}-thumbnail-lambda-s3-access"
+BUCKET_ACCESS_POLICY_DOCUMENT=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllObjectActions",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": ["arn:aws:s3:::${BUCKET_NAME}/*"]
+        }
+    ]
+}
+EOF
 
-echo "Role creation process complete, proceeding with next step"
+)
+
+if aws iam get-policy --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${BUCKET_ACCESS_POLICY_NAME}" >/dev/null 2>&1; then
+  echo "Policy ${BUCKET_ACCESS_POLICY_NAME} already exists."
+else
+  echo "Creating Policy ${BUCKET_ACCESS_POLICY_NAME}"
+  aws iam create-policy --policy-name ${BUCKET_ACCESS_POLICY_NAME} --policy-document "${BUCKET_ACCESS_POLICY_DOCUMENT}"
+fi
 
 echo "Attaching a policy to the role that allows access to S3"
 aws iam attach-role-policy \
   --role-name "${ROLE_NAME}" \
-  --policy-arn "arn:aws:iam::aws:policy/AmazonS3FullAccess" || { echo "Failed to attach a policy to the IAM role"; exit 1; }
+  --policy-arn "arn:aws:iam::${ACCOUNT_ID}:policy/${BUCKET_ACCESS_POLICY_NAME}" || { echo "Failed to attach a policy to the IAM role"; exit 1; }
 
 aws iam attach-role-policy \
   --role-name "${ROLE_NAME}" \
@@ -132,23 +153,24 @@ if ! aws lambda update-function-code \
   exit 1
 fi
 
-echo "Creating the rule..."
-if ! aws events put-rule \
-  --name "daily-thumbnails" \
-  --description "Triggers the ${FUNCTION_NAME_BULK} function once a day" \
-  --schedule-expression "cron(0 18 * * ? *)" \
-  --state "ENABLED"; then
-  echo "Error creating the rule."
-  exit 1
-fi
-
-echo "Adding a target to the rule..."
-if ! aws events put-targets \
-  --rule "daily-thumbnails" \
-  --targets "Id"="1","Arn"="arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME_BULK}"; then
-  echo "Error adding a target to the rule."
-  exit 1
-fi
+###### Disabling scheduled run of bulk lambda for now
+#echo "Creating the rule..."
+#if ! aws events put-rule \
+#  --name "daily-thumbnails" \
+#  --description "Triggers the ${FUNCTION_NAME_BULK} function once a day" \
+#  --schedule-expression "cron(0 18 * * ? *)" \
+#  --state "ENABLED"; then
+#  echo "Error creating the rule."
+#  exit 1
+#fi
+#
+#echo "Adding a target to the rule..."
+#if ! aws events put-targets \
+#  --rule "daily-thumbnails" \
+#  --targets "Id"="1","Arn"="arn:aws:lambda:${AVNI_MEDIA_AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME_BULK}"; then
+#  echo "Error adding a target to the rule."
+#  exit 1
+#fi
 
 EXISTING_PERMISSION=$(aws lambda get-policy --function-name $FUNCTION_NAME --output text --query 'Policy' 2>/dev/null | grep -q $STATEMENT_ID && echo "yes" || echo "no")
 
@@ -180,6 +202,7 @@ NOTIFICATION_CONFIG=$(cat <<EOF
     ]
 }
 EOF
+
 )
 
 if ! aws s3api put-bucket-notification-configuration \
