@@ -20,13 +20,14 @@ export const handler = async (event, context) => {
       const objects = response.Contents;
       for (const object of objects) {
         if (object.Key.match(/\.(jpe?g|png)$/i)) {
+          let thumbnailKey;
           try {
             const [organisationName, fileName] = object.Key.split('/');
             const s3Object = await s3.getObject({ Bucket: bucketName, Key: decodeURIComponent(object.Key.replace(/\+/g, " ")) }).promise();
 
-            const thumbnailKey = `${decodeURIComponent(organisationName.replace(/\+/g, " "))}/thumbnails/${decodeURIComponent(fileName.replace(/\+/g, " "))}`;
+            thumbnailKey = `${decodeURIComponent(organisationName.replace(/\+/g, " "))}/thumbnails/${decodeURIComponent(fileName.replace(/\+/g, " "))}`;
 
-            if (!thumbnailKey.includes(object.Key)) {
+            if (!fileName.includes('thumbnails')) {
                 const thumbnail = await sharp(s3Object.Body).resize(200, 200).toBuffer();
                 const thumbnailParams = {
                     Bucket: bucketName,
@@ -38,7 +39,7 @@ export const handler = async (event, context) => {
                   console.log(`Thumbnail created: ${thumbnailKey}`);
             }
           } catch (err) {
-            console.log("Error occurred: ", err)
+            console.error(`Thumbnail error: ${thumbnailKey} ${err}`);
           }
         }
       }
