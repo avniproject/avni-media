@@ -121,6 +121,5 @@ const getLowestLocation = (address: string, minLevelName: string) => {
 export function isVideo(url:string) {
   const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"];
   const fileExtension = url.substring(url.lastIndexOf(".")).toLowerCase();
-  console.log("abcnn",fileExtension)
   return videoExtensions.includes(fileExtension);
 }
