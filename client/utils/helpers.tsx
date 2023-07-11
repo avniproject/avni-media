@@ -115,7 +115,7 @@ export const getImageName = (image: imageType , minLevelName: string) => {
 }
 
 const getLowestLocation = (address: string, minLevelName: string) => {
-    return JSON.parse(address)[minLevelName];
+  return JSON.parse(address)[minLevelName];
 }
 
 export function isVideo(url:string) {
