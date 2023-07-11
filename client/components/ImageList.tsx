@@ -1,5 +1,6 @@
 import CheckButton from "./CheckButton";
 import { useState, useEffect, Key, useId} from "react";
+import ReactPlayer from 'react-player'
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -19,6 +20,7 @@ import {
   operationalModuleData,
   getImageName,
   imageType,
+  isVideo
 } from "@/utils/helpers";
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
@@ -803,12 +805,22 @@ export default function ImageList() {
                   <div className="relative">
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
                       <button>
-                        <img
-                          src={image.signedThumbnailUrl}
-                          alt={image?.subjectTypeName}
+                      {isVideo(image.url) ? (
+                        <ReactPlayer
+                          url={image.signedThumbnailUrl}
                           onClick={() => setCarouselImage(image)}
                           className="thumb"
+                          volume = {0}
+                          muted  = {true}
                         />
+                          ) : (
+                            <img
+                              src={image.signedThumbnailUrl}
+                              alt={image?.subjectTypeName}
+                              onClick={() => setCarouselImage(image)}
+                              className="thumb"
+                            />
+                          )}
                       </button>
                     </div>
                     <CheckButton

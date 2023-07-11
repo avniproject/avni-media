@@ -101,6 +101,7 @@ export interface imageType {
     address: string;
     subjectFirstName: string;
     subjectLastName: string
+    url: string
 }
 
 export const getImageName = (image: imageType , minLevelName: string) => {
@@ -115,4 +116,11 @@ export const getImageName = (image: imageType , minLevelName: string) => {
 
 const getLowestLocation = (address: string, minLevelName: string) => {
     return JSON.parse(address)[minLevelName];
+}
+
+export function isVideo(url:string) {
+  const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"];
+  const fileExtension = url.substring(url.lastIndexOf(".")).toLowerCase();
+  console.log("abcnn",fileExtension)
+  return videoExtensions.includes(fileExtension);
 }
