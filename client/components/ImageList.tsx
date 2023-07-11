@@ -808,9 +808,8 @@ export default function ImageList() {
                       <button>
                       {isVideo(image.url) ? (
                         <a className="thumb" href={image.signedUrl}>
-                        <VideoFileIcon 
-                        sx={{ fontSize: 210 }} />
-                        
+                          <VideoFileIcon 
+                          sx={{ fontSize: 210 }} />
                         </a>
                           ) : (
                             <img
