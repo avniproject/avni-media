@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
-import { cond } from "lodash";
 
 interface Prop {
   concepts: any;
