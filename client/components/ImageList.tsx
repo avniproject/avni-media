@@ -1,7 +1,6 @@
 import CheckButton from "./CheckButton";
 import { useState, useEffect, Key, useId} from "react";
 import VideoFileIcon from '@mui/icons-material/VideoFile';
-import  SvgIcon  from "@mui/material/SvgIcon";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
