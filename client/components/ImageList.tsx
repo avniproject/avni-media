@@ -1,6 +1,7 @@
 import CheckButton from "./CheckButton";
 import { useState, useEffect, Key, useId} from "react";
-import ReactPlayer from 'react-player'
+import VideoFileIcon from '@mui/icons-material/VideoFile';
+import  SvgIcon  from "@mui/material/SvgIcon";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -806,13 +807,11 @@ export default function ImageList() {
                     <div className="relative w-full h-50 rounded-lg overflow-hidden">
                       <button>
                       {isVideo(image.url) ? (
-                        <ReactPlayer
-                          url={image.signedThumbnailUrl}
-                          onClick={() => setCarouselImage(image)}
-                          className="thumb"
-                          volume = {0}
-                          muted  = {true}
-                        />
+                        <a className="thumb" href={image.signedUrl}>
+                        <VideoFileIcon 
+                        sx={{ fontSize: 210 }} />
+                        
+                        </a>
                           ) : (
                             <img
                               src={image.signedThumbnailUrl}
