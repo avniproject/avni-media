@@ -43,6 +43,7 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
     };
 
     answerConceptData();
+    setSelectedOptions([])
   }, [concepts]);
 
   useEffect(() => {
