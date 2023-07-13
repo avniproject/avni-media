@@ -21,7 +21,7 @@ export const handler = async (event, context) => {
     
     const thumbnailKey = `${decodeURIComponent(organisationName.replace(/\+/g, " "))}/thumbnails/${decodeURIComponent(fileName.replace(/\+/g, " "))}`;
 
-    if (!thumbnailKey.includes(key)) {
+    if (!thumbnailKey.includes(key) && (!fileName.includes('thumbnails'))) {
       console.info('Thumbnail creation process with input param->', inputParams)
       const { Body } = await s3.getObject(inputParams).promise();
       console.log('Ready to create thumbnail...')
