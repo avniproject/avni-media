@@ -387,6 +387,7 @@ export default function ImageList() {
     setToNumericConcept([])
     setConceptDates([])
     setNoteConcept([])
+    setCodedConcept([])
   };
 
   const conceptDate = (data: any[]|null) => {
