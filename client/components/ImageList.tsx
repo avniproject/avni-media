@@ -382,6 +382,11 @@ export default function ImageList() {
   const concept = (data: any[]) => {
     const conceptJson = conceptdata.find((item: { name: any }) => item && item.name === data);
     setConcept(conceptJson);
+    setDateTimeConcept([])
+    setTextConcept([])
+    setToNumericConcept([])
+    setConceptDates([])
+    setNoteConcept([])
   };
 
   const conceptDate = (data: any[]|null) => {
