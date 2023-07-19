@@ -563,6 +563,17 @@ export default function ImageList() {
   const subjectType = (data: any[], subjectUuid: string[]) => {
     setSelectedSubjectUUID(subjectUuid)
     setSubjectType(data);
+    if(data.length === 0){
+      console.log("data",data.length)
+      setCodedConcept([])
+      setEncounterType([])
+      setProgamType([])
+      setDateTimeConcept([])
+      setTextConcept([])
+      setToNumericConcept([])
+      setConceptDates([])
+      setNoteConcept([])
+    }
   };
   useEffect(() => {
     if (selectedSubjectUUID.length > 0) {

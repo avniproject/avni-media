@@ -90,7 +90,7 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
                 codedData.map((option: { id:  null | undefined; name: string  }) => (
                   <div key={option.id}>
                     <button
-                      className={`flex justify-between w-full px-4 py-2 text-sm ${
+                      className={`flex text-start px-4 py-4 text-sm w-full ${
                         selectedOptions.includes(option)
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-700"
