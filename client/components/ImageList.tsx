@@ -564,7 +564,6 @@ export default function ImageList() {
     setSelectedSubjectUUID(subjectUuid)
     setSubjectType(data);
     if(data.length === 0){
-      console.log("data",data.length)
       setCodedConcept([])
       setEncounterType([])
       setProgamType([])
