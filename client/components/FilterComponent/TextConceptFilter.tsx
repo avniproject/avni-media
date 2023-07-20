@@ -5,7 +5,7 @@ interface Prop {
   textConcept : string
 }
 
-export default function TexConceptFilter({ getConcepts,textConcept }: Prop) {
+export default function TexConceptFilter({ getConcepts, textConcept }: Prop) {
 
   const [inputValue, setInputValue] = useState("");
 
