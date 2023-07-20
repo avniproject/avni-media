@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 interface Prop {
   getNumericConcept: (fromNumber: number, toNumber: number) => void;
-  numericConcept: any[]
+  numericConcept: any[];
 }
 
 export default function NumericConceptFilter({ getNumericConcept, numericConcept }: Prop) {

@@ -10,7 +10,7 @@ dayjs.extend(customParseFormat);
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 interface Props {
   getTimeStampConcept: (data: any[] | null) => void;
-  dateTimeConcept: any[] | null
+  dateTimeConcept: any[] | null;
 }
 
 const TimeStampConceptFilter = ({ getTimeStampConcept, dateTimeConcept }: Props) => {

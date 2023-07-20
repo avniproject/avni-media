@@ -4,13 +4,13 @@ import { Menu } from "@headlessui/react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import dayjs, { Dayjs}  from "dayjs";
+import dayjs, { Dayjs }  from "dayjs";
 const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "DD/MM/YYYY";
 interface Props {
   getDateConcept: (data: any[] | null) => void;
-  conceptDates: any[]| null
+  conceptDates: any[] | null;
 }
 
 const DateConceptFilter = ({ getDateConcept, conceptDates }: Props) => {

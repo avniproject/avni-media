@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 interface Prop {
   getConcepts: (data: string) => void;
-  textConcept : string
+  textConcept : string;
 }
 
 export default function TexConceptFilter({ getConcepts, textConcept }: Prop) {
