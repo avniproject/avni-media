@@ -9,18 +9,18 @@ const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 interface Props {
-  conceptDateTime: (data: any[] | null) => void;
+  getTimeStampConcept: (data: any[] | null) => void;
   dateTimeConcept: any[] | null
 }
 
-const TimeStampConceptFilter = ({ conceptDateTime, dateTimeConcept }: Props) => {
+const TimeStampConceptFilter = ({ getTimeStampConcept, dateTimeConcept }: Props) => {
  
   const [date, setDate] = useState<null | string[]>(null);
   const [value, setValue] = useState<[Dayjs, Dayjs] | null>(null);
 
   useEffect(() => {
 
-    conceptDateTime(date);
+    getTimeStampConcept(date);
     
   }, [date]);
 

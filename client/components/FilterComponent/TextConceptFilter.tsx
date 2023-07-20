@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 
 interface Prop {
-  conceptNote: (data: string) => void;
+  getConcepts: (data: string) => void;
   textConcept : string
 }
 
-export default function TexConceptFilter({ conceptNote,textConcept }: Prop) {
+export default function TexConceptFilter({ getConcepts,textConcept }: Prop) {
 
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
 
-    conceptNote(inputValue);
+    getConcepts(inputValue);
     
   }, [inputValue]);
   
@@ -20,7 +20,7 @@ export default function TexConceptFilter({ conceptNote,textConcept }: Prop) {
   if(textConcept.length===0){
     setInputValue('')
    }
-   
+
   },[textConcept])
 
   return (
