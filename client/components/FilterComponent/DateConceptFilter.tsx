@@ -4,21 +4,33 @@ import { Menu } from "@headlessui/react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import dayjs from "dayjs";
+import dayjs, { Dayjs }  from "dayjs";
 const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "DD/MM/YYYY";
 interface Props {
-  conceptDate: (data: any[] | null) => void;
+  getDateConcept: (data: any[] | null) => void;
+  conceptDates: any[] | null;
 }
 
-const DateConceptFilter = ({ conceptDate }: Props) => {
+const DateConceptFilter = ({ getDateConcept, conceptDates }: Props) => {
 
   const [date, setDate] = useState<null | string[]>(null);
-
+  const [value, setValue] = useState<[Dayjs, Dayjs] | null>(null);
   useEffect(() => {
-    conceptDate(date);
+    getDateConcept(date);
   }, [date]);
+
+  useEffect(()=>{
+    if (conceptDates === null || conceptDates.length === 0) {
+      setValue(null); 
+    } else {
+      setValue([
+        dayjs(conceptDates[0].from), 
+        dayjs(conceptDates[0].to), 
+      ]);
+    }
+  },[conceptDates])
 
   return (
     <>
@@ -28,6 +40,7 @@ const DateConceptFilter = ({ conceptDate }: Props) => {
       >
         <RangePicker
           format={dateFormat}
+          value ={value}
           onChange={(dateValue) => {
             if (dateValue) {
               setDate(

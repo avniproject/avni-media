@@ -63,7 +63,7 @@ export default function ImageList() {
   const [textConcept, setTextConcept] = useState<any>([])
   const [codedConcept, setCodedConcept] = useState<any>([])
   const [noteConcept, setNoteConcept] = useState<any>([])
-  const [toNumericConcept, setToNumericConcept] = useState<any>([])
+  const [numericConcept, setToNumericConcept] = useState<any>([])
   const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
   const [conceptDates, setConceptDates] =  useState<any[] | null>([]);
   const [typeId, setTypeId] = useState<any>([])
@@ -390,7 +390,7 @@ export default function ImageList() {
     setCodedConcept([])
   };
 
-  const conceptDate = (data: any[]|null) => {
+  const getDateConcept = (data: any[]|null) => {
     if(data && data.length>0){
       setConceptDates([{
         "conceptUuid":concepts.uuid,
@@ -400,7 +400,7 @@ export default function ImageList() {
     }
   };
 
-  const conceptDateTime = (data: any[]|null) => {
+  const getTimeStampConcept = (data: any[]|null) => {
     if(data && data.length>0){
       setDateTimeConcept([{
         "conceptUuid": concepts.uuid,
@@ -410,7 +410,7 @@ export default function ImageList() {
     }
   };
 
-  const conceptNumeric = (fromNumber: number, toNumber: number) =>{
+  const getNumericConcept = (fromNumber: number, toNumber: number) =>{
    setToNumericConcept([{
     "conceptUuid":concepts.uuid,
     "from": fromNumber,
@@ -424,10 +424,12 @@ export default function ImageList() {
         "conceptUuid": concepts.uuid,
         "values":data
        }])
+    }else{
+      setCodedConcept([])
     }
   }
 
-  const conceptNote = (data: string) =>{
+  const getNoteConcept = (data: string) =>{
 
     if(data && data.length>0){
       setNoteConcept([{
@@ -438,7 +440,7 @@ export default function ImageList() {
    
   }
 
-  const conceptText = (data: string) =>{
+  const getTextConcept = (data: string) =>{
 
    if(data && data.length>0){
     setTextConcept([{
@@ -628,8 +630,8 @@ export default function ImageList() {
       conceptfilter.push(codedConcept[0]);
     }
     
-    if (toNumericConcept && toNumericConcept.length > 0) {
-      conceptfilter.push(toNumericConcept[0]);
+    if (numericConcept && numericConcept.length > 0) {
+      conceptfilter.push(numericConcept[0]);
     }
     
     if (textConcept && textConcept.length > 0) {
@@ -664,7 +666,7 @@ export default function ImageList() {
    setDataBody(body)
   }
   fitersData()
- },[date, subject, encouter, program, toDate, fromDate, add, codedConcept, toNumericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept]);
+ },[date, subject, encouter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept]);
 
   const handleApplyFilter = async () => {
     redirectIfNotValid();
@@ -770,18 +772,27 @@ export default function ImageList() {
           />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Date" ? (
           <DateConceptFilter
-          conceptDate={conceptDate}
+          getDateConcept={getDateConcept}
+          conceptDates={conceptDates}
           />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "DateTime" ? (
-          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
+          <TimeStampConceptFilter 
+          getTimeStampConcept={getTimeStampConcept} 
+          dateTimeConcept={dateTimeConcept}/>
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
-          conceptNote={conceptText} />
+          getConcepts={getTextConcept}
+          textConcept ={textConcept}
+           />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
-          <NumericConceptFilter conceptNumeric={conceptNumeric} />
+          <NumericConceptFilter 
+          getNumericConcept={getNumericConcept}
+          numericConcept={numericConcept}
+           />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Notes" ? (
           <TexConceptFilter 
-          conceptNote={conceptNote}/>
+          getConcepts={getNoteConcept}
+          textConcept ={noteConcept}/>
         ) : null}
       </div>
 

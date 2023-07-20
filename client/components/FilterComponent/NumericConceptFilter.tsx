@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
 interface Prop {
-  conceptNumeric: (fromNumber: number, toNumber: number) => void;
+  getNumericConcept: (fromNumber: number, toNumber: number) => void;
+  numericConcept: any[];
 }
 
-export default function NumericConceptFilter({ conceptNumeric }: Prop) {
+export default function NumericConceptFilter({ getNumericConcept, numericConcept }: Prop) {
 
   const [frominputValue, setfromInputValue] = useState("");
   const [toinputValue, settoInputValue] = useState("");
@@ -18,10 +19,16 @@ export default function NumericConceptFilter({ conceptNumeric }: Prop) {
     setIsValidRange(isValid);
     if (isValid) {
      
-      conceptNumeric(parseInt(frominputValue), parseInt(toinputValue));
+      getNumericConcept(parseInt(frominputValue), parseInt(toinputValue));
 
     }
   }, [frominputValue, toinputValue]);
+  useEffect(()=>{
+   if(numericConcept.length===0){
+    setfromInputValue('')
+    settoInputValue('')
+   }
+  },[numericConcept])
 
   return (
     <>
