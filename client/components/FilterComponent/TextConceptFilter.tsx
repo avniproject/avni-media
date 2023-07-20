@@ -20,6 +20,7 @@ export default function TexConceptFilter({ conceptNote,textConcept }: Prop) {
   if(textConcept.length===0){
     setInputValue('')
    }
+   
   },[textConcept])
 
   return (

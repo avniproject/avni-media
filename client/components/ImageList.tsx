@@ -789,7 +789,6 @@ export default function ImageList() {
           <TexConceptFilter 
           conceptNote={conceptNote}
           textConcept ={noteConcept}/>
-         
         ) : null}
       </div>
 
