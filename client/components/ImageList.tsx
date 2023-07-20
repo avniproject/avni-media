@@ -424,6 +424,8 @@ export default function ImageList() {
         "conceptUuid": concepts.uuid,
         "values":data
        }])
+    }else{
+      setCodedConcept([])
     }
   }
 
@@ -776,12 +778,18 @@ export default function ImageList() {
           <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
-          conceptNote={conceptText} />
+          conceptNote={conceptText}
+          textConcept ={textConcept}
+           />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
-          <NumericConceptFilter conceptNumeric={conceptNumeric} />
+          <NumericConceptFilter conceptNumeric={conceptNumeric}
+          toNumericConcept={toNumericConcept}
+           />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Notes" ? (
           <TexConceptFilter 
-          conceptNote={conceptNote}/>
+          conceptNote={conceptNote}
+          textConcept ={noteConcept}/>
+         
         ) : null}
       </div>
 
