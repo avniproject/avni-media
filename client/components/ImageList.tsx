@@ -781,7 +781,7 @@ export default function ImageList() {
           dateTimeConcept={dateTimeConcept}/>
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
-           getConcepts={getTextConcept}
+          getConcepts={getTextConcept}
           textConcept ={textConcept}
            />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
