@@ -773,9 +773,11 @@ export default function ImageList() {
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Date" ? (
           <DateConceptFilter
           conceptDate={conceptDate}
+          conceptDates={conceptDates}
           />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "DateTime" ? (
-          <TimeStampConceptFilter conceptDateTime={conceptDateTime} />
+          <TimeStampConceptFilter conceptDateTime={conceptDateTime} 
+          dateTimeConcept={dateTimeConcept}/>
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
           conceptNote={conceptText}
