@@ -4,23 +4,36 @@ import { Menu } from "@headlessui/react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 interface Props {
   conceptDateTime: (data: any[] | null) => void;
+  dateTimeConcept: any[] | null
 }
 
-const TimeStampConceptFilter = ({ conceptDateTime }: Props) => {
+const TimeStampConceptFilter = ({ conceptDateTime, dateTimeConcept }: Props) => {
  
   const [date, setDate] = useState<null | string[]>(null);
+  const [value, setValue] = useState<[Dayjs, Dayjs] | null>(null);
 
   useEffect(() => {
 
     conceptDateTime(date);
     
   }, [date]);
+
+  useEffect(()=>{
+    if (dateTimeConcept === null || dateTimeConcept.length === 0) {
+      setValue(null); 
+    } else {
+      setValue([
+        dayjs(dateTimeConcept[0].from), 
+        dayjs(dateTimeConcept[0].to), 
+      ]);
+    }
+  },[dateTimeConcept])
 
   return (
     <>
@@ -30,6 +43,7 @@ const TimeStampConceptFilter = ({ conceptDateTime }: Props) => {
       >
         <RangePicker
           format={dateFormat}
+          value = {value}
           onChange={(dateValue) => {
             if (dateValue) {
               setDate(
