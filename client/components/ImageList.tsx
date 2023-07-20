@@ -776,7 +776,8 @@ export default function ImageList() {
           conceptDates={conceptDates}
           />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "DateTime" ? (
-          <TimeStampConceptFilter conceptDateTime={conceptDateTime} 
+          <TimeStampConceptFilter 
+          conceptDateTime={conceptDateTime} 
           dateTimeConcept={dateTimeConcept}/>
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
           <TexConceptFilter
@@ -784,7 +785,8 @@ export default function ImageList() {
           textConcept ={textConcept}
            />
         ) :  selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
-          <NumericConceptFilter conceptNumeric={conceptNumeric}
+          <NumericConceptFilter 
+          conceptNumeric={conceptNumeric}
           toNumericConcept={toNumericConcept}
            />
         ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Notes" ? (
