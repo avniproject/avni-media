@@ -763,11 +763,12 @@ export default function ImageList() {
                     />
                 )}
 
-                <Concepts setConceptsFunction={(selectedMediaConcepts) => setSelectedMediaConcepts(selectedMediaConcepts)} conceptData={mediaConcepts} optionDependency={null} title={"Media Fields"}/>
+                <Concepts setConceptsFunction={(selectedMediaConcepts:string[]) => setSelectedMediaConcepts(selectedMediaConcepts)} conceptData={mediaConcepts} optionDependency={[]} title={"Media Fields"}/>
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
                 <Concepts setConceptsFunction={setConcepts} conceptData={conceptdata}
                           optionDependency={selectedFormSubject}
+                          title="Fields"
                 />
                 }
                 {selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Coded" ? (

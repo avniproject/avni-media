@@ -6,13 +6,14 @@ interface Prop {
     setConceptsFunction: any;
     conceptData: any[];
     optionDependency: any[];
+    title: string;
 }
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({setConceptsFunction, conceptData, optionDependency, title = "Fields"}: Prop) {
+export default function Concepts({setConceptsFunction, conceptData, optionDependency, title}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
