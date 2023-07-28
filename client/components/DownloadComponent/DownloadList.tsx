@@ -8,7 +8,7 @@ export default function Download() {
     const username = getUserUuidFromToken();
     const fetchData = async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_DOWNLOAD_LIST_URL}?username=${username}`
+        `${process.env.NEXT_PUBLIC_MEDIA_VIEWER}/allData?username=${username}`
       );
 
       setData(response.data);
