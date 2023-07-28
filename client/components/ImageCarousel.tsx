@@ -32,7 +32,7 @@ const ImageCarousel = ({
   const ci = carouselImage as never;
   const index = imageList.indexOf(ci);
   const [imageCarousel, setImageCarousel] = useState({
-    
+
     page: 0,
     data: [],
   });
@@ -56,7 +56,7 @@ const ImageCarousel = ({
         },
       };
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_IMAGE_LIST_URL}/search?page=${pagination.page}&size=${pagination.size}`,
+        `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pagination.page}&size=${pagination.size}`,
         dataBody,
         options
       );

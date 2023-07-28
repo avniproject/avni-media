@@ -88,9 +88,9 @@ export default function LocationHierarchy({
           setSelectedOptions(uuidArray);
         }
   }, [location]);
-  
+
   useEffect(()=>{
-    
+
     if( maxLevel && locationIndex.level < maxLevel-1){
     const extractedData = otherLocation.reduce((result, locations) => {
       const filteredData = locations.data.filter((item: {id : any; }) =>
@@ -104,7 +104,7 @@ export default function LocationHierarchy({
       }
       return result;
     }, []);
-   
+
     const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
 
     if (!isEqual(selectedOptions, updatedSelectedOptions)) {
@@ -119,7 +119,7 @@ export default function LocationHierarchy({
 
       if (locationIndex.level === maxLevel) {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
+          `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
 
         const jsonDataState = response.data;
@@ -132,9 +132,7 @@ export default function LocationHierarchy({
           try {
             parentsJson.map(async (item)=>{
               const response = await axios.get(
-                `${
-                  process.env.NEXT_PUBLIC_TOP_ADDRESS
-                }?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}` 
+                `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}`
               );
             const distJsonData = response.data;
             const distData = distJsonData.content;
@@ -143,7 +141,7 @@ export default function LocationHierarchy({
             })
           } catch (Error) {
             console.error(
-              `error found at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}`
+              `error found at ${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}`
             );
           }
         } else {
@@ -161,7 +159,7 @@ export default function LocationHierarchy({
               const parentsId = selectedOptions.slice(-1)[0];
                 parentsJson.map(async (item)=>{
                   const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_TOP_ADDRESS}?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
+                    `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
                   );
                   const distJsonDatas = response.data;
                   const distDatas = distJsonDatas.content;
@@ -176,7 +174,7 @@ export default function LocationHierarchy({
             }
           } catch (Error) {
             console.error(
-              `error at ${process.env.NEXT_PUBLIC_TOP_ADDRESS}`
+              `error at ${process.env.NEXT_PUBLIC_WEB}/locations/search/find`
             );
           }
         }
@@ -213,7 +211,7 @@ export default function LocationHierarchy({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
+
   return (
     <>
       <Menu as="div" className="location_menu">
