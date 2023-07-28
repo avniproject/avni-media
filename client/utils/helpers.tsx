@@ -6,10 +6,16 @@ export const validateAccessToken = () => {
     try {
         const token = localStorage.getItem("authToken") || ""
 
-        if(!token) return false;
+        if(!token) {
+            console.error("No token with name authToken found in local storage");
+            return false;
+        }
 
         const tokenData: any = jwt(token);
-        return tokenData.exp >= Math.floor(Date.now() / 1000);
+        let timeNowInSeconds = Math.floor(Date.now() / 1000);
+        let expired = tokenData.exp >= timeNowInSeconds;
+        console.log("Token expires in :", tokenData.exp - timeNowInSeconds)
+        return expired;
     } catch(err) {
       console.log('Error occurred--', err);
       return false;

@@ -4,22 +4,34 @@ clean:
 deps:
 	npm install --legacy-peer-deps
 
+define _create_env
+	cp ./env-templates/$1.template .env
+endef
+
 start:
+	$(call _create_env,development)
+	npm run dev
+
+start-local-staging:
+	$(call _create_env,local.staging)
 	npm run dev
 
 _build-app:
-	cp ./env-templates/$(template) .env
+	$(call _create_env,)
 	npm run build
 
 build-app:
-	make _build-app template=development.template
+	$(call _create_env,development)
+	npm run build
 
 build-app-prod:
-	make _build-app template=production.template
+	$(call _create_env,production)
+	npm run build
 
 build-app-staging:
-	make _build-app template=staging.template
+	$(call _create_env,staging)
+	npm run build
 
 build-app-prerelease:
-	make _build-app template=prerelease.template
-
+	$(call _create_env,prerelease)
+	npm run build
