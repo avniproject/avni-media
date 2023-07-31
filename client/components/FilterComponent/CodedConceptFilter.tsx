@@ -87,7 +87,7 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
           <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               {codedData &&
-                codedData.filter(x => !x.voided).map((option: { id:  null | undefined; name: string  }) => (
+                codedData.filter((x:any) => !x.voided).map((option: { id:  null | undefined; name: string  }) => (
                   <div key={option.id}>
                     <button
                       className={`flex text-start px-4 py-2 text-sm w-full ${
