@@ -695,6 +695,9 @@ export default function ImageList() {
         location.reload();
     };
 
+
+    console.log("ImageList", "render");
+
     return (
         <>
             <div className="flex items-center justify-between">
@@ -763,13 +766,10 @@ export default function ImageList() {
                     />
                 )}
 
-                <Concepts setConceptsFunction={(selectedMediaConcepts:string[]) => setSelectedMediaConcepts(selectedMediaConcepts)} conceptData={mediaConcepts} optionDependency={[]} title={"Media Fields"}/>
+                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} conceptData={mediaConcepts} title={"Media Fields"}/>
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
-                <Concepts setConceptsFunction={setConcepts} conceptData={conceptdata}
-                          optionDependency={selectedFormSubject}
-                          title="Fields"
-                />
+                <Concepts setConceptsFunction={setConcepts} conceptData={conceptdata} title="Fields"/>
                 }
                 {selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Coded" ? (
                     <CodedConceptFilter concepts={concepts.conceptAnswers}

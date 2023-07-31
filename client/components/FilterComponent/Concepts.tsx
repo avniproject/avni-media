@@ -13,20 +13,13 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({setConceptsFunction, conceptData, optionDependency, title}: Prop) {
+export default function Concepts({setConceptsFunction, conceptData, title}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         setConceptsFunction(selectedOptions);
     }, [selectedOptions]);
-
-    useEffect(() => {
-        const isNameExists = conceptData.some((item) => selectedOptions.includes(item.name));
-        if (!isNameExists) {
-            setSelectedOptions([])
-        }
-    }, [conceptData, optionDependency]);
 
     function handleOptionClick(option: any) {
         setSelectedOptions(option);
