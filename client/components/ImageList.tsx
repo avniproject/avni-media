@@ -51,7 +51,7 @@ export default function ImageList() {
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
     const [showPerpage, setShowperpage] = useState(10);
-    const [selectedFieldConcept, setSelectedFieldConcept] = useState<any>();
+    const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any>();
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encouter, setEncounterType] = useState<any[]>([]);
     const [program, setProgamType] = useState<any[]>([]);
@@ -77,6 +77,8 @@ export default function ImageList() {
     const [showAllEncounter, setShowAllEncounter] = useState<any[]>([]);
     const [selectedEncounterTypeUUID, setSelectedEncounterTypeUUID] = useState<any>([]);
     const [selectedMediaConcepts, setSelectedMediaConcepts] = useState<any>([]);
+
+    const selectedFieldConcept = selectedFieldConcepts && selectedFieldConcepts.length > 0 && selectedFieldConcepts[0];
 
     useEffect(() => {
         const userUUID = getUserUuidFromToken();
@@ -115,15 +117,15 @@ export default function ImageList() {
         const formElementGroups = forms.formElementGroups;
         await Promise.all(
             formElementGroups.map(
-                async (formjson: { applicableFormElements: any }) => {
-                    let applicableFormElements = formjson.applicableFormElements;
+                async (formJson: { applicableFormElements: any }) => {
+                    let applicableFormElements = formJson.applicableFormElements;
                     await Promise.all(
                         applicableFormElements.map(
                             async (element: {
                                 voided: boolean;
                                 concept: { uuid: string; dataType: any };
                             }) => {
-                                if (element.voided === false) {
+                                if (!element.voided) {
                                     const dataType = element.concept.dataType;
                                     const isDateType = dataType === "Date";
                                     const isDateTimeType = dataType === "DateTime";
@@ -694,6 +696,7 @@ export default function ImageList() {
         location.reload();
     };
 
+    const showCodedFilter = selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Coded";
     return (
         <>
             <div className="flex items-center justify-between">
@@ -742,7 +745,7 @@ export default function ImageList() {
                 )}
                 <Daterange dateRange={dateRange}/>
 
-                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} conceptData={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
+                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} concepts={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
 
                 {subjectFilter && subjectFilter.length > 0 && (
                     <SubjectType
@@ -766,9 +769,9 @@ export default function ImageList() {
                 )}
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && conceptData &&
-                <Concepts setConceptsFunction={setConcepts} conceptData={conceptData} title="Fields" multiSelect={false} searchable={true}/>
+                <Concepts setConceptsFunction={setConcepts} concepts={conceptData} title="Fields" multiSelect={false} searchable={true}/>
                 }
-                {selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Coded" ? (
+                {showCodedFilter ? (
                     <CodedConceptFilter concepts={selectedFieldConcept.conceptAnswers}
                                         conceptCoded={conceptCoded}
                     />

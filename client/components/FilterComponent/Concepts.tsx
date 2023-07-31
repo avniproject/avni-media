@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 interface Prop {
     setConceptsFunction: any;
-    conceptData: any[];
+    concepts: any[];
     title: string;
     multiSelect: boolean;
     searchable: boolean;
@@ -15,7 +15,7 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({setConceptsFunction, conceptData, title, multiSelect, searchable}: Prop) {
+export default function Concepts({setConceptsFunction, concepts, title, multiSelect, searchable}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -26,9 +26,7 @@ export default function Concepts({setConceptsFunction, conceptData, title, multi
     function handleOptionClick(option: any) {
         if (multiSelect) {
             const selectedOptionsClone = [...selectedOptions];
-            if (selectedOptionsClone.includes(option))
-                _.remove(selectedOptionsClone, (x) => x === option);
-            else
+            if (_.remove(selectedOptionsClone, (x) => x.name === option.name).length === 0)
                 selectedOptionsClone.push(option);
 
             setSelectedOptions(selectedOptionsClone);
@@ -41,7 +39,7 @@ export default function Concepts({setConceptsFunction, conceptData, title, multi
         setSearchTerm(event.target.value);
     }
 
-    const filteredConcepts = conceptData.filter((option) =>
+    const filteredConcepts = concepts.filter((option) =>
         option.name.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
     );
 
@@ -51,7 +49,7 @@ export default function Concepts({setConceptsFunction, conceptData, title, multi
                 <Menu.Button
                     className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
           <span>
-            {selectedOptions && selectedOptions.length > 0 ? selectedOptions : title}
+            {selectedOptions && selectedOptions.length > 0 ? selectedOptions.map(v => v.name).join(", ") : title}
           </span>
                     <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" aria-hidden="true"/>
                 </Menu.Button>
@@ -77,10 +75,10 @@ export default function Concepts({setConceptsFunction, conceptData, title, multi
                                                 active ? "justify-between bg-gray-100 text-gray-900" : "text-gray-700",
                                                 "justify-between flex text-start px-4 py-4 text-sm w-full"
                                             )}
-                                            onClick={() => handleOptionClick(option.name)}
+                                            onClick={() => handleOptionClick(option)}
                                         >
                                             {option.name}
-                                            {selectedOptions.includes(option.name) && multiSelect && (
+                                            {_.some(selectedOptions, x => x.name===option.name) && multiSelect && (
                                                 <CheckIcon className="check-button" aria-hidden="true"/>
                                             )}
                                         </button>
