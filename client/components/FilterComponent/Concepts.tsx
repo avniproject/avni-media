@@ -5,7 +5,6 @@ import {ChevronDownIcon} from "@heroicons/react/solid";
 interface Prop {
     setConceptsFunction: any;
     conceptData: any[];
-    optionDependency: any[];
     title: string;
 }
 
