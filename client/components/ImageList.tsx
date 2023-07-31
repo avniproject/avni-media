@@ -51,13 +51,13 @@ export default function ImageList() {
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
     const [showPerpage, setShowperpage] = useState(10);
-    const [concepts, setConcept] = useState<any>();
+    const [selectedFieldConcept, setSelectedFieldConcept] = useState<any>();
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encouter, setEncounterType] = useState<any[]>([]);
     const [program, setProgamType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
     const [dataBody, setDataBody] = useState<any>();
-    const [conceptdata, setConceptData] = useState<any>([]);
+    const [conceptData, setConceptData] = useState<any>([]);
     const [mediaConcepts, setMediaConcepts] = useState<any>([]);
     const [formsData, setFormsData] = useState<any>([]);
     const [textConcept, setTextConcept] = useState<any>([])
@@ -386,8 +386,7 @@ export default function ImageList() {
     };
 
     const setConcepts = (data: any[]) => {
-        const conceptJson = conceptdata.find((item: { name: any }) => item && item.name === data);
-        setConcept(conceptJson);
+        setSelectedFieldConcept(data);
         setDateTimeConcept([])
         setTextConcept([])
         setToNumericConcept([])
@@ -399,7 +398,7 @@ export default function ImageList() {
     const getDateConcept = (data: any[] | null) => {
         if (data && data.length > 0) {
             setConceptDates([{
-                "conceptUuid": concepts.uuid,
+                "conceptUuid": selectedFieldConcept.uuid,
                 "from": data[0],
                 "to": data[1]
             }])
@@ -409,7 +408,7 @@ export default function ImageList() {
     const getTimeStampConcept = (data: any[] | null) => {
         if (data && data.length > 0) {
             setDateTimeConcept([{
-                "conceptUuid": concepts.uuid,
+                "conceptUuid": selectedFieldConcept.uuid,
                 "from": data[0],
                 "to": data[1]
             }])
@@ -418,7 +417,7 @@ export default function ImageList() {
 
     const getNumericConcept = (fromNumber: number, toNumber: number) => {
         setToNumericConcept([{
-            "conceptUuid": concepts.uuid,
+            "conceptUuid": selectedFieldConcept.uuid,
             "from": fromNumber,
             "to": toNumber
         }])
@@ -427,7 +426,7 @@ export default function ImageList() {
     const conceptCoded = (data: any) => {
         if (data.length > 0) {
             setCodedConcept([{
-                "conceptUuid": concepts.uuid,
+                "conceptUuid": selectedFieldConcept.uuid,
                 "values": data
             }])
         } else {
@@ -439,7 +438,7 @@ export default function ImageList() {
 
         if (data && data.length > 0) {
             setNoteConcept([{
-                "conceptUuid": concepts.uuid,
+                "conceptUuid": selectedFieldConcept.uuid,
                 "values": [data]
             }])
         }
@@ -450,7 +449,7 @@ export default function ImageList() {
 
         if (data && data.length > 0) {
             setTextConcept([{
-                "conceptUuid": concepts.uuid,
+                "conceptUuid": selectedFieldConcept.uuid,
                 "values": [data]
             }])
         }
@@ -669,7 +668,7 @@ export default function ImageList() {
             setDataBody(body);
         }
         filtersData()
-    }, [date, subject, encouter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept]);
+    }, [date, subject, encouter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
@@ -694,9 +693,6 @@ export default function ImageList() {
     const restFilters = () => {
         location.reload();
     };
-
-
-    console.log("ImageList", "render");
 
     return (
         <>
@@ -745,6 +741,9 @@ export default function ImageList() {
                     )
                 )}
                 <Daterange dateRange={dateRange}/>
+
+                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} conceptData={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
+
                 {subjectFilter && subjectFilter.length > 0 && (
                     <SubjectType
                         subjectType={subjectType}
@@ -766,35 +765,33 @@ export default function ImageList() {
                     />
                 )}
 
-                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} conceptData={mediaConcepts} title={"Media Fields"}/>
-
-                {selectedFormSubject && selectedFormSubject.length > 0 && conceptdata &&
-                <Concepts setConceptsFunction={setConcepts} conceptData={conceptdata} title="Fields"/>
+                {selectedFormSubject && selectedFormSubject.length > 0 && conceptData &&
+                <Concepts setConceptsFunction={setConcepts} conceptData={conceptData} title="Fields" multiSelect={false} searchable={true}/>
                 }
-                {selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Coded" ? (
-                    <CodedConceptFilter concepts={concepts.conceptAnswers}
+                {selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Coded" ? (
+                    <CodedConceptFilter concepts={selectedFieldConcept.conceptAnswers}
                                         conceptCoded={conceptCoded}
                     />
-                ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Date" ? (
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Date" ? (
                     <DateConceptFilter
                         getDateConcept={getDateConcept}
                         conceptDates={conceptDates}
                     />
-                ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "DateTime" ? (
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "DateTime" ? (
                     <TimeStampConceptFilter
                         getTimeStampConcept={getTimeStampConcept}
                         dateTimeConcept={dateTimeConcept}/>
-                ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Text" ? (
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Text" ? (
                     <TexConceptFilter
                         getConcepts={getTextConcept}
                         textConcept={textConcept}
                     />
-                ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Numeric" ? (
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Numeric" ? (
                     <NumericConceptFilter
                         getNumericConcept={getNumericConcept}
                         numericConcept={numericConcept}
                     />
-                ) : selectedFormSubject && selectedFormSubject.length > 0 && concepts && concepts.dataType === "Notes" ? (
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Notes" ? (
                     <TexConceptFilter
                         getConcepts={getNoteConcept}
                         textConcept={noteConcept}/>

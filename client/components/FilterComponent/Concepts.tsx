@@ -1,18 +1,21 @@
 import {useEffect, useState} from "react";
 import {Menu} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/solid";
+import {CheckIcon, ChevronDownIcon} from "@heroicons/react/solid";
+import _ from 'lodash';
 
 interface Prop {
     setConceptsFunction: any;
     conceptData: any[];
     title: string;
+    multiSelect: boolean;
+    searchable: boolean;
 }
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({setConceptsFunction, conceptData, title}: Prop) {
+export default function Concepts({setConceptsFunction, conceptData, title, multiSelect, searchable}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -21,7 +24,17 @@ export default function Concepts({setConceptsFunction, conceptData, title}: Prop
     }, [selectedOptions]);
 
     function handleOptionClick(option: any) {
-        setSelectedOptions(option);
+        if (multiSelect) {
+            const selectedOptionsClone = [...selectedOptions];
+            if (selectedOptionsClone.includes(option))
+                _.remove(selectedOptionsClone, (x) => x === option);
+            else
+                selectedOptionsClone.push(option);
+
+            setSelectedOptions(selectedOptionsClone);
+        } else {
+            setSelectedOptions([option]);
+        }
     }
 
     function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -46,13 +59,13 @@ export default function Concepts({setConceptsFunction, conceptData, title}: Prop
 
             <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1 w-full">
-                    <input
+                    {searchable && <input
                         type="text"
                         value={searchTerm}
                         onChange={handleSearchChange}
                         className="w-full px-4 py-2 text-sm border-gray-300 focus:ring-teal-500 focus:border-teal-500"
                         placeholder="Search..."
-                    />
+                    />}
                     {filteredConcepts.length === 0 ? (
                         <div className="p-4 text-gray-500">No concepts found.</div>
                     ) : (
@@ -61,12 +74,15 @@ export default function Concepts({setConceptsFunction, conceptData, title}: Prop
                                     {({active}) => (
                                         <button
                                             className={classNames(
-                                                active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                                                "flex text-start px-4 py-4 text-sm w-full"
+                                                active ? "justify-between bg-gray-100 text-gray-900" : "text-gray-700",
+                                                "justify-between flex text-start px-4 py-4 text-sm w-full"
                                             )}
                                             onClick={() => handleOptionClick(option.name)}
                                         >
                                             {option.name}
+                                            {selectedOptions.includes(option.name) && multiSelect && (
+                                                <CheckIcon className="check-button" aria-hidden="true"/>
+                                            )}
                                         </button>
                                     )}
                                 </Menu.Item>
