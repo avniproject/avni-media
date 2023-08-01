@@ -24,7 +24,7 @@ export const validateAccessToken = () => {
     }
 }
 
-export function storeToken(authToken) {
+export function storeToken(authToken:any) {
     if (typeof window === "undefined") {
         return;
     }

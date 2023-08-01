@@ -16,7 +16,7 @@ export default function Navbar() {
     <Disclosure as="nav" className="navbg-color">
       {() => {
           const env = process.env.NEXT_PUBLIC_ENVIRONMENT;
-          const homeUrl = env === "dev" ? process.env.NEXT_PUBLIC_WEBAPP_BASE_URL : "/";
+          const homeUrl:any = env === "dev" ? process.env.NEXT_PUBLIC_WEBAPP_BASE_URL : "/";
           return (
               <>
                   <div className="relative flex justify-between h-16">
@@ -37,7 +37,7 @@ export default function Navbar() {
                                   <HomeIcon
                                       sx={{fontSize: 30}}
                                       onClick={() => {
-                                          window.location.href = homeUrl
+                                          window.location.href = homeUrl;
                                       }}
                                   />
                               </Box>
