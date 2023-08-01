@@ -14,40 +14,39 @@ function HomeIcon(props: SvgIconProps) {
 export default function Navbar() {
   return (
     <Disclosure as="nav" className="navbg-color">
-      {() => (
-        <>
-          <div className="relative flex justify-between h-16">
-            <div className="flex items-center flex-shrink-0 text-white ml-8">
-              <span className="text-xl tracking-tight">Avni Web Console</span>
-            </div>
+      {() => {
+          const env = process.env.NEXT_PUBLIC_ENVIRONMENT;
+          const homeUrl = env === "dev" ? process.env.NEXT_PUBLIC_WEBAPP_BASE_URL : "/";
+          return (
+              <>
+                  <div className="relative flex justify-between h-16">
+                      <div className="flex items-center flex-shrink-0 text-white ml-8">
+                          <span className="text-xl tracking-tight">Avni Web Console</span>
+                      </div>
 
-            <div className="flex-shrink-0 flex items-center ml-auto  mr-8">
-              <Link href={""}>
-                <Box
-                  sx={{
-                    "& > :not(style)": {
-                      m: 2,
-                      color: "white",
-                    },
-                  }}
-                >
-                  <HomeIcon
-                    sx={{ fontSize: 30 }}
-                    onClick={() => {
-                      const currentUrl = window.location.href;
-                      const newUrl = currentUrl.replace(
-                        /\/avni-media.*$/,
-                        "#/home"
-                      );
-                      window.location.href = newUrl;
-                    }}
-                  />
-                </Box>
-              </Link>
-            </div>
-          </div>
-        </>
-      )}
+                      <div className="flex-shrink-0 flex items-center ml-auto  mr-8">
+                          <Link href={""}>
+                              <Box
+                                  sx={{
+                                      "& > :not(style)": {
+                                          m: 2,
+                                          color: "white",
+                                      },
+                                  }}
+                              >
+                                  <HomeIcon
+                                      sx={{fontSize: 30}}
+                                      onClick={() => {
+                                          window.location.href = homeUrl
+                                      }}
+                                  />
+                              </Box>
+                          </Link>
+                      </div>
+                  </div>
+              </>
+          );
+      }}
     </Disclosure>
   );
 }
