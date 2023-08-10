@@ -1,5 +1,5 @@
 import CheckButton from "./CheckButton";
-import {useState, useEffect, Key, useId} from "react";
+import {Key, useEffect, useState} from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -13,14 +13,8 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import {
-    redirectIfNotValid,
-    getUserUuidFromToken,
-    operationalModuleData,
-    getImageName,
-    imageType,
-    isVideo
-} from "@/utils/helpers";
+import {getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
+import {imageType, getImageName, getThumbnail} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
@@ -336,8 +330,7 @@ export default function ImageList() {
     const onSelectImage = (value: string, checked: boolean) => {
         if (checked) {
             setCheckedImage((prevCheckedImage) => {
-                const updatedCheckedImage = [...prevCheckedImage, value];
-                return updatedCheckedImage;
+                return [...prevCheckedImage, value];
             });
         } else {
             setCheckedImage((prevCheckedImage) =>
@@ -369,7 +362,7 @@ export default function ImageList() {
         alert(
             `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
         );
-        const response = await axios.post(
+        await axios.post(
             `${process.env.NEXT_PUBLIC_MEDIA_VIEWER}/requestDownload`,
             {username: userName, data: selectedImage, description: inputValue, addressLevel: locationFilter}
         );
@@ -835,7 +828,7 @@ export default function ImageList() {
                                             <div className="relative w-full h-50 rounded-lg overflow-hidden">
                                                 <button>
                                                     <img
-                                                        src={isVideo(image.url) ? VideoThumbnail : image.signedThumbnailUrl}
+                                                        src={getThumbnail(image)}
                                                         alt={image?.subjectTypeName}
                                                         onClick={() => setCarouselImage(image)}
                                                         className="thumb"

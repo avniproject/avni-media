@@ -1,6 +1,7 @@
 import axios from 'axios';
 import jwt from 'jwt-decode';
 import jwt_decode from 'jwt-decode';
+import {imageType} from '../model/ImageType';
 
 const AuthTokenName = "authToken";
 
@@ -102,35 +103,6 @@ export const operationalModuleData = async () => {
         forms
     };
 };
-
-export interface imageType {
-    programEnrolment: string;
-    signedUrl: string;
-    signedThumbnailUrl: string;
-    uuid: string;
-    subjectTypeName: string;
-    createdDateTime: string;
-    encounterTypeName: string;
-    programName: string;
-    address: string;
-    subjectFirstName: string;
-    subjectLastName: string
-    url: string
-}
-
-export const getImageName = (image: imageType, minLevelName: string) => {
-    const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    return `${image.subjectFirstName ? image.subjectFirstName : ''}
-              ${image.subjectLastName ? '_' + image.subjectLastName : ''}
-              ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
-              ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
-              ${image.programEnrolment ? '_' + image.programEnrolment : ''}
-              ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
-}
-
-const getLowestLocation = (address: string, minLevelName: string) => {
-    return JSON.parse(address)[minLevelName];
-}
 
 export function isVideo(url: string) {
     const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"];

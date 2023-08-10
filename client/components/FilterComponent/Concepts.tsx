@@ -68,7 +68,7 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
                         <div className="p-4 text-gray-500">No concepts found.</div>
                     ) : (
                         filteredConcepts.map((option) => (
-                                <Menu.Item key={option.id}>
+                                <Menu.Item key={option.uuid}>
                                     {({active}) => (
                                         <button
                                             className={classNames(
