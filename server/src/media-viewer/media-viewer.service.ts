@@ -141,7 +141,7 @@ export class MediaViewerService {
   }
 
   async saveDownloadRequestMetadata(mediaData: any): Promise<DownloadJobs> {
-    const { username, data, description, addressLevel } = mediaData;
+    const { username, data, description, addressLevelTypes } = mediaData;
 
     if (!username || typeof username !== 'string' || !data) {
       this.logger.error(`Received invalid download request data`);
@@ -153,7 +153,7 @@ export class MediaViewerService {
       media.username = username;
       media.image_metadata = data;
       media.image_description = description;
-      media.location_level = addressLevel;
+      media.location_level = addressLevelTypes;
       this.logger.log('Saving the download request metadata');
       const savedMedia = await this.mediaRepository.save(media);
 

@@ -20,7 +20,7 @@ import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
 import TexConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
-import VideoThumbnail from './videoThumbnail';
+import {Checkbox, Divider, FormControlLabel, Button as MUIButton} from "@mui/material";
 
 export default function ImageList() {
     const [parentId, setParentId] = useState<any[]>([])
@@ -32,7 +32,9 @@ export default function ImageList() {
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [imageList, setImageList] = useState<any>({page: 0, data: []});
-    const [pagination, setPagination] = useState({size: 10, page: 0});
+    const MIN_PAGE_SIZE = 10, MAX_PAGE_SIZE= 100, PAGE_SIZE_STEP = 10;
+    const [pagination, setPagination] = useState({size: MIN_PAGE_SIZE, page: 0});
+    const [showPerpage, setShowperpage] = useState(PAGE_SIZE_STEP);
     const [userName, setUserName] = useState<string | string[] | undefined>();
     const [locationFilter, setLocation] = useState<any>([]);
     const [subjectFilter, setSubjectFilter] = useState<any>([]);
@@ -44,7 +46,6 @@ export default function ImageList() {
     const [encounterFilter, setEncounterFilter] = useState<any>([]);
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
-    const [showPerpage, setShowperpage] = useState(10);
     const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any>();
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encounter, setEncounterType] = useState<any[]>([]);
@@ -71,9 +72,11 @@ export default function ImageList() {
     const [showAllEncounter, setShowAllEncounter] = useState<any[]>([]);
     const [selectedEncounterTypeUUID, setSelectedEncounterTypeUUID] = useState<any>([]);
     const [selectedMediaConcepts, setSelectedMediaConcepts] = useState<any>([]);
-
     const selectedFieldConcept = selectedFieldConcepts && selectedFieldConcepts.length > 0 && selectedFieldConcepts[0];
-
+    const ALL_SELECTED = "ALL", SOME_SELECTED = "SOME", NONE_SELECTED = "NONE";
+    const [selectAllInPage, setSelectAllInPage] = useState<any>({0:NONE_SELECTED});
+    const [selectAllPages, setSelectAllPages] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(0);
     useEffect(() => {
         const userUUID = getUserUuidFromToken();
         setUserName(userUUID);
@@ -330,7 +333,7 @@ export default function ImageList() {
     const onSelectImage = (value: string, checked: boolean) => {
         if (checked) {
             setCheckedImage((prevCheckedImage) => {
-                return [...prevCheckedImage, value];
+                return (prevCheckedImage.indexOf(value) == -1) ? [...prevCheckedImage, value] :  prevCheckedImage
             });
         } else {
             setCheckedImage((prevCheckedImage) =>
@@ -340,7 +343,39 @@ export default function ImageList() {
     };
 
     useEffect(() => {
+        let currentPageSelectAllState = NONE_SELECTED;
+        setSelectAllInPage((oldValue: any) => {
+            const currentPageNotSelectedImages = imageList.data.filter((image: any) => !checkedImage.includes(image.uuid))
+            if (currentPageNotSelectedImages.length === 0 && imageList.data.length > 0) {
+                oldValue[currentPage] = ALL_SELECTED;
+            } else if (currentPageNotSelectedImages.length === imageList.data.length) {
+                oldValue[currentPage] = NONE_SELECTED
+            } else {
+                oldValue[currentPage] = SOME_SELECTED;
+            }
+            currentPageSelectAllState = oldValue[currentPage];
+            return oldValue;
+        })
+        setSelectAllPages((oldValue: boolean) => oldValue && currentPageSelectAllState == ALL_SELECTED)
+    }, [checkedImage]);
 
+    const toggleCheckAllImagesInCurrentPage = () => {
+        setSelectAllInPage((oldValue: any) => {
+            const currentValue = oldValue[currentPage];
+            const nextValue = (currentValue === NONE_SELECTED || currentValue === SOME_SELECTED) ? ALL_SELECTED: NONE_SELECTED;
+            return {...oldValue, [currentPage]: nextValue}
+        });
+    }
+
+    useEffect(() => {
+        if(selectAllInPage[currentPage] === ALL_SELECTED){
+            imageList.data.forEach((image : any) => onSelectImage(image.uuid, true));
+        } else if(selectAllInPage[currentPage] === NONE_SELECTED) {
+            imageList.data.forEach((image : any) => onSelectImage(image.uuid, false));
+        }
+    }, [imageList, selectAllInPage])
+
+    useEffect(() => {
         const filteredData = imageList.data.filter((item: { uuid: string; }) => checkedImage.includes(item.uuid))
         setSelectedImage((prevImages) => {
             const newImages = [...prevImages, ...filteredData];
@@ -355,17 +390,38 @@ export default function ImageList() {
 
     const pageChange = (size: number, page: number) => {
         setPagination({size: size, page: page});
+        setCurrentPage(page);
+        if(selectAllPages) {
+            setSelectAllInPage((oldValue: any) => {
+                oldValue[page] = ALL_SELECTED;
+                return oldValue;
+            })
+        }
     };
     const [showModal, setShowModal] = useState(false);
 
     const handleSendSelectedImages = async (inputValue: any) => {
         alert(
-            `We are procesing your donwload request. Once the download is ready, it will be available under Available Downloads.`
+            `We are processing your download request. Once the download is ready, it will be available under Available Downloads.
+            A maxiumim of 1000 images will be included in the download bundle.`
         );
-        await axios.post(
-            `${process.env.NEXT_PUBLIC_MEDIA_VIEWER}/requestDownload`,
-            {username: userName, data: selectedImage, description: inputValue, addressLevel: locationFilter}
-        );
+        if (selectAllPages) {
+            const options = {
+                headers: {
+                    "AUTH-TOKEN": localStorage.getItem("authToken"),
+                },
+            };
+            await axios.post(
+                `${process.env.NEXT_PUBLIC_ETL}/requestDownloadAll`,
+                {mediaSearchRequest: dataBody, username: userName, description: inputValue, addressLevelTypes: locationFilter},
+                options
+            );
+        } else {
+            await axios.post(
+                `${process.env.NEXT_PUBLIC_MEDIA_VIEWER}/requestDownload`,
+                {username: userName, data: selectedImage, description: inputValue, addressLevelTypes: locationFilter}
+            );
+        }
     };
 
     const handleOpenModal = () => {
@@ -662,7 +718,8 @@ export default function ImageList() {
             );
             setDataBody(body);
         }
-        filtersData()
+        filtersData();
+        resetSelections();
     }, [date, subject, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
 
     const handleApplyFilter = async () => {
@@ -689,6 +746,23 @@ export default function ImageList() {
         location.reload();
     };
 
+    const toggleSelectAllPages = () => {
+        setSelectAllPages(oldValue => {
+            const newValue = !oldValue;
+            if(!newValue) {
+                setSelectAllInPage({[currentPage]:NONE_SELECTED})
+                setCheckedImage([]);
+            }
+            return newValue
+        });
+    }
+
+    const resetSelections = () => {
+        setSelectAllInPage({[currentPage]:NONE_SELECTED});
+        setSelectAllPages(false);
+        setCheckedImage([]);
+    }
+
     const showCodedFilter = selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Coded";
     return (
         <>
@@ -696,18 +770,18 @@ export default function ImageList() {
                 <h1 className="text-xl leading-6 font-semibold text-gray-900 ml-8 flex-none">
                     Media Viewer
                 </h1>
-                <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700  mr-6">
+                <div className="mt-10 text-base leading-6 shadow-sm px-4 py-2 bg-white font-medium text-gray-700 mr-6">
                     <NumberDropdown
                         label="Images per page "
-                        min={10}
-                        max={100}
-                        step={10}
+                        min={MIN_PAGE_SIZE}
+                        max={MAX_PAGE_SIZE}
+                        step={PAGE_SIZE_STEP}
                         onChange={handleNumberChange}
                     />
                 </div>
             </div>
 
-            <div className="text-center">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                 {locationFilter && (
                     locationFilter.map(
                         (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
@@ -794,8 +868,8 @@ export default function ImageList() {
                 ) : null}
             </div>
 
-            <div className="bg-white">
-                <div className="flex justify-center mt-10">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-4 sm:py-4">
+                <div>
                     {showModal && (
                         <UserInputModal
                             showModal={showModal}
@@ -817,7 +891,19 @@ export default function ImageList() {
                         onClick={restFilters}
                         name="Reset Filters"
                     />
+                    <FormControlLabel style={{paddingLeft:"48px"}} label={"Select All"}
+                                      control={<Checkbox
+                                          onChange={toggleCheckAllImagesInCurrentPage}
+                                          checked={selectAllInPage[currentPage] === ALL_SELECTED}
+                                          indeterminate={selectAllInPage[currentPage] === SOME_SELECTED}
+                                          disabled={selectAllPages}
+                                      />} />
+                    {(selectAllInPage[currentPage] === ALL_SELECTED) &&
+                    <MUIButton variant="text" onClick={toggleSelectAllPages}>{selectAllPages ? "CLEAR SELECTION" : "SELECT ALL PAGES"}</MUIButton>}
+
+
                 </div>
+                <Divider style={{paddingTop: "24px"}}/>
                 <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
                     <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
                         {imageList.data.map(

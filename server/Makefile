@@ -10,6 +10,10 @@ start:
 start-dev:
 	npm run start:dev
 
+start-local-staging:
+	cp ./env-templates/local-staging.template .env
+	npm run start:dev
+
 start-prod:
 	npm run start:prod
 
