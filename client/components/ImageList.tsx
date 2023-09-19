@@ -23,8 +23,8 @@ import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 import VideoThumbnail from './videoThumbnail';
 
 export default function ImageList() {
-    const [parentid, setParentId] = useState<any[]>([])
-    const [distloc, setDistloc] = useState<any[]>([])
+    const [parentId, setParentId] = useState<any[]>([])
+    const [distLoc, setDistLoc] = useState<any[]>([])
     const [add, setAdd] = useState<any>([]);
     const [address, setAddress] = useState<any>([]);
     const [secondAddress, setSecondAddress] = useState<any>([]);
@@ -37,7 +37,7 @@ export default function ImageList() {
     const [locationFilter, setLocation] = useState<any>([]);
     const [subjectFilter, setSubjectFilter] = useState<any>([]);
     const [programFilter, setProgramFilter] = useState<any>([]);
-    const [maxLevelLocation, setMaxtLevelLocation] = useState<any>([]);
+    const [maxLevelLocation, setMaxLevelLocation] = useState<any>([]);
     const [minLevel, setMinLevel] = useState<number>();
     const [maxLevel, setMaxLevel] = useState<number>();
     const [minLevelName, setMinLevelName] = useState<string>("");
@@ -47,8 +47,8 @@ export default function ImageList() {
     const [showPerpage, setShowperpage] = useState(10);
     const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any>();
     const [date, setDateRange] = useState<any[] | null>([]);
-    const [encouter, setEncounterType] = useState<any[]>([]);
-    const [program, setProgamType] = useState<any[]>([]);
+    const [encounter, setEncounterType] = useState<any[]>([]);
+    const [program, setProgramType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
     const [dataBody, setDataBody] = useState<any>();
     const [conceptData, setConceptData] = useState<any>([]);
@@ -86,7 +86,7 @@ export default function ImageList() {
 
             setMinLevelName(processedData.minLevelAddressName);
 
-            setMaxtLevelLocation(processedData.maxLevelLocation);
+            setMaxLevelLocation(processedData.maxLevelLocation);
 
             setLocation(processedData.sortedAddressLevel);
 
@@ -353,7 +353,7 @@ export default function ImageList() {
     }, [checkedImage, imageList]);
 
 
-    const pagechange = (size: number, page: number) => {
+    const pageChange = (size: number, page: number) => {
         setPagination({size: size, page: page});
     };
     const [showModal, setShowModal] = useState(false);
@@ -453,7 +453,7 @@ export default function ImageList() {
 
     const programType = (data: any[], programUuid: string[]) => {
         setSelectedProgramUUId(programUuid);
-        setProgamType(data);
+        setProgramType(data);
     };
 
     const dateRange = (data: any[] | null) => {
@@ -469,9 +469,9 @@ export default function ImageList() {
 
     useEffect(() => {
 
-        const filteredLoc = locations.filter((locationItem: { parentId: any; }) => parentid.includes(locationItem.parentId))
-        setDistloc(filteredLoc)
-    }, [parentid])
+        const filteredLoc = locations.filter((locationItem: { parentId: any; }) => parentId.includes(locationItem.parentId))
+        setDistLoc(filteredLoc)
+    }, [parentId])
 
     const getLocation = async (data: any[], parentsIdArray: any[]) => {
 
@@ -571,7 +571,7 @@ export default function ImageList() {
         if (data.length === 0) {
             setCodedConcept([])
             setEncounterType([])
-            setProgamType([])
+            setProgramType([])
             setDateTimeConcept([])
             setTextConcept([])
             setToNumericConcept([])
@@ -646,7 +646,7 @@ export default function ImageList() {
                 Object.entries({
                     subjectTypeNames: subject,
                     programNames: program,
-                    encounterTypeNames: encouter,
+                    encounterTypeNames: encounter,
                     fromDate: fromDate,
                     toDate: toDate,
                     addresses: add,
@@ -663,7 +663,7 @@ export default function ImageList() {
             setDataBody(body);
         }
         filtersData()
-    }, [date, subject, encouter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
+    }, [date, subject, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
@@ -722,7 +722,7 @@ export default function ImageList() {
                                         minLevel={minLevel}
                                         maxLevel={maxLevel}
                                         getLocation={getLocation}
-                                        location={distloc}
+                                        location={distLoc}
                                         getOtherLocation={getOtherLocation}
                                         otherLocation={otherLocation}
                                         getTopLevel={getTopLevel}
@@ -869,7 +869,7 @@ export default function ImageList() {
                 )}
                 <Pagination
                     showperpage={showPerpage}
-                    pagechange={pagechange}
+                    pagechange={pageChange}
                     nextPageData={nextPageData.data}
                 />
             </div>
