@@ -401,10 +401,7 @@ export default function ImageList() {
     const [showModal, setShowModal] = useState(false);
 
     const handleSendSelectedImages = async (inputValue: any) => {
-        alert(
-            `We are processing your download request. Once the download is ready, it will be available under Available Downloads.
-            A maxiumim of 1000 images will be included in the download bundle.`
-        );
+        alert(`We are processing your download request. Once the download is ready, it will be available under Available Downloads. At most 1000 media items will be included in the download bundle.`);
         if (selectAllPages) {
             const options = {
                 headers: {
@@ -898,8 +895,9 @@ export default function ImageList() {
                                           indeterminate={selectAllInPage[currentPage] === SOME_SELECTED}
                                           disabled={selectAllPages}
                                       />} />
-                    {(selectAllInPage[currentPage] === ALL_SELECTED) &&
-                    <MUIButton variant="text" onClick={toggleSelectAllPages}>{selectAllPages ? "CLEAR SELECTION" : "SELECT ALL PAGES"}</MUIButton>}
+                    {(selectAllInPage[currentPage] === ALL_SELECTED) && <>
+                        <MUIButton variant="text" onClick={toggleSelectAllPages} style={{textTransform:"capitalize", fontSize:"1rem"}}>{selectAllPages ? "Clear selection" : "Select all media matching filter"}</MUIButton>
+                    </>}
 
 
                 </div>
