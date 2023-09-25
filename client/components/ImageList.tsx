@@ -898,8 +898,15 @@ export default function ImageList() {
                     {(selectAllInPage[currentPage] === ALL_SELECTED) && <>
                         <MUIButton variant="text" onClick={toggleSelectAllPages} style={{textTransform:"capitalize", fontSize:"1rem"}}>{selectAllPages ? "Clear selection" : "Select all media matching filter"}</MUIButton>
                     </>}
-
-
+                    {
+                        (selectAllPages || checkedImage.length > 0) && <Divider style={{paddingTop:"24px"}}/>
+                    }
+                    {
+                        (!selectAllPages && checkedImage.length > 0) && <p style={{paddingTop:"24px", fontSize:"1rem"}}>Selected {checkedImage.length} media items</p>
+                    }
+                    {
+                        selectAllPages && <p style={{paddingTop:"24px", fontSize:"1rem"}}>Selected all media items in all pages</p>
+                    }
                 </div>
                 <Divider style={{paddingTop: "24px"}}/>
                 <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
