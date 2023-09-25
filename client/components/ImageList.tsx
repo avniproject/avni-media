@@ -361,7 +361,7 @@ export default function ImageList() {
 
     const toggleCheckAllImagesInCurrentPage = () => {
         setSelectAllInPage((oldValue: any) => {
-            const currentValue = oldValue[currentPage];
+            const currentValue = oldValue[currentPage] || NONE_SELECTED;
             const nextValue = (currentValue === NONE_SELECTED || currentValue === SOME_SELECTED) ? ALL_SELECTED: NONE_SELECTED;
             return {...oldValue, [currentPage]: nextValue}
         });
