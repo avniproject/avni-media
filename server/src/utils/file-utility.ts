@@ -37,16 +37,16 @@ export class FileUtility{
         locationHierarchy: { name: any; }[]
       ): Promise<string> {
         const address = metadata.address;
-        const conceptType = metadata.conceptName;
-        const subjectType = metadata.subjectTypeName;
-        const encounterType = metadata.encounterTypeName;
+        const conceptType = metadata.conceptName.replace("/", "-");
+        const subjectType = metadata.subjectTypeName.replace("/", "-");
+        const encounterType = metadata.encounterTypeName.replace("/", "-");
         const keys = locationHierarchy.map((index: { name: any; }) => index.name);
-        const jsonadd = JSON.parse(address);
+        const jsonAddress = JSON.parse(address);
         const addressArray = [];
         let val =''
         for (const key of keys) {
           val= key.toString()
-          addressArray.push(jsonadd[val]);
+          addressArray.push(jsonAddress[val].replace("/", "-"));
         }
         let directoryPath = ''
         await Promise.all(
