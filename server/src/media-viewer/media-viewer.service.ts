@@ -6,10 +6,11 @@ import { DownloadJobs } from 'src/entity/media.entity';
 import { Status } from 'src/media-viewer/status.enum';
 import { FileUtility } from 'src/utils/file-utility';
 import axios from 'axios';
-import * as JSZip from 'jszip';
 import { S3Service } from 'src/s3/s3.Service';
 import * as fs from 'fs';
-import * as fsrm from 'fs-extra';
+import * as fsExtra from 'fs-extra';
+import { zip } from 'zip-a-folder';
+
 @Injectable()
 export class MediaViewerService {
   private readonly logger = new Logger(MediaViewerService.name);
@@ -22,7 +23,7 @@ export class MediaViewerService {
     private readonly configService: ConfigService,
   ) {}
 
-  async createZipOfMediaFiles(): Promise<DownloadJobs[]> {
+  async createZipOfMediaFiles(): Promise<{ job: number }[]> {
     const data = await this.mediaRepository.find({
       where: { status: 'Pending' as Status },
     });
@@ -31,9 +32,7 @@ export class MediaViewerService {
 
     const parsedData = JSON.parse(jsonData);
 
-    const zip = new JSZip();
-
-    let folderName = '';
+    let downloadRootFolder = '';
 
     await Promise.all(
       Object.keys(parsedData).map(async (id) => {
@@ -51,93 +50,147 @@ export class MediaViewerService {
               },
               i: any,
             ) => {
-              const imageUrl = metadata.url;
-              folderName = await this.fileUtility.folderStructure(
+              const folderName = await this.fileUtility.folderStructure(
                 metadata,
                 locationHierarchy,
               );
-              try {
-                const splitOn =
-                  '.com/' +
-                  this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') +
-                  '/';
-
-                const parts = imageUrl.split(splitOn);
-                const objectKey = parts[1];
-                this.logger.log('Creating presigned url for: ', objectKey);
-                const presignedURL = await this.s3Service.generatePresignedUrl(
-                  objectKey,
-                );
-
-                const response = await axios.get(presignedURL, {
-                  responseType: 'arraybuffer',
-                });
-
-                if (response.status === 200) {
-                  const fileName = `image${[i]}.jpg`;
-                  this.logger.log(
-                    'Creating zip file for folder name: ',
-                    folderName,
-                    ' and file name: ',
-                    fileName,
-                  );
-                  zip
-                    .folder(folderName)
-                    .file(fileName, response.data, { binary: true });
-                }
-                imageCount = imageCount + 1;
-              } catch (error) {
-                this.logger.error(
-                  `Error downloading image from ${imageUrl}: ${error}`,
-                );
-              }
+              downloadRootFolder = this.getRootFolder(folderName);
+              imageCount += await this.downloadMediaItemToFilesystem(
+                metadata,
+                i,
+                folderName,
+              );
             },
           ),
         );
+        this.logger.log(
+          `Completed media downloads for job ${parsedData[id].id}`,
+        );
 
-        const content = await zip.generateAsync({ type: 'nodebuffer' });
-        const timestamp = new Date().getTime();
-        const zipFileName = `${parsedData[id].id}${timestamp}.zip`;
-        const filePath = __dirname + zipFileName;
-        fs.writeFileSync(filePath, content);
-        const stats = fs.statSync(filePath);
-        const fileSizeInBytes = stats.size;
+        const { zipFileName, localZipfilePath, fileSizeInBytes } =
+          await this.createZip(parsedData[id].id, downloadRootFolder);
 
         const fileSizeLabel = this.fileUtility.getFileSizeText(fileSizeInBytes);
         const s3FileName = 'media-zipped-files/' + zipFileName;
 
         this.logger.log(
-          `Uploading the zip file ${s3FileName} to S3 at ${filePath} `,
+          `Uploading the zip file ${s3FileName} to S3 at ${localZipfilePath} `,
         );
         const zipFileS3url = await this.s3Service.uploadFileToS3(
-          filePath,
+          localZipfilePath,
           s3FileName,
         );
 
-        const record = parsedData[id];
-        const updatedRecord = {
-          ...record,
-          status: 'Complete',
-          zip_url: zipFileS3url,
-          file_size: fileSizeLabel,
-          image_count: imageCount,
-        };
-        this.logger.log('Updating the zip URL and job status');
-        await this.mediaRepository.update(record.id, updatedRecord);
-
-        fs.unlinkSync(filePath);
-        try {
-          const folderSName = folderName.split('/');
-          const rmFolder = folderSName[0];
-          await fsrm.remove(rmFolder);
-          this.logger.log(`Temp directory ${rmFolder} cleaned successfully.`);
-        } catch (err) {
-          this.logger.error(`Error deleting directory ${folderName}: ${err}`);
-        }
+        await this.updateDBRecord(
+          parsedData,
+          id,
+          zipFileS3url,
+          fileSizeLabel,
+          imageCount,
+        );
+        await this.cleanup(localZipfilePath, downloadRootFolder);
       }),
     );
 
-    return;
+    return data.map((d) => ({ job: d.id }));
+  }
+
+  private async downloadMediaItemToFilesystem(
+    metadata: {
+      url: any;
+      address: any;
+      conceptName: any;
+      subjectTypeName: any;
+      encounterTypeName: any;
+    },
+    i: any,
+    folderName: string,
+  ) {
+    let imageCount = 0;
+    const imageUrl = metadata.url;
+
+    try {
+      const splitOn =
+        '.com/' + this.configService.get('AVNI_MEDIA_S3_BUCKET_NAME') + '/';
+
+      const parts = imageUrl.split(splitOn);
+      this.logger.debug(`Image url ${imageUrl} , parts ${parts}`);
+      const objectKey = parts[1];
+      if (objectKey) {
+        this.logger.debug('Creating pre-signed url for: ', objectKey);
+        const presignedURL = await this.s3Service.generatePresignedUrl(
+          objectKey,
+        );
+
+        const response = await axios.get(presignedURL, {
+          responseType: 'arraybuffer',
+        });
+
+        if (response.status === 200) {
+          const fileName = `image${[i]}.jpg`;
+          this.logger.debug(
+            `Writing local file: ${folderName}/${fileName} for ${objectKey}`,
+          );
+          fs.writeFileSync(
+            `${folderName}/${fileName}`,
+            response.data,
+            'binary',
+          );
+        }
+        imageCount = 1;
+      }
+    } catch (error) {
+      this.logger.error(`Error downloading image from ${imageUrl}: ${error}`);
+    }
+    return imageCount;
+  }
+
+  private async cleanup(localZipFilePath: string, downloadRootFolder: string) {
+    fs.unlinkSync(localZipFilePath);
+    try {
+      const rmFolder = this.getRootFolder(downloadRootFolder);
+      await fsExtra.removeSync(rmFolder);
+      this.logger.log(`Temp directory ${rmFolder} cleaned successfully.`);
+    } catch (err) {
+      this.logger.error(
+        `Error deleting directory ${downloadRootFolder}: ${err}`,
+      );
+    }
+  }
+
+  private async updateDBRecord(
+    parsedData,
+    id: string,
+    zipFileS3url: string,
+    fileSizeLabel: string,
+    imageCount: number,
+  ) {
+    const record = parsedData[id];
+    const updatedRecord = {
+      ...record,
+      status: 'Complete',
+      zip_url: zipFileS3url,
+      file_size: fileSizeLabel,
+      image_count: imageCount,
+    };
+    this.logger.log('Updating the zip URL and job status');
+    await this.mediaRepository.update(record.id, updatedRecord);
+  }
+
+  private async createZip(id: string, folderName: string) {
+    const timestamp = new Date().getTime();
+    const zipFileName = `${id}${timestamp}.zip`;
+    const filePath = __dirname + zipFileName;
+    const fsZipOutputStream = fs.createWriteStream(filePath);
+    await zip(folderName, undefined, { customWriteStream: fsZipOutputStream });
+    const stats = fs.statSync(filePath);
+    const fileSizeInBytes = stats.size;
+    return { zipFileName, localZipfilePath: filePath, fileSizeInBytes };
+  }
+
+  private getRootFolder(folderName: string) {
+    const folderSName = folderName.split('/');
+    return folderSName[0];
   }
 
   async saveDownloadRequestMetadata(mediaData: any): Promise<DownloadJobs> {
