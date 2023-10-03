@@ -32,10 +32,11 @@ export class MediaViewerService {
 
     const parsedData = JSON.parse(jsonData);
 
-    let downloadRootFolder = '';
     let imageCount = 0;
     await Promise.all(
       Object.keys(parsedData).map(async (id) => {
+        const jobId = parsedData[id].id;
+        const downloadRoot = `job${jobId}`;
         const locationHierarchy = parsedData[id].location_level;
         const downloadResults = await Promise.all(
           parsedData[id].image_metadata.map(
@@ -50,11 +51,15 @@ export class MediaViewerService {
               i: any,
             ) => {
               const folderName = await this.fileUtility.folderStructure(
+                downloadRoot,
                 metadata,
                 locationHierarchy,
               );
-              downloadRootFolder = this.getRootFolder(folderName);
-              await this.downloadMediaItemToFilesystem(metadata, i, folderName);
+              return await this.downloadMediaItemToFilesystem(
+                metadata,
+                i,
+                folderName,
+              );
             },
           ),
         );
@@ -62,11 +67,11 @@ export class MediaViewerService {
           (downloadResult) => downloadResult,
         ).length;
         this.logger.log(
-          `Completed media downloads for job ${parsedData[id].id}`,
+          `Completed media downloads for job ${jobId} with ${imageCount} images`,
         );
 
         const { zipFileName, localZipfilePath, fileSizeInBytes } =
-          await this.createZip(parsedData[id].id, downloadRootFolder);
+          await this.createZip(jobId, downloadRoot);
 
         const fileSizeLabel = this.fileUtility.getFileSizeText(fileSizeInBytes);
         const s3FileName = 'media-zipped-files/' + zipFileName;
@@ -86,7 +91,7 @@ export class MediaViewerService {
           fileSizeLabel,
           imageCount,
         );
-        await this.cleanup(localZipfilePath, downloadRootFolder);
+        await this.cleanup(localZipfilePath, downloadRoot);
       }),
     );
 
@@ -104,7 +109,7 @@ export class MediaViewerService {
     index: any,
     folderName: string,
   ) {
-    let downloadSuccessful = false;
+    let downloadSuccessful: boolean;
     const imageUrl = metadata.url;
 
     try {
@@ -140,7 +145,9 @@ export class MediaViewerService {
         downloadSuccessful = true;
       } else {
         downloadSuccessful = false;
-        console.error(`Could not download ${imageUrl} with parts ${parts}`);
+        this.logger.error(
+          `Skipping download of ${imageUrl}, missing required prefix in path`,
+        );
       }
     } catch (error) {
       this.logger.error(`Error downloading image from ${imageUrl}: ${error}`);
