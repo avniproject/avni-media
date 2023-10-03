@@ -33,12 +33,11 @@ export class MediaViewerService {
     const parsedData = JSON.parse(jsonData);
 
     let downloadRootFolder = '';
-
+    let imageCount = 0;
     await Promise.all(
       Object.keys(parsedData).map(async (id) => {
         const locationHierarchy = parsedData[id].location_level;
-        let imageCount = 0;
-        await Promise.all(
+        const downloadResults = await Promise.all(
           parsedData[id].image_metadata.map(
             async (
               metadata: {
@@ -55,14 +54,13 @@ export class MediaViewerService {
                 locationHierarchy,
               );
               downloadRootFolder = this.getRootFolder(folderName);
-              imageCount += await this.downloadMediaItemToFilesystem(
-                metadata,
-                i,
-                folderName,
-              );
+              await this.downloadMediaItemToFilesystem(metadata, i, folderName);
             },
           ),
         );
+        imageCount = downloadResults.filter(
+          (downloadResult) => downloadResult,
+        ).length;
         this.logger.log(
           `Completed media downloads for job ${parsedData[id].id}`,
         );
@@ -103,10 +101,10 @@ export class MediaViewerService {
       subjectTypeName: any;
       encounterTypeName: any;
     },
-    i: any,
+    index: any,
     folderName: string,
   ) {
-    let imageCount = 0;
+    let downloadSuccessful = false;
     const imageUrl = metadata.url;
 
     try {
@@ -115,21 +113,23 @@ export class MediaViewerService {
 
       const parts = imageUrl.split(splitOn);
       this.logger.debug(`Image url ${imageUrl} , parts ${parts}`);
-      const objectKey = parts[1];
-      if (objectKey) {
-        this.logger.debug('Creating pre-signed url for: ', objectKey);
+      const s3objectKey = parts[1];
+      if (s3objectKey) {
+        this.logger.debug('Creating pre-signed url for: ', s3objectKey);
         const presignedURL = await this.s3Service.generatePresignedUrl(
-          objectKey,
+          s3objectKey,
         );
 
         const response = await axios.get(presignedURL, {
           responseType: 'arraybuffer',
         });
-
+        const mediaItemExtension = s3objectKey.substring(
+          s3objectKey.lastIndexOf('.') + 1,
+        );
         if (response.status === 200) {
-          const fileName = `image${[i]}.jpg`;
+          const fileName = `mediaItem${index}.${mediaItemExtension}`;
           this.logger.debug(
-            `Writing local file: ${folderName}/${fileName} for ${objectKey}`,
+            `Writing local file: ${folderName}/${fileName} for ${s3objectKey}`,
           );
           fs.writeFileSync(
             `${folderName}/${fileName}`,
@@ -137,12 +137,16 @@ export class MediaViewerService {
             'binary',
           );
         }
-        imageCount = 1;
+        downloadSuccessful = true;
+      } else {
+        downloadSuccessful = false;
+        console.error(`Could not download ${imageUrl} with parts ${parts}`);
       }
     } catch (error) {
       this.logger.error(`Error downloading image from ${imageUrl}: ${error}`);
+      downloadSuccessful = false;
     }
-    return imageCount;
+    return downloadSuccessful;
   }
 
   private async cleanup(localZipFilePath: string, downloadRootFolder: string) {
