@@ -34,6 +34,7 @@ export class FileUtility {
   }
 
   async folderStructure(
+    downloadRoot: string,
     metadata: any,
     locationHierarchy: { name: any }[],
   ): Promise<string> {
@@ -43,7 +44,7 @@ export class FileUtility {
     const encounterType = metadata.encounterTypeName;
     const keys = locationHierarchy.map((index: { name: any }) => index.name);
     const jsonAddress = JSON.parse(address);
-    const pathPartsArray = [];
+    const pathPartsArray = [downloadRoot];
     let val = '';
     for (const key of keys) {
       val = key.toString();

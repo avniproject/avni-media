@@ -4,3 +4,5 @@ node_modules/
 # ignore generated zip files
 *.zip
 .idea/
+.DS_Store
+.env
