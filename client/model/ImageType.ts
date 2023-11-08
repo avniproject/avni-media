@@ -14,6 +14,14 @@ export interface imageType {
     subjectFirstName: string;
     subjectLastName: string
     url: string
+    entityId: number;
+}
+
+export interface imageMetadata {
+    subjectTypeName: string | null;
+    programName: string | null;
+    encounterTypeName: string | null;
+    entityId: number;
 }
 
 export const getImageName = function(image: imageType, minLevelName: string) {
@@ -32,6 +40,15 @@ const getLowestLocation = function (address: string, minLevelName: string) {
 
 export const getThumbnail = function(image: imageType) {
     return isVideo(image.url) ? VideoThumbnail : image.signedThumbnailUrl
+}
+
+export const getMetadata = function(img: imageType) : imageMetadata {
+    return {
+        entityId: img.entityId,
+        encounterTypeName: img.encounterTypeName || null,
+        subjectTypeName: img.subjectTypeName || null,
+        programName: img.programName || null
+    }
 }
 
 export const getImage = function(image: imageType) {

@@ -6,7 +6,8 @@ import CheckButton from "./CheckButton";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {redirectIfNotValid, operationalModuleData} from '@/utils/helpers'
-import {imageType, getImageName, getImage} from '../model/ImageType';
+import {imageType, getImageName, getImage, imageMetadata, getMetadata} from '../model/ImageType';
+import {Button} from "@mui/material";
 
 interface Props {
     imageList: object[];
@@ -69,6 +70,25 @@ const ImageCarousel = ({
         onSelectImage(value, checked,);
     };
 
+    function buildSubjectDashboardURLForUUID(uuid: string) {
+        return `${process.env.NEXT_PUBLIC_WEBAPP_BASE_URL}/#/app/subject?uuid=${uuid}`;
+    }
+
+    const redirectToSubjectDashboardURL = async (imgMetadata: imageMetadata) => {
+        const options = {
+            headers: {
+                "AUTH-TOKEN": localStorage.getItem("authToken"),
+            },
+            params : imgMetadata
+        };
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_WEB}/web/individual/byMetadata`,
+            options
+        );
+        window.location.href = buildSubjectDashboardURLForUUID(response.data.uuid);
+        return;
+    };
+
     return (
         <>
             <div className="fixed  inset-0 overflow-y-auto  " style={{zIndex: 21}}>
@@ -82,12 +102,11 @@ const ImageCarousel = ({
                         className="hidden sm:inline-block sm:align-middle sm:h-screen"
                         aria-hidden="true"
                     >
-            &#8203;
-          </span>
+                  </span>
                     <div
                         className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                         <div className="inline-block  bg-red rounded-lg">
-                            <button className="absolute top-0 right-3 z-50" onClick={onClose}>
+                            <button className="absolute top-0 right-1 z-50" onClick={onClose}>
                                 <svg
                                     className="h-6 w-6"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +124,7 @@ const ImageCarousel = ({
                                 </svg>
                             </button>
                         </div>
-                        <div className="flex  w-full h-full">
+                        <div className="flex w-full h-full">
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
                                     return (
@@ -161,7 +180,15 @@ const ImageCarousel = ({
                                                 />
                                             </div>
                                             <div className="name-size">
-                                                <p className="text-sm">
+                                                <Button
+                                                    className="text-sm m-lt-3 float-right"
+                                                    style={{textTransform:"capitalize", fontSize: "1rem"}}
+                                                    variant="text"
+                                                    onClick={() => redirectToSubjectDashboardURL(getMetadata(img))}
+                                                >
+                                                    More Info
+                                                </Button>
+                                                <p className="text-sm float-left">
                                                     Date:{" "}
                                                     {new Date(img.createdDateTime)
                                                         .toLocaleDateString("en-IN", {

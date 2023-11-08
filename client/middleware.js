@@ -11,7 +11,7 @@ export function middleware(request) {
     // console.log("Path:", pathname);
 
     if (pathname.startsWith('/web') || pathname.startsWith("/location")) {
-        const url = new URL(pathname, mainService);
+        const url = new URL(pathname+request.nextUrl.search, mainService);
         // console.log("Rewriting to ", JSON.stringify(url));
         return NextResponse.rewrite(url);
     }
