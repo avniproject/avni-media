@@ -104,8 +104,16 @@ export const operationalModuleData = async () => {
     };
 };
 
-export function isVideo(url: string) {
-    const videoExtensions = [".mp4", ".mov", ".avi", ".mkv"];
-    const fileExtension = url.substring(url.lastIndexOf(".")).toLowerCase();
-    return videoExtensions.includes(fileExtension);
+export function isAudioOrVideo(fileExtension: string) {
+    const audioVideoFileExtensions = [".mp4", ".mov", ".avi", ".mkv", ".mp3", ".wav"];
+    return matchesFileExtension(fileExtension, audioVideoFileExtensions);
+}
+
+export function isImage(fileExtension: string) {
+    const imageFileExtensions = [".png", ".jpg"];
+    return matchesFileExtension(fileExtension, imageFileExtensions);
+}
+
+export function matchesFileExtension(fileExtension: string, supportedExtensions: string[]) {
+    return supportedExtensions.includes(fileExtension);
 }

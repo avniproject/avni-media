@@ -14,7 +14,7 @@ import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
 import {getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
-import {imageType, getImageName, getThumbnail} from '../model/ImageType';
+import {imageType, getImageName, getImage} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
@@ -919,7 +919,7 @@ export default function ImageList() {
                                             <div className="relative w-full h-50 rounded-lg overflow-hidden">
                                                 <button>
                                                     <img
-                                                        src={getThumbnail(image)}
+                                                        src={getImage(image, true)}
                                                         alt={image?.subjectTypeName}
                                                         onClick={() => setCarouselImage(image)}
                                                         className="thumb"

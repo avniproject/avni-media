@@ -1,5 +1,6 @@
-import VideoThumbnail from "../components/videoThumbnail";
-import {isVideo} from "../utils/helpers";
+import PlayMediaThumbnail from "../components/playMediaThumbnail";
+import FileThumbnail from "../components/fileThumbnail";
+import {isAudioOrVideo, isImage} from "../utils/helpers";
 
 export interface imageType {
     programEnrolment: string;
@@ -39,7 +40,7 @@ const getLowestLocation = function (address: string, minLevelName: string) {
 }
 
 export const getThumbnail = function(image: imageType) {
-    return isVideo(image.url) ? VideoThumbnail : image.signedThumbnailUrl
+    return isAudioOrVideo(image.url) ? PlayMediaThumbnail : image.signedThumbnailUrl
 }
 
 export const getMetadata = function(img: imageType) : imageMetadata {
@@ -51,6 +52,14 @@ export const getMetadata = function(img: imageType) : imageMetadata {
     }
 }
 
-export const getImage = function(image: imageType) {
-    return isVideo(image.url) ? VideoThumbnail : image.signedUrl
+export const getImage = function(image: imageType, getThumbnail: boolean = false) {
+    const fileExtension = image.url.substring(image.url.lastIndexOf(".")).toLowerCase();
+
+    if (isImage(fileExtension)) {
+        return getThumbnail ? image.signedThumbnailUrl : image.signedUrl;
+    }
+    if (isAudioOrVideo(fileExtension)) {
+        return PlayMediaThumbnail;
+    }
+    return FileThumbnail;
 }
