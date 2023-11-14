@@ -1,4 +1,4 @@
-NEXT_PUBLIC_ETL=https://localhost:6012/etl
+NEXT_PUBLIC_ETL=http://localhost:8022/etl
 NEXT_PUBLIC_MEDIA_VIEWER=http://localhost:3010/media-viewer
 NEXT_PUBLIC_WEB=http://localhost:8021
 NEXT_PUBLIC_ENVIRONMENT=dev
