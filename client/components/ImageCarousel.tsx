@@ -71,7 +71,7 @@ const ImageCarousel = ({
     };
 
     function buildSubjectDashboardURLForUUID(uuid: string) {
-        return `${process.env.NEXT_PUBLIC_WEBAPP_BASE_URL}/#/app/subject?uuid=${uuid}`;
+        return `${process.env.NEXT_PUBLIC_WEB}/#/app/subject?uuid=${uuid}`;
     }
 
     const redirectToSubjectDashboardURL = async (imgMetadata: imageMetadata) => {
@@ -181,8 +181,8 @@ const ImageCarousel = ({
                                             </div>
                                             <div className="name-size">
                                                 <Button
-                                                    className="text-sm m-lt-3 float-right"
-                                                    style={{textTransform:"capitalize", fontSize: "1rem"}}
+                                                    className="text-sm m-lt-3 float-right mb-md-5 mr-md-5"
+                                                    style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"0px"}}
                                                     variant="text"
                                                     onClick={() => redirectToSubjectDashboardURL(getMetadata(img))}
                                                 >
