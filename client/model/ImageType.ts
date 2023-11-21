@@ -39,10 +39,6 @@ const getLowestLocation = function (address: string, minLevelName: string) {
     return JSON.parse(address)[minLevelName];
 }
 
-export const getThumbnail = function(image: imageType) {
-    return isAudioOrVideo(image.url) ? PlayMediaThumbnail : image.signedThumbnailUrl
-}
-
 export const getMetadata = function(img: imageType) : imageMetadata {
     return {
         entityId: img.entityId,
@@ -53,10 +49,12 @@ export const getMetadata = function(img: imageType) : imageMetadata {
 }
 
 export const getImage = function(image: imageType, getThumbnail: boolean = false) {
+    if (!getThumbnail) return image.signedUrl;
+
     const fileExtension = image.url.substring(image.url.lastIndexOf(".")).toLowerCase();
 
     if (isImage(fileExtension)) {
-        return getThumbnail ? image.signedThumbnailUrl : image.signedUrl;
+        return image.signedThumbnailUrl;
     }
     if (isAudioOrVideo(fileExtension)) {
         return PlayMediaThumbnail;

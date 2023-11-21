@@ -164,7 +164,7 @@ const ImageCarousel = ({
                                         index
                                     ) => (
                                         <div key={index}>
-                                            <img src={getImage(img)} className="carousel-image"/>
+                                            <img src={getImage(img, true)} className="carousel-image"/>
                                             <div className="checkbox">
                                                 <CheckButton
                                                     image_url={getImage(img)}
