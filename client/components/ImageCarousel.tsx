@@ -188,7 +188,9 @@ const ImageCarousel = ({
                                                 >
                                                     More Info
                                                 </Button>
-                                                <p className="text-sm float-left">
+                                                <p className="text-sm float-left"
+                                                   style={{ paddingLeft:"20px", paddingTop:"4px" }}
+                                                >
                                                     Date:{" "}
                                                     {new Date(img.createdDateTime)
                                                         .toLocaleDateString("en-IN", {
