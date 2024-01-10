@@ -56,8 +56,8 @@ EOF
 sudo -H -u avni-media-user bash << EOF
 mkdir -p ~/avni-media/client
 mkdir -p ~/avni-media/server
-tar -zxvf /tmp/avni-media-client.tgz --directory ~/avni-media/client
-tar -zxvf /tmp/avni-media-server.tgz --directory ~/avni-media/server
+tar -zxf /tmp/avni-media-client.tgz --directory ~/avni-media/client --totals --checkpoint=1000
+tar -zxf /tmp/avni-media-server.tgz --directory ~/avni-media/server --totals --checkpoint=1000
 EOF
 
 #Run server

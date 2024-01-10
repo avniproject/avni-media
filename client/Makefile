@@ -35,3 +35,11 @@ build-app-staging:
 build-app-prerelease:
 	$(call _create_env,prerelease)
 	npm run build
+
+build-app-rwb-prod:
+	$(call _create_env,rwb.production)
+	npm run build
+
+build-app-rwb-staging:
+	$(call _create_env,rwb.staging)
+	npm run build

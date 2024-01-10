@@ -1,0 +1,3 @@
+NEXT_PUBLIC_ETL=https://etl-staging.rwb.avniproject.org/etl
+NEXT_PUBLIC_MEDIA_VIEWER=https://etl-staging.rwb.avniproject.org/media-viewer
+NEXT_PUBLIC_WEB=https://staging.rwb.avniproject.org

@@ -32,3 +32,9 @@ build-app-staging:
 
 build-app-prerelease:
 	make _build-app template=prerelease.template
+
+build-app-rwb-prod:
+	make _build-app template=rwb.production.template
+
+build-app-rwb-staging:
+	make _build-app template=rwb.staging.template
