@@ -25,7 +25,7 @@ export const handler = async (event, context) => {
       console.info('Thumbnail creation process with input param->', inputParams)
       const { Body } = await s3.getObject(inputParams).promise();
       console.log('Ready to create thumbnail...')
-      const thumbnail = await sharp(Body).resize(200, 200).toBuffer();
+      const thumbnail = await sharp(Body, { failOn: 'error' }).resize(200, 200).toBuffer();
       console.log('Thumbnail created...')
 
       const thumbnailParams = {
