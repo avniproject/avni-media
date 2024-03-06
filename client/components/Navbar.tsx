@@ -2,6 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import Box from "@mui/material/Box";
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 import Link from "next/link";
+import {getAppHomeUrl} from "@/utils/ConfigUtil";
 
 function HomeIcon(props: SvgIconProps) {
   return (
@@ -15,8 +16,6 @@ export default function Navbar() {
   return (
     <Disclosure as="nav" className="navbg-color">
       {() => {
-          const env = process.env.NEXT_PUBLIC_ENVIRONMENT;
-          const homeUrl:any = env === "dev" ? process.env.NEXT_PUBLIC_WEBAPP_BASE_URL : "/";
           return (
               <>
                   <div className="relative flex justify-between h-16">
@@ -37,7 +36,7 @@ export default function Navbar() {
                                   <HomeIcon
                                       sx={{fontSize: 30}}
                                       onClick={() => {
-                                          window.location.href = homeUrl;
+                                          window.location.href = getAppHomeUrl();
                                       }}
                                   />
                               </Box>

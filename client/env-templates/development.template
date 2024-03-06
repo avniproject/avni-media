@@ -2,3 +2,4 @@ NEXT_PUBLIC_ETL=http://localhost:8022/etl
 NEXT_PUBLIC_MEDIA_VIEWER=http://localhost:3010/media-viewer
 NEXT_PUBLIC_WEB=http://localhost:8021
 NEXT_PUBLIC_ENVIRONMENT=dev
+NEXT_PUBLIC_WEBAPP_BASE_URL=http://localhost:6010

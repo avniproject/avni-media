@@ -1,7 +1,7 @@
 import axios from 'axios';
 import jwt from 'jwt-decode';
 import jwt_decode from 'jwt-decode';
-import {imageType} from '../model/ImageType';
+import {getAppHomeUrl} from "@/utils/ConfigUtil";
 
 const AuthTokenName = "authToken";
 
@@ -16,9 +16,9 @@ export const validateAccessToken = () => {
 
         const tokenData: any = jwt(token);
         const timeNowInSeconds = Math.floor(Date.now() / 1000);
-        const expired = tokenData.exp >= timeNowInSeconds;
+        const valid = tokenData.exp >= timeNowInSeconds;
         console.log("Token expires in :", tokenData.exp - timeNowInSeconds)
-        return expired;
+        return valid;
     } catch (err) {
         console.log('Error occurred--', err);
         return false;
@@ -38,7 +38,7 @@ export const redirectIfNotValid = function() {
     }
 
     if (!validateAccessToken()) {
-        window.location.href = `${process.env.NEXT_PUBLIC_WEBAPP_BASE_URL}`;
+        window.location.href = getAppHomeUrl();
         return;
     }
 }
