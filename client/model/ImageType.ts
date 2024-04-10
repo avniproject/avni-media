@@ -14,6 +14,7 @@ export interface imageType {
     address: string;
     subjectFirstName: string;
     subjectLastName: string
+    subjectMiddleName: string
     url: string
     entityId: number;
 }
@@ -28,6 +29,7 @@ export interface imageMetadata {
 export const getImageName = function(image: imageType, minLevelName: string) {
     const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
     return `${image.subjectFirstName ? image.subjectFirstName : ''}
+              ${image.subjectMiddleName ? '_' + image.subjectMiddleName : ''}
               ${image.subjectLastName ? '_' + image.subjectLastName : ''}
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}

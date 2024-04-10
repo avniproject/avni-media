@@ -51,6 +51,7 @@ export default function ImageList() {
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
+    const [subjectName, setSubjectName] = useState<any>();
     const [dataBody, setDataBody] = useState<any>();
     const [conceptData, setConceptData] = useState<any>([]);
     const [mediaConcepts, setMediaConcepts] = useState<any>([]);
@@ -697,6 +698,7 @@ export default function ImageList() {
             }
             const body = Object.fromEntries(
                 Object.entries({
+                    subjectName: subjectName,
                     subjectTypeNames: subject,
                     programNames: program,
                     encounterTypeNames: encounter,
@@ -717,7 +719,7 @@ export default function ImageList() {
         }
         filtersData();
         resetSelections();
-    }, [date, subject, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
+    }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
@@ -779,6 +781,15 @@ export default function ImageList() {
             </div>
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+                <div className="inline-flex w-56 mt-5">
+                    <input
+                        type="text"
+                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                        value={subjectName}
+                        onChange={(e) => setSubjectName(e.target.value)}
+                        placeholder="Subject Name"
+                    />
+                </div>
                 {locationFilter && (
                     locationFilter.map(
                         (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
