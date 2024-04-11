@@ -781,10 +781,10 @@ export default function ImageList() {
             </div>
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                <div className="inline-flex w-56 mt-5">
+                <div className="inline-flex w-56 h-10 mt-5">
                     <input
                         type="text"
-                        className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                         value={subjectName}
                         onChange={(e) => setSubjectName(e.target.value)}
                         placeholder="Subject Name"
