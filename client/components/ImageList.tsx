@@ -488,7 +488,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setNoteConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
-                "values": [data]
+                "values": data.split(" ")
             }])
         }
 
@@ -499,7 +499,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setTextConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
-                "values": [data]
+                "values": data.split(" ")
             }])
         }
 
