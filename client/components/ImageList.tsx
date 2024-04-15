@@ -787,7 +787,7 @@ export default function ImageList() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                         value={subjectName}
                         onChange={(e) => setSubjectName(e.target.value)}
-                        placeholder="Subject Name"
+                        placeholder="Name"
                     />
                 </div>
                 {locationFilter && (
