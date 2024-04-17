@@ -21,6 +21,7 @@ import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
 import TexConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 import {Checkbox, Divider, FormControlLabel, Button as MUIButton} from "@mui/material";
+import _ from 'lodash';
 
 export default function ImageList() {
     const [parentId, setParentId] = useState<any[]>([])
@@ -144,7 +145,7 @@ export default function ImageList() {
                                                 concept.uuid === element.concept.uuid
                                         );
                                         if (!exists) {
-                                            filteredConcept.push(element.concept);
+                                            filteredConcept.push(_.merge(element.concept, {formUuid: formUUID}));
                                         }
                                     }
                                 }
@@ -448,6 +449,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setConceptDates([{
                 "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "from": data[0],
                 "to": data[1]
             }])
@@ -458,6 +460,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setDateTimeConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "from": data[0],
                 "to": data[1]
             }])
@@ -467,6 +470,7 @@ export default function ImageList() {
     const getNumericConcept = (fromNumber: number, toNumber: number) => {
         setToNumericConcept([{
             "conceptUuid": selectedFieldConcept.uuid,
+            "formUuid": selectedFieldConcept.formUuid,
             "from": fromNumber,
             "to": toNumber
         }])
@@ -476,6 +480,7 @@ export default function ImageList() {
         if (data.length > 0) {
             setCodedConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data
             }])
         } else {
@@ -488,6 +493,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setNoteConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data.split(" ")
             }])
         }
@@ -499,6 +505,7 @@ export default function ImageList() {
         if (data && data.length > 0) {
             setTextConcept([{
                 "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data.split(" ")
             }])
         }
