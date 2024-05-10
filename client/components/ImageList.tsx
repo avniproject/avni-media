@@ -14,7 +14,7 @@ import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
 import {getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
-import {imageType, getImageName, getImage} from '../model/ImageType';
+import {imageType, getImageName, getImage, getImageNameWithoutNewLines} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
@@ -22,6 +22,7 @@ import TexConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 import {Checkbox, Divider, FormControlLabel, Button as MUIButton} from "@mui/material";
 import _ from 'lodash';
+import {MediaSearchService} from "@/service/MediaSearchService";
 
 export default function ImageList() {
     const [parentId, setParentId] = useState<any[]>([])
@@ -33,7 +34,7 @@ export default function ImageList() {
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [imageList, setImageList] = useState<any>({page: 0, data: []});
-    const MIN_PAGE_SIZE = 10, MAX_PAGE_SIZE= 100, PAGE_SIZE_STEP = 10;
+    const MIN_PAGE_SIZE = 10, MAX_PAGE_SIZE = 100, PAGE_SIZE_STEP = 10;
     const [pagination, setPagination] = useState({size: MIN_PAGE_SIZE, page: 0});
     const [showPerpage, setShowperpage] = useState(PAGE_SIZE_STEP);
     const [userName, setUserName] = useState<string | string[] | undefined>();
@@ -76,7 +77,7 @@ export default function ImageList() {
     const [selectedMediaConcepts, setSelectedMediaConcepts] = useState<any>([]);
     const selectedFieldConcept = selectedFieldConcepts && selectedFieldConcepts.length > 0 && selectedFieldConcepts[0];
     const ALL_SELECTED = "ALL", SOME_SELECTED = "SOME", NONE_SELECTED = "NONE";
-    const [selectAllInPage, setSelectAllInPage] = useState<any>({0:NONE_SELECTED});
+    const [selectAllInPage, setSelectAllInPage] = useState<any>({0: NONE_SELECTED});
     const [selectAllPages, setSelectAllPages] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(0);
     useEffect(() => {
@@ -107,10 +108,9 @@ export default function ImageList() {
     }, []);
 
 
-
     const getConceptData = async (formUUID: any, filteredConcept: any[]) => {
         const formData = await axios.get(
-      `${process.env.NEXT_PUBLIC_WEB}/web/form/${formUUID}`
+            `${process.env.NEXT_PUBLIC_WEB}/web/form/${formUUID}`
         );
         const forms = formData.data;
         const formElementGroups = forms.formElementGroups;
@@ -299,24 +299,11 @@ export default function ImageList() {
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const options = {
-                headers: {
-                    "AUTH-TOKEN": localStorage.getItem("authToken"),
-                },
-            };
+            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, showPerpage);
+            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, pagination.page + 1, showPerpage);
 
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pagination.page}&size=${showPerpage}`,
-                dataBody,
-                options
-            );
-            const nextPageResponse = await axios.post(
-                `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pagination.page + 1}&size=${showPerpage}`,
-                dataBody,
-                options
-            );
-            setImageList(response.data);
-            setNextPageData(nextPageResponse.data);
+            setImageList(responseData);
+            setNextPageData(nextPageResponseData);
         };
 
         fetchImages();
@@ -335,7 +322,7 @@ export default function ImageList() {
     const onSelectImage = (value: string, checked: boolean) => {
         if (checked) {
             setCheckedImage((prevCheckedImage) => {
-                return (prevCheckedImage.indexOf(value) == -1) ? [...prevCheckedImage, value] :  prevCheckedImage
+                return (prevCheckedImage.indexOf(value) == -1) ? [...prevCheckedImage, value] : prevCheckedImage
             });
         } else {
             setCheckedImage((prevCheckedImage) =>
@@ -364,16 +351,16 @@ export default function ImageList() {
     const toggleCheckAllImagesInCurrentPage = () => {
         setSelectAllInPage((oldValue: any) => {
             const currentValue = oldValue[currentPage] || NONE_SELECTED;
-            const nextValue = (currentValue === NONE_SELECTED || currentValue === SOME_SELECTED) ? ALL_SELECTED: NONE_SELECTED;
+            const nextValue = (currentValue === NONE_SELECTED || currentValue === SOME_SELECTED) ? ALL_SELECTED : NONE_SELECTED;
             return {...oldValue, [currentPage]: nextValue}
         });
     }
 
     useEffect(() => {
-        if(selectAllInPage[currentPage] === ALL_SELECTED){
-            imageList.data.forEach((image : any) => onSelectImage(image.uuid, true));
-        } else if(selectAllInPage[currentPage] === NONE_SELECTED) {
-            imageList.data.forEach((image : any) => onSelectImage(image.uuid, false));
+        if (selectAllInPage[currentPage] === ALL_SELECTED) {
+            imageList.data.forEach((image: any) => onSelectImage(image.uuid, true));
+        } else if (selectAllInPage[currentPage] === NONE_SELECTED) {
+            imageList.data.forEach((image: any) => onSelectImage(image.uuid, false));
         }
     }, [imageList, selectAllInPage])
 
@@ -393,7 +380,7 @@ export default function ImageList() {
     const pageChange = (size: number, page: number) => {
         setPagination({size: size, page: page});
         setCurrentPage(page);
-        if(selectAllPages) {
+        if (selectAllPages) {
             setSelectAllInPage((oldValue: any) => {
                 oldValue[page] = ALL_SELECTED;
                 return oldValue;
@@ -730,18 +717,8 @@ export default function ImageList() {
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
-        const options = {
-            headers: {
-                "AUTH-TOKEN": localStorage.getItem("authToken"),
-                "Content-Type": "application/json",
-            },
-        };
-        const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pagination.page}&size=${pagination.size}`,
-            dataBody,
-            options
-        );
-        setImageList(response.data);
+        const responseData = await MediaSearchService.searchMedia(dataBody, 0, pagination.size);
+        setImageList(responseData);
     };
 
     const handleNumberChange = (value: number) => {
@@ -755,8 +732,8 @@ export default function ImageList() {
     const toggleSelectAllPages = () => {
         setSelectAllPages(oldValue => {
             const newValue = !oldValue;
-            if(!newValue) {
-                setSelectAllInPage({[currentPage]:NONE_SELECTED})
+            if (!newValue) {
+                setSelectAllInPage({[currentPage]: NONE_SELECTED})
                 setCheckedImage([]);
             }
             return newValue
@@ -764,7 +741,7 @@ export default function ImageList() {
     }
 
     const resetSelections = () => {
-        setSelectAllInPage({[currentPage]:NONE_SELECTED});
+        setSelectAllInPage({[currentPage]: NONE_SELECTED});
         setSelectAllPages(false);
         setCheckedImage([]);
     }
@@ -827,7 +804,9 @@ export default function ImageList() {
                 )}
                 <Daterange dateRange={dateRange}/>
 
-                <Concepts setConceptsFunction={(x:string[]) => {setSelectedMediaConcepts(x)}} concepts={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
+                <Concepts setConceptsFunction={(x: string[]) => {
+                    setSelectedMediaConcepts(x)
+                }} concepts={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
 
                 {subjectFilter && subjectFilter.length > 0 && (
                     <SubjectType
@@ -851,7 +830,7 @@ export default function ImageList() {
                 )}
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && conceptData &&
-                <Concepts setConceptsFunction={setConcepts} concepts={conceptData} title="Fields" multiSelect={false} searchable={true}/>
+                    <Concepts setConceptsFunction={setConcepts} concepts={conceptData} title="Fields" multiSelect={false} searchable={true}/>
                 }
                 {showCodedFilter ? (
                     <CodedConceptFilter concepts={selectedFieldConcept.conceptAnswers}
@@ -906,24 +885,27 @@ export default function ImageList() {
                         onClick={restFilters}
                         name="Reset Filters"
                     />
-                    <FormControlLabel style={{paddingLeft:"48px"}} label={"Select All"}
+                    <FormControlLabel style={{paddingLeft: "48px"}} label={"Select All"}
                                       control={<Checkbox
                                           onChange={toggleCheckAllImagesInCurrentPage}
                                           checked={selectAllInPage[currentPage] === ALL_SELECTED}
                                           indeterminate={selectAllInPage[currentPage] === SOME_SELECTED}
                                           disabled={selectAllPages}
-                                      />} />
+                                      />}/>
                     {(selectAllInPage[currentPage] === ALL_SELECTED) && <>
-                        <MUIButton variant="text" onClick={toggleSelectAllPages} style={{textTransform:"capitalize", fontSize:"1rem"}}>{selectAllPages ? "Clear selection" : "Select all media matching filter"}</MUIButton>
+                        <MUIButton variant="text" onClick={toggleSelectAllPages} style={{
+                            textTransform: "capitalize",
+                            fontSize: "1rem"
+                        }}>{selectAllPages ? "Clear selection" : "Select all media matching filter"}</MUIButton>
                     </>}
                     {
-                        (selectAllPages || checkedImage.length > 0) && <Divider style={{paddingTop:"24px"}}/>
+                        (selectAllPages || checkedImage.length > 0) && <Divider style={{paddingTop: "24px"}}/>
                     }
                     {
-                        (!selectAllPages && checkedImage.length > 0) && <p style={{paddingTop:"24px", fontSize:"1rem"}}>Selected {checkedImage.length} media items</p>
+                        (!selectAllPages && checkedImage.length > 0) && <p style={{paddingTop: "24px", fontSize: "1rem"}}>Selected {checkedImage.length} media items</p>
                     }
                     {
-                        selectAllPages && <p style={{paddingTop:"24px", fontSize:"1rem"}}>Selected all media items in all pages</p>
+                        selectAllPages && <p style={{paddingTop: "24px", fontSize: "1rem"}}>Selected all media items in all pages</p>
                     }
                 </div>
                 <Divider style={{paddingTop: "24px"}}/>
@@ -945,6 +927,8 @@ export default function ImageList() {
                                                 </button>
                                             </div>
                                             <CheckButton
+                                                imageNameWithoutNewLines={getImageNameWithoutNewLines(image, minLevelName)}
+                                                unSignedUrl={image.url}
                                                 name={getImageName(image, minLevelName)}
                                                 id={image.uuid}
                                                 onSelectImage={onSelectImage}
