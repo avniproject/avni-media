@@ -143,6 +143,12 @@ jobs:
       - image: cimg/node:19.8.1
     working_directory: ~/
     steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::118388513628:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-0879e9c88952968ea"
+          availability-zone: "ap-south-1a"
       - deploy:
           hostname: "int-staging.avniproject.org"
           env: "staging"
@@ -152,6 +158,12 @@ jobs:
       - image: cimg/node:19.8.1
     working_directory: ~/
     steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::118388513628:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-0cdce9ae698eb3462"
+          availability-zone: "ap-south-1b"
       - deploy:
           hostname: "int-prerelease.avniproject.org"
           env: "prerelease"
@@ -161,6 +173,12 @@ jobs:
       - image: cimg/node:19.8.1
     working_directory: ~/
     steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::118388513628:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-07df2679f68762a68"
+          availability-zone: "ap-south-1a"
       - deploy:
           hostname: "int-prod.avniproject.org"
           env: "prod"
