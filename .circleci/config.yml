@@ -45,7 +45,7 @@ commands:
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
- deploy_ansible:
+  deploy_ansible:
     description: "Deployment of avni-media using ansible"
     parameters:
       env:
