@@ -3,15 +3,23 @@ orbs:
   aws-cli: circleci/aws-cli@4.1.1
 
 commands:
-  upload:
+  deploy:
     description: Upload of avni-media artifacts
     parameters:
+      instance-id:
+        type: string
       hostname:
         type: string
         default: "int-staging.avniproject.org"
       env:
         type: string
         default: "staging"
+      os-user:
+        type: string
+        default: ubuntu
+      availability-zone:
+        type: string
+        default: ap-south-1a
     steps:
       - attach_workspace:
           at: ~/artifacts
@@ -25,21 +33,22 @@ commands:
             sudo apt-get -y -qq install python3-pip
 
       - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
+
+      - run:
           name: Copy artifacts to server
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
-  deploy:
-    description: Deployment of avni-media
-    parameters:
-      hostname:
-        type: string
-        default: "int-staging.avniproject.org"
-      env:
-        type: string
-        default: "staging"
-    steps:
+
+      - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
+
       # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
       - run:
           name: Deploy client and server
@@ -48,6 +57,11 @@ commands:
             chmod a+x /tmp/install.sh
             sudo /tmp/install.sh
             EOF
+
+      - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
 
       - run:
           name: Delete artifacts from server
@@ -178,13 +192,9 @@ jobs:
       - setup_server_access:
           instance-id: "i-029f9587b33d91f35"
           availability-zone: "ap-south-1a"
-      - upload:
-          hostname: "int-staging.avniproject.org"
-          env: "staging"
-      - setup_server_access:
+      - deploy:
           instance-id: "i-029f9587b33d91f35"
           availability-zone: "ap-south-1a"
-      - deploy:
           hostname: "int-staging.avniproject.org"
           env: "staging"
   PRERELEASE_deploy:
@@ -198,13 +208,9 @@ jobs:
       - setup_server_access:
           instance-id: "i-0a357dbb9e5a91ca2"
           availability-zone: "ap-south-1b"
-      - upload:
-          hostname: "int-prerelease.avniproject.org"
-          env: "prerelease"
-      - setup_server_access:
+      - deploy:
           instance-id: "i-0a357dbb9e5a91ca2"
           availability-zone: "ap-south-1b"
-      - deploy:
           hostname: "int-prerelease.avniproject.org"
           env: "prerelease"
   PRODUCTION_deploy:
@@ -218,13 +224,9 @@ jobs:
       - setup_server_access:
           instance-id: "i-07e5114eea30b3b61"
           availability-zone: "ap-south-1a"
-      - upload:
-          hostname: "int-prod.avniproject.org"
-          env: "prod"
-      - setup_server_access:
+      - deploy:
           instance-id: "i-07e5114eea30b3b61"
           availability-zone: "ap-south-1a"
-      - deploy:
           hostname: "int-prod.avniproject.org"
           env: "prod"
 
