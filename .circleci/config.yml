@@ -4,14 +4,22 @@ orbs:
 
 commands:
   deploy:
-    description: Deployment of avni-media
+    description: Upload of avni-media artifacts
     parameters:
+      instance-id:
+        type: string
       hostname:
         type: string
         default: "int-staging.avniproject.org"
       env:
         type: string
         default: "staging"
+      os-user:
+        type: string
+        default: ubuntu
+      availability-zone:
+        type: string
+        default: ap-south-1a
     steps:
       - attach_workspace:
           at: ~/artifacts
@@ -25,11 +33,21 @@ commands:
             sudo apt-get -y -qq install python3-pip
 
       - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
+
+      - run:
           name: Copy artifacts to server
           command: |
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-server-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-server.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/avni-media-client-<< parameters.env >>.tgz ubuntu@<< parameters.hostname >>:/tmp/avni-media-client.tgz
             scp -o StrictHostKeyChecking=no ~/artifacts/install.sh ubuntu@<< parameters.hostname >>:/tmp/install.sh
+
+      - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
 
       # Refer to https://serverfault.com/questions/936746/bashrc-is-not-sourced-on-ssh-command, for fix when remote ssh commands fail on new machine
       - run:
@@ -41,38 +59,15 @@ commands:
             EOF
 
       - run:
+          name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
+          command: |
+            aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
+
+      - run:
           name: Delete artifacts from server
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
-  deploy_ansible:
-    description: "Deployment of avni-media using ansible"
-    parameters:
-      env:
-        type: string
-        default: "staging"
-    steps:
-      - attach_workspace:
-          at: ~/artifacts
-
-      - run: sudo apt-get install make openssl
-
-      - run: curl -L https://github.com/avniproject/avni-infra/archive/master.zip >> ~/infra.zip
-
-      - run: |
-          cd ~/
-          unzip infra.zip
-          mv avni-infra-master avni-infra
-          rm -rf infra.zip
-
-      - run: echo $ANSIBLE_VAULT_PASS > ~/.vault-pass.txt
-
-      - run: |
-          pwd
-          cd ~/avni-infra/configure
-          VAULT_PASSWORD_FILE=~/.vault-pass.txt app_zip_path=~/artifacts/ make deploy-avni-media-<< parameters.env >>
-
-      - run: rm ~/.vault-pass.txt
   setup_server_access:
     description: Generate and copy temporary keys to server
     parameters:
@@ -198,9 +193,10 @@ jobs:
           instance-id: "i-029f9587b33d91f35"
           availability-zone: "ap-south-1a"
       - deploy:
+          instance-id: "i-029f9587b33d91f35"
+          availability-zone: "ap-south-1a"
           hostname: "int-staging.avniproject.org"
           env: "staging"
-
   PRERELEASE_deploy:
     docker:
       - image: cimg/node:19.8.1
@@ -213,9 +209,10 @@ jobs:
           instance-id: "i-0a357dbb9e5a91ca2"
           availability-zone: "ap-south-1b"
       - deploy:
+          instance-id: "i-0a357dbb9e5a91ca2"
+          availability-zone: "ap-south-1b"
           hostname: "int-prerelease.avniproject.org"
           env: "prerelease"
-
   PRODUCTION_deploy:
     docker:
       - image: cimg/node:19.8.1
@@ -228,8 +225,42 @@ jobs:
           instance-id: "i-07e5114eea30b3b61"
           availability-zone: "ap-south-1a"
       - deploy:
+          instance-id: "i-07e5114eea30b3b61"
+          availability-zone: "ap-south-1a"
           hostname: "int-prod.avniproject.org"
           env: "prod"
+  RWB_STAGING_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::730335671779:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-0b9dc7b3e65a44aec"
+          availability-zone: "ap-south-1b"
+      - deploy:
+          instance-id: "i-0b9dc7b3e65a44aec"
+          availability-zone: "ap-south-1b"
+          hostname: "etl.rwb.avniproject.org"
+          env: "rwb-staging"
+  RWB_PRODUCTION_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::730335671779:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-067dc4ef8c36f8053"
+          availability-zone: "ap-south-1a"
+      - deploy:
+          instance-id: "i-067dc4ef8c36f8053"
+          availability-zone: "ap-south-1a"
+          hostname: "etl-staging.rwb.avniproject.org"
+          env: "rwb-prod"
 
 workflows:
   version: 2
@@ -260,3 +291,23 @@ workflows:
           context: prod-deploy
           requires:
             - PRODUCTION_approve
+      - RWB_STAGING_approve:
+          type: approval
+          requires:
+            - build
+      - RWB_STAGING_deploy:
+          context:
+            - RWB_AWS_OIDC
+            - non-prod-deploy
+          requires:
+            - RWB_STAGING_approve
+      - RWB_PRODUCTION_approve:
+          type: approval
+          requires:
+            - build
+      - RWB_PRODUCTION_deploy:
+          context:
+            - RWB_AWS_OIDC
+            - prod-deploy
+          requires:
+            - RWB_PRODUCTION_approve
