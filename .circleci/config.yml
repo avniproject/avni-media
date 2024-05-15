@@ -134,6 +134,18 @@ jobs:
           cd ~/avni-media
           make zip-app-client-prerelease
 
+      - run: |
+          cd ~/avni-media/client
+          make build-app-rwb-prod
+          cd ~/avni-media
+          make zip-app-client-rwb-prod
+
+      - run: |
+          cd ~/avni-media/client
+          make build-app-rwb-staging
+          cd ~/avni-media
+          make zip-app-client-rwb-staging
+
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
 
@@ -164,6 +176,18 @@ jobs:
           cd ~/avni-media
           make zip-app-server-prerelease
 
+      - run: |
+          cd ~/avni-media/server
+          make build-app-rwb-prod
+          cd ~/avni-media
+          make zip-app-server-rwb-prod
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-rwb-staging
+          cd ~/avni-media
+          make zip-app-server-rwb-staging
+
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
       - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
 
@@ -174,6 +198,10 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
+            - avni-media-client-rwb-staging.tgz
+            - avni-media-server-rwb-staging.tgz
+            - avni-media-client-rwb-prod.tgz
+            - avni-media-server-rwb-prod.tgz
             - avni-media-client-prerelease.tgz
             - avni-media-server-prerelease.tgz
             - install.sh
@@ -229,6 +257,38 @@ jobs:
           availability-zone: "ap-south-1a"
           hostname: "int-prod.avniproject.org"
           env: "prod"
+  RWB_STAGING_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::730335671779:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-0b9dc7b3e65a44aec"
+          availability-zone: "ap-south-1b"
+      - deploy:
+          instance-id: "i-0b9dc7b3e65a44aec"
+          availability-zone: "ap-south-1b"
+          hostname: "etl-staging.rwb.avniproject.org"
+          env: "rwb-staging"
+  RWB_PRODUCTION_deploy:
+    docker:
+      - image: cimg/node:19.8.1
+    working_directory: ~/
+    steps:
+      - aws-cli/setup:
+          role_arn: "arn:aws:iam::730335671779:role/avni_circleci_instance_connect"
+          region: "ap-south-1"
+      - setup_server_access:
+          instance-id: "i-067dc4ef8c36f8053"
+          availability-zone: "ap-south-1a"
+      - deploy:
+          instance-id: "i-067dc4ef8c36f8053"
+          availability-zone: "ap-south-1a"
+          hostname: "etl.rwb.avniproject.org"
+          env: "rwb-prod"
 
 workflows:
   version: 2
@@ -259,3 +319,23 @@ workflows:
           context: prod-deploy
           requires:
             - PRODUCTION_approve
+      - RWB_STAGING_approve:
+          type: approval
+          requires:
+            - build
+      - RWB_STAGING_deploy:
+          context:
+            - RWB_AWS_OIDC
+            - non-prod-deploy
+          requires:
+            - RWB_STAGING_approve
+      - RWB_PRODUCTION_approve:
+          type: approval
+          requires:
+            - build
+      - RWB_PRODUCTION_deploy:
+          context:
+            - RWB_AWS_OIDC
+            - prod-deploy
+          requires:
+            - RWB_PRODUCTION_approve
