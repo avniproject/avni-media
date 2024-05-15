@@ -134,6 +134,18 @@ jobs:
           cd ~/avni-media
           make zip-app-client-prerelease
 
+      - run: |
+          cd ~/avni-media/client
+          make build-app-rwb-prod
+          cd ~/avni-media
+          make zip-app-client-rwb-prod
+
+      - run: |
+          cd ~/avni-media/client
+          make build-app-rwb-staging
+          cd ~/avni-media
+          make zip-app-client-rwb-staging
+
       - restore_cache:
           key: dependency-cache-server-{{ checksum "server/package.json" }}
 
@@ -164,6 +176,18 @@ jobs:
           cd ~/avni-media
           make zip-app-server-prerelease
 
+      - run: |
+          cd ~/avni-media/server
+          make build-app-rwb-prod
+          cd ~/avni-media
+          make zip-app-server-rwb-prod
+
+      - run: |
+          cd ~/avni-media/server
+          make build-app-rwb-staging
+          cd ~/avni-media
+          make zip-app-server-rwb-staging
+
       - run: cp ~/avni-media/avni-media-*.tgz ~/artifacts/
       - run: cp ~/avni-media/deploy/install.sh ~/artifacts/
 
@@ -174,6 +198,10 @@ jobs:
             - avni-media-server-staging.tgz
             - avni-media-client-prod.tgz
             - avni-media-server-prod.tgz
+            - avni-media-client-rwb-staging.tgz
+            - avni-media-server-rwb-staging.tgz
+            - avni-media-client-rwb-prod.tgz
+            - avni-media-server-rwb-prod.tgz
             - avni-media-client-prerelease.tgz
             - avni-media-server-prerelease.tgz
             - install.sh
