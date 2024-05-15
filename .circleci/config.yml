@@ -54,7 +54,6 @@ commands:
           command: |
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm -rf /tmp/avni-media-client.tgz /tmp/avni-media-server.tgz
             ssh -o StrictHostKeyChecking=no ubuntu@<< parameters.hostname >> rm /tmp/install.sh
-
   setup_server_access:
     description: Generate and copy temporary keys to server
     parameters:
