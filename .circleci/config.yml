@@ -243,7 +243,7 @@ jobs:
       - deploy:
           instance-id: "i-0b9dc7b3e65a44aec"
           availability-zone: "ap-south-1b"
-          hostname: "etl.rwb.avniproject.org"
+          hostname: "etl-staging.rwb.avniproject.org"
           env: "rwb-staging"
   RWB_PRODUCTION_deploy:
     docker:
@@ -259,7 +259,7 @@ jobs:
       - deploy:
           instance-id: "i-067dc4ef8c36f8053"
           availability-zone: "ap-south-1a"
-          hostname: "etl-staging.rwb.avniproject.org"
+          hostname: "etl.rwb.avniproject.org"
           env: "rwb-prod"
 
 workflows:
