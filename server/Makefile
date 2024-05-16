@@ -15,7 +15,8 @@ start-local-staging:
 	npm run start:dev
 
 start-prod:
-	npm run start:prod
+	cp ./env-templates/local-prod.template .env
+	npm run start:prod:dev
 
 _build-app:
 	cp ./env-templates/$(template) .env
