@@ -1,0 +1,9 @@
+NEXT_PUBLIC_WEB=
+NEXT_PUBLIC_ETL=
+NEXT_PUBLIC_ENVIRONMENT=dev
+NEXT_PUBLIC_MEDIA_VIEWER=http://localhost:3000/avni-media
+NEXT_PUBLIC_WEBAPP_BASE_URL=http://localhost:3000/avni-media
+
+# Actual Service URL to be used only next JS middleware
+NEXT_PUBLIC_ETL_MIDDLEWARE=https://app.avniproject.org/etl
+NEXT_PUBLIC_WEB_MIDDLEWARE=http://app.avniproject.org
