@@ -66,7 +66,6 @@ source ~/.profile  ###Env variables are configure from here
 cd ~/avni-media/server
 nvm use v19.8.1
 pm2 start ./dist/main.js --name "avni-media-server" -p 3010
-pm2 save
 EOF
 
 #Build client
@@ -75,7 +74,6 @@ source ~/.profile  ###Env variables are configure from here
 cd ~/avni-media/client
 nvm use v19.8.1
 pm2 start npm --name "avni-media-client" -- run start -- -p 3000
-pm2 save
 EOF
 
 #Persist apps to ensure they get restarted automatically
