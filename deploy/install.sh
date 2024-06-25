@@ -79,5 +79,6 @@ EOF
 #Persist apps to ensure they get restarted automatically
 sudo su - avni-media-user << EOF
 pm2 startup systemd
+sudo env PATH=$PATH:/home/avni-media-user/.nvm/versions/node/v19.8.1/bin /home/avni-media-user/.nvm/versions/node/v19.8.1/lib/node_modules/pm2/bin/pm2 startup systemd -u avni-media-user --hp /home/avni-media-user
 pm2 save
 EOF
