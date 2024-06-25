@@ -16,6 +16,10 @@ start-local-staging:
 	$(call _create_env,local.staging)
 	npm run dev
 
+start-with-prod:
+	$(call _create_env,development.production)
+	npm run dev
+
 _build-app:
 	$(call _create_env,)
 	npm run build

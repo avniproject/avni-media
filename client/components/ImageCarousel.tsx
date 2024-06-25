@@ -6,8 +6,9 @@ import CheckButton from "./CheckButton";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {redirectIfNotValid, operationalModuleData} from '@/utils/helpers'
-import {imageType, getImageName, getImage, imageMetadata, getMetadata} from '../model/ImageType';
+import {imageType, getImageName, getImage, imageMetadata, getMetadata, getImageNameWithoutNewLines} from '../model/ImageType';
 import {Button} from "@mui/material";
+import {MediaSearchService} from "@/service/MediaSearchService";
 
 interface Props {
     imageList: object[];
@@ -33,10 +34,7 @@ const ImageCarousel = ({
                        }: Props) => {
     const ci = carouselImage as never;
     const index = imageList.indexOf(ci);
-    const [imageCarousel, setImageCarousel] = useState({
-        page: 0,
-        data: []
-    });
+    const [images, setImages] = useState([]);
 
     const [minLevelName, setMinLevelName] = useState<string>('');
 
@@ -51,17 +49,8 @@ const ImageCarousel = ({
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const options = {
-                headers: {
-                    "AUTH-TOKEN": localStorage.getItem("authToken"),
-                },
-            };
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pagination.page}&size=${pagination.size}`,
-                dataBody,
-                options
-            );
-            setImageCarousel(response.data);
+            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, pagination.size);
+            setImages(responseData.data);
         };
         fetchImages();
     }, [totalRecords]);
@@ -158,15 +147,17 @@ const ImageCarousel = ({
                                 dynamicHeight={false}
                                 useKeyboardArrows={true}
                             >
-                                {imageCarousel.data.map(
+                                {images.map(
                                     (
                                         img: imageType,
                                         index
                                     ) => (
                                         <div key={index}>
-                                            <img src={getImage(img, true)} className="carousel-image"/>
+                                            <img src={getImage(img, false)} className="carousel-image"/>
                                             <div className="checkbox">
                                                 <CheckButton
+                                                    imageNameWithoutNewLines={getImageNameWithoutNewLines(img, minLevelName)}
+                                                    unSignedUrl={img.url}
                                                     image_url={getImage(img)}
                                                     name={getImageName(img, minLevelName)}
                                                     id={img.uuid}
