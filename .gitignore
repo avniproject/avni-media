@@ -6,4 +6,5 @@ node_modules/
 .idea/
 .DS_Store
 .env
+/server/development.env
 /server/makefiles/local.env

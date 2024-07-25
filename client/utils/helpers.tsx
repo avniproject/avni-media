@@ -1,7 +1,7 @@
 import axios from 'axios';
 import jwt from 'jwt-decode';
 import jwt_decode from 'jwt-decode';
-import {getAppHomeUrl} from "@/utils/ConfigUtil";
+import {getAppHomeUrl, isDevMode} from "@/utils/ConfigUtil";
 
 const AuthTokenName = "authToken";
 
@@ -37,7 +37,7 @@ export const redirectIfNotValid = function() {
         return;
     }
 
-    if (!validateAccessToken()) {
+    if (!isDevMode() && !validateAccessToken() ) {
         window.location.href = getAppHomeUrl();
         return;
     }
