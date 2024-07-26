@@ -1,16 +1,11 @@
 import {imageType} from "@/model/ImageType";
 import axios from "axios";
 import _ from 'lodash';
-import {getUserName, isDevMode} from '@/utils/ConfigUtil';
+import {fetchAuthHeaders} from '@/utils/helpers';
 
 export class MediaSearchService {
     static async searchMedia(searchData: any, pageNumber: any, pageSize: any) {
-        const options = {headers: {}};
-        if (isDevMode()) {
-            options.headers = {"USER-NAME": getUserName()};
-        } else {
-            options.headers = {"AUTH-TOKEN": localStorage.getItem("authToken")};
-        }
+        const options = {headers: fetchAuthHeaders()};
         const response = await axios.post(
             `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pageNumber}&size=${pageSize}`,
             searchData,

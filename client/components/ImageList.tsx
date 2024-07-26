@@ -13,7 +13,7 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import {getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
+import {fetchAuthHeaders, getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
 import {imageType, getImageName, getImage, getImageNameWithoutNewLines} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
@@ -392,11 +392,7 @@ export default function ImageList() {
     const handleSendSelectedImages = async (inputValue: any) => {
         alert(`We are processing your download request. Once the download is ready, it will be available under Available Downloads. At most 1000 media items will be included in the download bundle.`);
         if (selectAllPages) {
-            const options = {
-                headers: {
-                    "AUTH-TOKEN": localStorage.getItem("authToken"),
-                },
-            };
+            const options = {headers: fetchAuthHeaders()};
             await axios.post(
                 `${process.env.NEXT_PUBLIC_ETL}/requestDownloadAll`,
                 {mediaSearchRequest: dataBody, username: userName, description: inputValue, addressLevelTypes: locationFilter},

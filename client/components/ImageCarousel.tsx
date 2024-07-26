@@ -5,7 +5,7 @@ import {Carousel} from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {redirectIfNotValid, operationalModuleData} from '@/utils/helpers'
+import {redirectIfNotValid, operationalModuleData, fetchAuthHeaders} from '@/utils/helpers'
 import {imageType, getImageName, getImage, imageMetadata, getMetadata, getImageNameWithoutNewLines} from '../model/ImageType';
 import {Button} from "@mui/material";
 import {MediaSearchService} from "@/service/MediaSearchService";
@@ -65,10 +65,8 @@ const ImageCarousel = ({
 
     const redirectToSubjectDashboardURL = async (imgMetadata: imageMetadata) => {
         const options = {
-            headers: {
-                "AUTH-TOKEN": localStorage.getItem("authToken"),
-            },
-            params : imgMetadata
+            headers: fetchAuthHeaders(),
+            params: imgMetadata
         };
         const response = await axios.get(
             `${process.env.NEXT_PUBLIC_WEB}/web/individual/byMetadata`,

@@ -10,3 +10,8 @@ export function isDevMode() {
     const env = process.env.NEXT_PUBLIC_ENVIRONMENT;
     return env === "dev";
 }
+
+export function isDevModeWithoutIDP() {
+    console.log('isDevMode() && !!getUserName()', isDevMode() && !!getUserName());
+    return isDevMode() && !!getUserName();
+}
