@@ -1,4 +1,4 @@
-import {Key, useEffect, useState} from "react";
+import {Fragment, Key, useEffect, useState} from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -912,36 +912,44 @@ export default function ImageList() {
                     }
                 </div>
                 <Divider style={{paddingTop: "24px"}}/>
-                <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-                    <div
-                        className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
-                        {imageList.data.map(
-                            (image: imageType) =>
-                                <MediaViewItem key={image.uuid} image={image} setCarouselImage={setCarouselImage}
-                                               minLevelName={minLevelName} onSelectImage={onSelectImage}
-                                               checkedImage={checkedImage}/>
+                {imageList.total === 0 ? <p style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center", paddingTop: "24px", fontSize: "1rem"
+                    }}>No results to display</p> :
+                    <Fragment>
+                        <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+                            <div
+                                className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
+                                {imageList.data.map(
+                                    (image: imageType) =>
+                                        <MediaViewItem key={image.uuid} image={image}
+                                                       setCarouselImage={setCarouselImage}
+                                                       minLevelName={minLevelName} onSelectImage={onSelectImage}
+                                                       checkedImage={checkedImage}/>
+                                )}
+                            </div>
+                        </div>
+                        {carouselImage && (
+                            <ImageCarousel
+                                imageList={imageList.data}
+                                totalRecords={imageList.total}
+                                carouselImage={carouselImage}
+                                onClose={() => setCarouselImage(null)}
+                                onSelectImage={onSelectImage}
+                                currentPage={currentPage}
+                                showPerpage={showPerpage}
+                                checkedImage={checkedImage}
+                                setCheckedImage={[]}
+                                dataBody={dataBody}
+                            />
                         )}
-                    </div>
-                </div>
-                {carouselImage && (
-                    <ImageCarousel
-                        imageList={imageList.data}
-                        totalRecords={imageList.total}
-                        carouselImage={carouselImage}
-                        onClose={() => setCarouselImage(null)}
-                        onSelectImage={onSelectImage}
-                        currentPage={currentPage}
-                        showPerpage={showPerpage}
-                        checkedImage={checkedImage}
-                        setCheckedImage={[]}
-                        dataBody={dataBody}
-                    />
-                )}
-                <Pagination
-                    showperpage={showPerpage}
-                    pagechange={pageChange}
-                    nextPageData={nextPageData.data}
-                />
+                        <Pagination
+                            showperpage={showPerpage}
+                            pagechange={pageChange}
+                            nextPageData={nextPageData.data}
+                        />
+                    </Fragment>}
             </div>
         </>
     );
