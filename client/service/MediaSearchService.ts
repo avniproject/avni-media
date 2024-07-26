@@ -5,15 +5,16 @@ import {getUserName, isDevMode} from '@/utils/ConfigUtil';
 
 export class MediaSearchService {
     static async searchMedia(searchData: any, pageNumber: any, pageSize: any) {
-        const options = {
-            headers: {
-                "AUTH-TOKEN": localStorage.getItem("authToken"),
-            },
-        };
+        const options = {headers: {}};
+        if (isDevMode()) {
+            options.headers = {"USER-NAME": getUserName()};
+        } else {
+            options.headers = {"AUTH-TOKEN": localStorage.getItem("authToken")};
+        }
         const response = await axios.post(
             `${process.env.NEXT_PUBLIC_ETL}/media/search?page=${pageNumber}&size=${pageSize}`,
             searchData,
-        !isDevMode() ? options : {headers: {"USER-NAME" : getUserName()}}
+            options
         );
         const responseData = response.data.data;
         await Promise.all(responseData.map(async (img: imageType) => {
