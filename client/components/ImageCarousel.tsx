@@ -9,6 +9,7 @@ import {redirectIfNotValid, operationalModuleData, fetchAuthHeaders} from '@/uti
 import {imageType, getImageName, getImage, imageMetadata, getMetadata, getImageNameWithoutNewLines} from '../model/ImageType';
 import {Button} from "@mui/material";
 import {MediaSearchService} from "@/service/MediaSearchService";
+import Loading from '@/components/loading';
 
 interface Props {
     imageList: object[];
@@ -37,7 +38,7 @@ const ImageCarousel = ({
     const ci = carouselImage as never;
     const index = imageList.indexOf(ci);
     const [images, setImages] = useState([]);
-
+    const [showLoader, setShowLoader] = useState(false);
     const [minLevelName, setMinLevelName] = useState<string>('');
 
     useEffect(() => {
@@ -51,8 +52,10 @@ const ImageCarousel = ({
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
+            setShowLoader(true);
             const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
             setImages(responseData.data);
+            setShowLoader(false);
         };
         fetchImages();
     }, [totalRecords]);
@@ -113,7 +116,8 @@ const ImageCarousel = ({
                                 </svg>
                             </button>
                         </div>
-                        <div className="flex w-full h-full">
+                        <div className="flex w-full h-full" style={{position: "relative",width: "500px", height: "500px"}}>
+                            {showLoader && <Loading />}
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
                                     return (
