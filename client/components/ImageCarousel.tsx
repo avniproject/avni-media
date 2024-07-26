@@ -14,7 +14,8 @@ interface Props {
     imageList: object[];
     totalRecords: any;
     carouselImage: any;
-    pagination: any;
+    currentPage: any;
+    showPerpage: any,
     onClose: () => void;
     onSelectImage: (value: string, checked: boolean) => void;
     checkedImage: string[];
@@ -26,7 +27,8 @@ const ImageCarousel = ({
                            imageList,
                            totalRecords,
                            carouselImage,
-                           pagination,
+                           currentPage,
+                           showPerpage,
                            onClose,
                            onSelectImage,
                            checkedImage,
@@ -49,7 +51,7 @@ const ImageCarousel = ({
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, pagination.size);
+            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
             setImages(responseData.data);
         };
         fetchImages();

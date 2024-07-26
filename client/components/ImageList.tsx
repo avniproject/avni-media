@@ -35,7 +35,6 @@ export default function ImageList() {
     const [toDate, setToDate] = useState(null);
     const [imageList, setImageList] = useState<any>({page: 0, data: []});
     const MIN_PAGE_SIZE = 10, MAX_PAGE_SIZE = 100, PAGE_SIZE_STEP = 10;
-    const [pagination, setPagination] = useState({size: MIN_PAGE_SIZE, page: 0});
     const [showPerpage, setShowperpage] = useState(PAGE_SIZE_STEP);
     const [userName, setUserName] = useState<string | string[] | undefined>();
     const [locationFilter, setLocation] = useState<any>([]);
@@ -299,15 +298,15 @@ export default function ImageList() {
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, showPerpage);
-            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, pagination.page + 1, showPerpage);
+            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
+            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, currentPage + 1, showPerpage);
 
             setImageList(responseData);
             setNextPageData(nextPageResponseData);
         };
 
         fetchImages();
-    }, [pagination, showPerpage]);
+    }, [currentPage, showPerpage]);
 
     const [carouselImage, setCarouselImage] = useState<{
         uuid: string;
@@ -377,8 +376,7 @@ export default function ImageList() {
     }, [checkedImage, imageList]);
 
 
-    const pageChange = (size: number, page: number) => {
-        setPagination({size: size, page: page});
+    const pageChange = (page: number) => {
         setCurrentPage(page);
         if (selectAllPages) {
             setSelectAllInPage((oldValue: any) => {
@@ -713,7 +711,7 @@ export default function ImageList() {
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
-        const responseData = await MediaSearchService.searchMedia(dataBody, 0, pagination.size);
+        const responseData = await MediaSearchService.searchMedia(dataBody, 0, showPerpage);
         setImageList(responseData);
     };
 
@@ -950,7 +948,8 @@ export default function ImageList() {
                         carouselImage={carouselImage}
                         onClose={() => setCarouselImage(null)}
                         onSelectImage={onSelectImage}
-                        pagination={pagination}
+                        currentPage={currentPage}
+                        showPerpage={showPerpage}
                         checkedImage={checkedImage}
                         setCheckedImage={[]}
                         dataBody={dataBody}
