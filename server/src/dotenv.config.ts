@@ -2,9 +2,7 @@ import { config } from 'dotenv';
 import * as fs from 'fs';
 
 export const dotenvConfig = () => {
-  const envFile = `${process.env.NODE_ENV || 'development'}.env`;
-
-  console.log('envFile', envFile);
+  const envFile = '.env';
 
   if (fs.existsSync(envFile)) {
     const envConfig = config({ path: envFile });

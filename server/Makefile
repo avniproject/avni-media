@@ -8,6 +8,7 @@ start:
 	npm run start
 
 start-dev:
+	cp ./env-templates/development.template .env
 	npm run start:dev
 
 start-local-staging:
