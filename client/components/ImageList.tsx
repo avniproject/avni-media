@@ -912,11 +912,11 @@ export default function ImageList() {
                     }
                 </div>
                 <Divider style={{paddingTop: "24px"}}/>
-                {imageList.total === 0 ? <p style={{
+                {imageList.total === 0 ? (showLoader ? <></>: (<p style={{
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center", paddingTop: "24px", fontSize: "1rem"
-                    }}>No results to display</p> :
+                    }}>No results to display</p>)) :
                     <Fragment>
                         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
                             <div
