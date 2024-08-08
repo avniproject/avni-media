@@ -1,5 +1,4 @@
-import CheckButton from "./CheckButton";
-import {Key, useEffect, useState} from "react";
+import {Fragment, Key, useEffect, useState} from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -13,8 +12,8 @@ import Program from "./FilterComponent/Program";
 import SubjectType from "./FilterComponent/SubjectType";
 import NumberDropdown from "./FilterComponent/ImageSize";
 import Button from "./DownloadComponent/Button";
-import {getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
-import {imageType, getImageName, getImage, getImageNameWithoutNewLines} from '../model/ImageType';
+import {fetchAuthHeaders, getUserUuidFromToken, operationalModuleData, redirectIfNotValid} from "@/utils/helpers";
+import {imageType} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
@@ -23,6 +22,8 @@ import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 import {Checkbox, Divider, FormControlLabel, Button as MUIButton} from "@mui/material";
 import _ from 'lodash';
 import {MediaSearchService} from "@/service/MediaSearchService";
+import MediaViewItem from '@/components/MediaViewItem';
+import Loading from './loading';
 
 export default function ImageList() {
     const [parentId, setParentId] = useState<any[]>([])
@@ -33,9 +34,8 @@ export default function ImageList() {
     const [selectedParentId, setSelectedParentId] = useState<any>([]);
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-    const [imageList, setImageList] = useState<any>({page: 0, data: []});
+    const [imageList, setImageList] = useState<any>({total: 0, data: []});
     const MIN_PAGE_SIZE = 10, MAX_PAGE_SIZE = 100, PAGE_SIZE_STEP = 10;
-    const [pagination, setPagination] = useState({size: MIN_PAGE_SIZE, page: 0});
     const [showPerpage, setShowperpage] = useState(PAGE_SIZE_STEP);
     const [userName, setUserName] = useState<string | string[] | undefined>();
     const [locationFilter, setLocation] = useState<any>([]);
@@ -299,15 +299,17 @@ export default function ImageList() {
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, showPerpage);
-            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, pagination.page + 1, showPerpage);
+            setShowLoader(true);
+            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
+            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, currentPage + 1, showPerpage);
 
             setImageList(responseData);
+            setShowLoader(false);
             setNextPageData(nextPageResponseData);
         };
 
         fetchImages();
-    }, [pagination, showPerpage]);
+    }, [currentPage, showPerpage]);
 
     const [carouselImage, setCarouselImage] = useState<{
         uuid: string;
@@ -377,8 +379,7 @@ export default function ImageList() {
     }, [checkedImage, imageList]);
 
 
-    const pageChange = (size: number, page: number) => {
-        setPagination({size: size, page: page});
+    const pageChange = (page: number) => {
         setCurrentPage(page);
         if (selectAllPages) {
             setSelectAllInPage((oldValue: any) => {
@@ -388,15 +389,12 @@ export default function ImageList() {
         }
     };
     const [showModal, setShowModal] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
 
     const handleSendSelectedImages = async (inputValue: any) => {
         alert(`We are processing your download request. Once the download is ready, it will be available under Available Downloads. At most 1000 media items will be included in the download bundle.`);
         if (selectAllPages) {
-            const options = {
-                headers: {
-                    "AUTH-TOKEN": localStorage.getItem("authToken"),
-                },
-            };
+            const options = {headers: fetchAuthHeaders()};
             await axios.post(
                 `${process.env.NEXT_PUBLIC_ETL}/requestDownloadAll`,
                 {mediaSearchRequest: dataBody, username: userName, description: inputValue, addressLevelTypes: locationFilter},
@@ -717,8 +715,10 @@ export default function ImageList() {
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
-        const responseData = await MediaSearchService.searchMedia(dataBody, 0, pagination.size);
+        setShowLoader(true);
+        const responseData = await MediaSearchService.searchMedia(dataBody, 0, showPerpage);
         setImageList(responseData);
+        setShowLoader(false);
     };
 
     const handleNumberChange = (value: number) => {
@@ -873,6 +873,9 @@ export default function ImageList() {
                             subject={subject}
                         />
                     )}
+                    {showLoader && (
+                        <Loading />
+                    )}
                     <Button name="Apply Filter" onClick={handleApplyFilter}/>
                     <Button onClick={handleOpenModal} name=" Download"/>
                     <Link href="./downloadList">
@@ -909,62 +912,44 @@ export default function ImageList() {
                     }
                 </div>
                 <Divider style={{paddingTop: "24px"}}/>
-                <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-                    <div className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
-                        {imageList.data.map(
-                            (image: imageType) => {
-                                return (
-                                    <div key={`${image.uuid}-${Math.random()}`}>
-                                        <div className="relative">
-                                            <div className="relative w-full h-50 rounded-lg overflow-hidden">
-                                                <button>
-                                                    <img
-                                                        src={getImage(image, true)}
-                                                        alt={image?.subjectTypeName}
-                                                        onClick={() => setCarouselImage(image)}
-                                                        className="thumb"
-                                                    />
-                                                </button>
-                                            </div>
-                                            <CheckButton
-                                                imageNameWithoutNewLines={getImageNameWithoutNewLines(image, minLevelName)}
-                                                unSignedUrl={image.url}
-                                                name={getImageName(image, minLevelName)}
-                                                id={image.uuid}
-                                                onSelectImage={onSelectImage}
-                                                checkedImage={checkedImage}
-                                                imageDetail={image}
-                                                image_url={image.signedUrl}
-                                                flag="list"
-                                                onSelectImageCarousel={function (): void {
-                                                    throw new Error("Function not implemented.");
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            }
+                {imageList.total === 0 ? (showLoader ? <></>: (<p style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center", paddingTop: "24px", fontSize: "1rem"
+                    }}>No results to display</p>)) :
+                    <Fragment>
+                        <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+                            <div
+                                className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
+                                {imageList.data.map(
+                                    (image: imageType) =>
+                                        <MediaViewItem key={image.uuid} image={image}
+                                                       setCarouselImage={setCarouselImage}
+                                                       minLevelName={minLevelName} onSelectImage={onSelectImage}
+                                                       checkedImage={checkedImage}/>
+                                )}
+                            </div>
+                        </div>
+                        {carouselImage && (
+                            <ImageCarousel
+                                imageList={imageList.data}
+                                totalRecords={imageList.total}
+                                carouselImage={carouselImage}
+                                onClose={() => setCarouselImage(null)}
+                                onSelectImage={onSelectImage}
+                                currentPage={currentPage}
+                                showPerpage={showPerpage}
+                                checkedImage={checkedImage}
+                                setCheckedImage={[]}
+                                dataBody={dataBody}
+                            />
                         )}
-                    </div>
-                </div>
-                {carouselImage && (
-                    <ImageCarousel
-                        imageList={imageList.data}
-                        totalRecords={imageList.total}
-                        carouselImage={carouselImage}
-                        onClose={() => setCarouselImage(null)}
-                        onSelectImage={onSelectImage}
-                        pagination={pagination}
-                        checkedImage={checkedImage}
-                        setCheckedImage={[]}
-                        dataBody={dataBody}
-                    />
-                )}
-                <Pagination
-                    showperpage={showPerpage}
-                    pagechange={pageChange}
-                    nextPageData={nextPageData.data}
-                />
+                        <Pagination
+                            showperpage={showPerpage}
+                            pagechange={pageChange}
+                            nextPageData={nextPageData.data}
+                        />
+                    </Fragment>}
             </div>
         </>
     );

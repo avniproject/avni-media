@@ -1,7 +1,7 @@
 import axios from 'axios';
 import jwt from 'jwt-decode';
 import jwt_decode from 'jwt-decode';
-import {getAppHomeUrl} from "@/utils/ConfigUtil";
+import {getAppHomeUrl, getUserName, isDevModeWithoutIDP} from "@/utils/ConfigUtil";
 
 const AuthTokenName = "authToken";
 
@@ -37,9 +37,17 @@ export const redirectIfNotValid = function() {
         return;
     }
 
-    if (!validateAccessToken()) {
+    if (!isDevModeWithoutIDP() && !validateAccessToken() ) {
         window.location.href = getAppHomeUrl();
         return;
+    }
+}
+
+export function fetchAuthHeaders() {
+    if (isDevModeWithoutIDP()) {
+        return {"USER-NAME": getUserName()};
+    } else {
+        return {"AUTH-TOKEN": localStorage.getItem("authToken")};
     }
 }
 
@@ -49,6 +57,7 @@ interface DecodedToken {
 }
 
 export const getUserUuidFromToken = () => {
+    if(isDevModeWithoutIDP()) return getUserName();
     const authToken = "" + localStorage.getItem("authToken");
     const decodedToken = jwt_decode(authToken) as DecodedToken;
     return  decodedToken["custom:userUUID"];

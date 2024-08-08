@@ -7,7 +7,7 @@ console.log("Middleware used");
 
 export function middleware(request) {
     const pathname = request.nextUrl.pathname;
-    console.log("Path:", pathname, "AuthToken:", request.headers.get("Auth-Token"));
+    console.log("Path:", pathname, "USER-NAME",  request.headers.get("USER-NAME"), "AuthToken:", request.headers.get("AUTH-TOKEN"));
 
     if (pathname.startsWith('/web') || pathname.startsWith("/location")) {
         const url = new URL(pathname + request.nextUrl.search, mainService);

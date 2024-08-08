@@ -5,16 +5,18 @@ import {Carousel} from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {redirectIfNotValid, operationalModuleData} from '@/utils/helpers'
+import {redirectIfNotValid, operationalModuleData, fetchAuthHeaders} from '@/utils/helpers'
 import {imageType, getImageName, getImage, imageMetadata, getMetadata, getImageNameWithoutNewLines} from '../model/ImageType';
 import {Button} from "@mui/material";
 import {MediaSearchService} from "@/service/MediaSearchService";
+import Loading from '@/components/loading';
 
 interface Props {
     imageList: object[];
     totalRecords: any;
     carouselImage: any;
-    pagination: any;
+    currentPage: any;
+    showPerpage: any,
     onClose: () => void;
     onSelectImage: (value: string, checked: boolean) => void;
     checkedImage: string[];
@@ -26,7 +28,8 @@ const ImageCarousel = ({
                            imageList,
                            totalRecords,
                            carouselImage,
-                           pagination,
+                           currentPage,
+                           showPerpage,
                            onClose,
                            onSelectImage,
                            checkedImage,
@@ -35,7 +38,7 @@ const ImageCarousel = ({
     const ci = carouselImage as never;
     const index = imageList.indexOf(ci);
     const [images, setImages] = useState([]);
-
+    const [showLoader, setShowLoader] = useState(false);
     const [minLevelName, setMinLevelName] = useState<string>('');
 
     useEffect(() => {
@@ -49,8 +52,10 @@ const ImageCarousel = ({
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            const responseData = await MediaSearchService.searchMedia(dataBody, pagination.page, pagination.size);
+            setShowLoader(true);
+            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
             setImages(responseData.data);
+            setShowLoader(false);
         };
         fetchImages();
     }, [totalRecords]);
@@ -65,10 +70,8 @@ const ImageCarousel = ({
 
     const redirectToSubjectDashboardURL = async (imgMetadata: imageMetadata) => {
         const options = {
-            headers: {
-                "AUTH-TOKEN": localStorage.getItem("authToken"),
-            },
-            params : imgMetadata
+            headers: fetchAuthHeaders(),
+            params: imgMetadata
         };
         const response = await axios.get(
             `${process.env.NEXT_PUBLIC_WEB}/web/individual/byMetadata`,
@@ -113,7 +116,8 @@ const ImageCarousel = ({
                                 </svg>
                             </button>
                         </div>
-                        <div className="flex w-full h-full">
+                        <div className="flex w-full h-full" style={{position: "relative",width: "500px", height: "500px"}}>
+                            {showLoader && <Loading />}
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
                                     return (

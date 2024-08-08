@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 interface Props {
   showperpage: number;
-  pagechange: (size: number, pageNumber: number) => void;
+  pagechange: (pageNumber: number) => void;
   nextPageData: any[];
 
 }
@@ -15,10 +15,10 @@ interface Props {
   useEffect(() => {
    
     if (counter == page) {
-      pagechange(showperpage, counter - 1)
+      pagechange(counter - 1)
     }
     else {
-      pagechange(showperpage, counter -1 )
+      pagechange(counter -1 )
     }
   }, [counter, showperpage])
 
