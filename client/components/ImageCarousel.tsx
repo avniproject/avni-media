@@ -12,7 +12,7 @@ import {MediaSearchService} from "@/service/MediaSearchService";
 import Loading from '@/components/loading';
 
 interface Props {
-    imageList: object[];
+    imageList: imageType[];
     totalRecords: any;
     carouselImage: any;
     currentPage: any;
@@ -22,43 +22,21 @@ interface Props {
     checkedImage: string[];
     setCheckedImage: string[];
     dataBody: any;
+    minLevelName: string;
 }
 
 const ImageCarousel = ({
                            imageList,
-                           totalRecords,
                            carouselImage,
-                           currentPage,
-                           showPerpage,
                            onClose,
                            onSelectImage,
                            checkedImage,
-                           dataBody
+                           minLevelName
                        }: Props) => {
     const ci = carouselImage as never;
     const index = imageList.indexOf(ci);
     const [images, setImages] = useState([]);
     const [showLoader, setShowLoader] = useState(false);
-    const [minLevelName, setMinLevelName] = useState<string>('');
-
-    useEffect(() => {
-        const filterData = async () => {
-            const processedData = await operationalModuleData()
-            setMinLevelName(processedData.minLevelAddressName)
-        };
-        filterData();
-    }, []);
-
-    useEffect(() => {
-        redirectIfNotValid();
-        const fetchImages = async () => {
-            setShowLoader(true);
-            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
-            setImages(responseData.data);
-            setShowLoader(false);
-        };
-        fetchImages();
-    }, [totalRecords]);
 
     const onSelectImageCarousel = (value: string, checked: boolean) => {
         onSelectImage(value, checked,);
@@ -77,7 +55,8 @@ const ImageCarousel = ({
             `${process.env.NEXT_PUBLIC_WEB}/web/individual/byMetadata`,
             options
         );
-        window.location.href = buildSubjectDashboardURLForUUID(response.data.uuid);
+        const newWindow = window.open(buildSubjectDashboardURLForUUID(response.data.uuid), '_blank', 'noopener,noreferrer');
+        if (newWindow) newWindow.opener = null;
         return;
     };
 
@@ -151,7 +130,7 @@ const ImageCarousel = ({
                                 dynamicHeight={false}
                                 useKeyboardArrows={true}
                             >
-                                {images.map(
+                                {imageList.map(
                                     (
                                         img: imageType,
                                         index

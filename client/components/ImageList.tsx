@@ -942,6 +942,7 @@ export default function ImageList() {
                                 checkedImage={checkedImage}
                                 setCheckedImage={[]}
                                 dataBody={dataBody}
+                                minLevelName={minLevelName}
                             />
                         )}
                         <Pagination
