@@ -4,22 +4,14 @@ import { useState, useEffect } from 'react';
 interface Props {
   showperpage: number;
   pagechange: (pageNumber: number) => void;
-  nextPageData: any[];
+  enableNextPage: boolean;
 
 }
-  const Pagination = ({ showperpage, pagechange, nextPageData }: Props) => {
+  const Pagination = ({ showperpage, pagechange, enableNextPage }: Props) => {
   const [counter, setCounter] = useState(1)
 
-  const page = Math.ceil(nextPageData.length / showperpage)
-
   useEffect(() => {
-   
-    if (counter == page) {
       pagechange(counter - 1)
-    }
-    else {
-      pagechange(counter -1 )
-    }
   }, [counter, showperpage])
 
  
@@ -33,7 +25,7 @@ interface Props {
       }
     }
     else if (type == "next") {
-      if (nextPageData.length >= 1) {
+      if (enableNextPage) {
         setCounter(counter + 1)
       }
       else{
@@ -67,7 +59,7 @@ interface Props {
       <div className="-mt-px w-0 flex-1 flex justify-start">
         <button
           onClick={() => onButtonclick("next")}
-          disabled={nextPageData.length === 0}
+          disabled={!enableNextPage}
           className="border-t-2 border-transparent pt-1 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
         >
           Next

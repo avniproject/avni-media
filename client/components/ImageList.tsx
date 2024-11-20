@@ -301,11 +301,8 @@ export default function ImageList() {
         const fetchImages = async () => {
             setShowLoader(true);
             const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
-            const nextPageResponseData = await MediaSearchService.searchMedia(dataBody, currentPage + 1, showPerpage);
-
             setImageList(responseData);
             setShowLoader(false);
-            setNextPageData(nextPageResponseData);
         };
 
         fetchImages();
@@ -943,12 +940,13 @@ export default function ImageList() {
                                 setCheckedImage={[]}
                                 dataBody={dataBody}
                                 minLevelName={minLevelName}
+                                setCarouselImage={setCarouselImage}
                             />
                         )}
                         <Pagination
                             showperpage={showPerpage}
                             pagechange={pageChange}
-                            nextPageData={nextPageData.data}
+                            enableNextPage={imageList.data.length === showPerpage}
                         />
                     </Fragment>}
             </div>

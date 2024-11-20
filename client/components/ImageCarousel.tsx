@@ -15,6 +15,7 @@ interface Props {
     imageList: imageType[];
     totalRecords: any;
     carouselImage: any;
+    setCarouselImage: any;
     currentPage: any;
     showPerpage: any,
     onClose: () => void;
@@ -31,7 +32,8 @@ const ImageCarousel = ({
                            onClose,
                            onSelectImage,
                            checkedImage,
-                           minLevelName
+                           minLevelName,
+                           setCarouselImage
                        }: Props) => {
     const ci = carouselImage as never;
     const index = imageList.indexOf(ci);
@@ -99,24 +101,32 @@ const ImageCarousel = ({
                             {showLoader && <Loading />}
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
+                                    const customClickHandler = () => {
+                                        setCarouselImage(imageList[index - 1]);
+                                        clickHandler();
+                                    }
                                     return (
                                         <div
                                             className={`${
                                                 hasPrev ? "absolute" : "hidden"
                                             } top-0 bottom-20 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
-                                            onClick={clickHandler}
+                                            onClick={customClickHandler}
                                         >
                                             <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
                                         </div>
                                     );
                                 }}
                                 renderArrowNext={(clickHandler, hasNext) => {
+                                    const customClickHandler = () => {
+                                        setCarouselImage(imageList[index + 1]);
+                                        clickHandler();
+                                    }
                                     return (
                                         <div
                                             className={`${
                                                 hasNext ? "absolute" : "hidden"
                                             } top-0 bottom-20 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
-                                            onClick={clickHandler}
+                                            onClick={customClickHandler}
                                         >
                                             <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
                                         </div>
@@ -136,7 +146,7 @@ const ImageCarousel = ({
                                         index
                                     ) => (
                                         <div key={index}>
-                                            <img src={getImage(img, false)} className="carousel-image"/>
+                                            <img src={getImage(img, ci !== img)} className="carousel-image"/>
                                             <div className="checkbox">
                                                 <CheckButton
                                                     imageNameWithoutNewLines={getImageNameWithoutNewLines(img, minLevelName)}
