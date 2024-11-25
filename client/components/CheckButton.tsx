@@ -11,10 +11,10 @@ interface prop {
     imageDetail: any
     image_url: string,
     unSignedUrl: string,
-    imageNameWithoutNewLines: string
+    imageDescription: string[]
 }
 
-export default function CheckButton({name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag, image_url, unSignedUrl, imageNameWithoutNewLines}: prop) {
+export default function CheckButton({name, id, onSelectImage, checkedImage, onSelectImageCarousel, flag, image_url, unSignedUrl, imageDescription}: prop) {
     const handleChecked = (e: any) => {
         const {value, checked} = e.target;
         if (flag == 'list') {
@@ -25,11 +25,19 @@ export default function CheckButton({name, id, onSelectImage, checkedImage, onSe
         }
     }
 
+    const isList = (flag == 'list');
     const isChecked = checkedImage.includes(id.toString());
     const downloadUrl = `/web/media/downloadStream?s3Url=${unSignedUrl}&fileName=${getDownloadFileName(name, unSignedUrl)}`;
 
     return (
         <fieldset className="mt-5">
+            <div className="mt-1 text-sm">
+                {isList || !imageDescription ?
+                    <label className="font-medium text-gray-700"><a href={image_url} target="_blank">{name}</a></label>
+                    : <label className="font-medium text-gray-700 image-description"><a href={image_url}
+                                                                      target="_blank">{imageDescription.map((text, idx) =>
+                        <div key={idx}>{text}</div>)}</a></label>}
+            </div>
             <div className="flex justify-between">
                 <div className="">
                     <input
@@ -47,9 +55,6 @@ export default function CheckButton({name, id, onSelectImage, checkedImage, onSe
                         <DownloadOutlined/>
                     </a>
                 </div>
-            </div>
-            <div className="mt-1 text-sm">
-                <label className="font-medium text-gray-700"><a href={image_url} target="_blank">{name}</a></label>
             </div>
         </fieldset>
     );

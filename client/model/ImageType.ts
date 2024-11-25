@@ -12,6 +12,7 @@ export interface imageType {
     createdDateTime: string;
     encounterTypeName: string;
     programName: string;
+    conceptName: string;
     address: string;
     subjectFirstName: string;
     subjectLastName: string
@@ -38,17 +39,18 @@ export const getImageName = function (image: imageType, minLevelName: string) {
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
 }
 
-export const getImageNameWithoutNewLines = function (image: imageType, minLevelName: string) {
+export const getImageDescription = function (image: imageType, minLevelName: string) {
     const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
-    let name = '';
-    name += `${image.subjectFirstName ? image.subjectFirstName : ''}`;
-    name += `${image.subjectMiddleName ? '_' + image.subjectMiddleName : ''}`;
-    name += `${image.subjectLastName ? '_' + image.subjectLastName : ''}`;
-    name += `${image.subjectTypeName ? '_' + image.subjectTypeName : ''}`;
-    name += `${image.encounterTypeName ? '_' + image.encounterTypeName : ''}`;
-    name += `${image.programEnrolment ? '_' + image.programEnrolment : ''}`;
-    name += `${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
-    return name;
+    let description = [];
+    description.push(`${image.subjectFirstName ? 'Subject First Name: ' + image.subjectFirstName : ''}`);
+    description.push(`${image.subjectMiddleName ? 'Subject Middle Name: ' + image.subjectMiddleName : ''}`);
+    description.push(`${image.subjectLastName ? 'Subject Last Name: ' + image.subjectLastName : ''}`);
+    description.push(`${image.subjectTypeName ? 'Subject Type Name: ' + image.subjectTypeName : ''}`);
+    description.push(`${image.encounterTypeName ? 'Encounter Type Name: ' + image.encounterTypeName : ''}`);
+    description.push(`${image.programEnrolment ? 'Program Name: ' + image.programEnrolment : ''}`);
+    description.push(`${image.conceptName ? 'Field Name: ' + image.conceptName : ''}`);
+    description.push(`${lowestLevelAddress ? 'Place of registration: ' + lowestLevelAddress : ''}`);
+    return description;
 }
 
 const getLowestLocation = function (address: string, minLevelName: string) {

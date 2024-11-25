@@ -1,4 +1,4 @@
-import {getImage, getImageName, getImageNameWithoutNewLines, imageType} from '@/model/ImageType';
+import {getImage, getImageName, imageType} from '@/model/ImageType';
 import CheckButton from '@/components/CheckButton';
 
 interface Props {
@@ -6,7 +6,7 @@ interface Props {
     setCarouselImage: (value: (((prevState: ({ uuid: string; signedUrl: string; signedThumbnailUrl: string; subjectTypeName: string } | null)) => ({ uuid: string; signedUrl: string; signedThumbnailUrl: string; subjectTypeName: string } | null)) | { uuid: string; signedUrl: string; signedThumbnailUrl: string; subjectTypeName: string } | null)) => void,
     minLevelName: string,
     onSelectImage: (value: string, checked: boolean) => void,
-    checkedImage: string[]
+    checkedImage: string[],
 }
 
 const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, checkedImage}: Props) => {
@@ -24,7 +24,7 @@ const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, ch
                     </button>
                 </div>
                 <CheckButton
-                    imageNameWithoutNewLines={getImageNameWithoutNewLines(image, minLevelName)}
+                    imageDescription={[getImageName(image, minLevelName)]}
                     unSignedUrl={image.url}
                     name={getImageName(image, minLevelName)}
                     id={image.uuid}
