@@ -1,4 +1,4 @@
-import {getImage, getImageName, imageType} from '@/model/ImageType';
+import {getImage, getImageDescription, getImageName, imageType} from '@/model/ImageType';
 import CheckButton from '@/components/CheckButton';
 
 interface Props {
@@ -13,7 +13,8 @@ const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, ch
     return (
         <div key={`${image.uuid}-${Math.random()}`}>
             <div className="relative">
-                <div className="relative w-full h-50 rounded-lg overflow-hidden">
+                <div className="relative w-full h-50 rounded-lg overflow-hidden"
+                     style={{ padding:"2px"}}>
                     <button>
                         <img
                             src={getImage(image, true)}
@@ -24,7 +25,7 @@ const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, ch
                     </button>
                 </div>
                 <CheckButton
-                    imageDescription={[getImageName(image, minLevelName)]}
+                    imageDescription={getImageDescription(image, minLevelName)}
                     unSignedUrl={image.url}
                     name={getImageName(image, minLevelName)}
                     id={image.uuid}

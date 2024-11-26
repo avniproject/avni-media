@@ -102,7 +102,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasPrev ? "absolute" : "hidden"
-                                            } top-40 bottom-60 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                                             onClick={clickHandler}
                                         >
                                             <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
@@ -114,7 +114,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasNext ? "absolute" : "hidden"
-                                            } top-40 bottom-60 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                                             onClick={clickHandler}
                                         >
                                             <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
@@ -155,14 +155,14 @@ const ImageCarousel = ({
                                             <div className="name-size">
                                                 <Button
                                                     className="text-sm m-lt-3 float-right mb-md-5 mr-md-5"
-                                                    style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"4px"}}
+                                                    style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"10px"}}
                                                     variant="text"
                                                     onClick={() => redirectToSubjectDashboardURL(getMetadata(img))}
                                                 >
                                                     More Info
                                                 </Button>
                                                 <p className="text-sm float-left"
-                                                   style={{ paddingLeft:"20px", paddingTop:"4px" }}
+                                                   style={{ paddingLeft:"20px", paddingTop:"10px" }}
                                                 >
                                                     Date:{" "}
                                                     {new Date(img.createdDateTime)

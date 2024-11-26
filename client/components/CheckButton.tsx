@@ -29,17 +29,24 @@ export default function CheckButton({name, id, onSelectImage, checkedImage, onSe
     const isChecked = checkedImage.includes(id.toString());
     const downloadUrl = `/web/media/downloadStream?s3Url=${unSignedUrl}&fileName=${getDownloadFileName(name, unSignedUrl)}`;
 
+    function getImageNameOrDescription() {
+        return <>
+            {!imageDescription ?
+                <label className="font-medium text-blue-700">
+                    <a href={image_url} target="_blank">{name}</a>
+                </label>
+                : <label className="font-medium text-blue-700 image-description">
+                    <a href={image_url} target="_blank">{imageDescription.map((text, idx) => <div
+                        key={idx}>{text}</div>)}</a>
+                </label>}
+        </>;
+    }
+
     return (
-        <fieldset className="mt-5">
-            <div className="mt-1 text-sm">
-                {isList || !imageDescription ?
-                    <label className="font-medium text-gray-700"><a href={image_url} target="_blank">{name}</a></label>
-                    : <label className="font-medium text-gray-700 image-description"><a href={image_url}
-                                                                      target="_blank">{imageDescription.map((text, idx) =>
-                        <div key={idx}>{text}</div>)}</a></label>}
-            </div>
-            <div className="flex justify-between">
-                <div className="">
+        <fieldset className="mt-3">
+            <div className="flex justify-between"
+                 style={{margin: "0px 10px 0px 10px"}}>
+                <div className="mr-8">
                     <input
                         id={id.toString()}
                         value={id}
@@ -47,14 +54,18 @@ export default function CheckButton({name, id, onSelectImage, checkedImage, onSe
                         type="checkbox"
                         checked={isChecked}
                         className="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
+                        style={{marginTop: "6px"}}
                         onChange={(e) => handleChecked(e)}
                     />
                 </div>
                 <div className="mr-8">
-                    <a href={downloadUrl} download>
+                    <a href={downloadUrl} className="text-blue-600" download>
                         <DownloadOutlined/>
                     </a>
                 </div>
+            </div>
+            <div className="mt-1 text-sm" style={{padding: "6px"}}>
+                {getImageNameOrDescription()}
             </div>
         </fieldset>
     );
