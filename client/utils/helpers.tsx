@@ -119,7 +119,7 @@ export function isAudioOrVideo(fileExtension: string) {
 }
 
 export function isImage(fileExtension: string) {
-    const imageFileExtensions = [".png", ".jpg"];
+    const imageFileExtensions = [".png", ".jpg", ".jpeg"];
     return matchesFileExtension(fileExtension, imageFileExtensions);
 }
 
