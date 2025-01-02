@@ -18,7 +18,7 @@
 
 .carousel {
   width: 900px;
-  height: 500px;
+  height: 700px;
 }
 .carousel-image{
   width: 500px;
@@ -63,4 +63,9 @@
   height: 20px; 
   width: 20px; 
   color: #38b2ac; 
+}
+.image-description{
+  position: relative;
+  display: inline-block;
+  align-content: baseline;
 }

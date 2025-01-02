@@ -3,12 +3,11 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import {Carousel} from "react-responsive-carousel";
 import CheckButton from "./CheckButton";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import axios from "axios";
-import {redirectIfNotValid, operationalModuleData, fetchAuthHeaders} from '@/utils/helpers'
-import {imageType, getImageName, getImage, imageMetadata, getMetadata, getImageNameWithoutNewLines} from '../model/ImageType';
+import {fetchAuthHeaders} from '@/utils/helpers'
+import {getImage, getImageDescription, getImageName, getMetadata, imageMetadata, imageType} from '../model/ImageType';
 import {Button} from "@mui/material";
-import {MediaSearchService} from "@/service/MediaSearchService";
 import Loading from '@/components/loading';
 
 interface Props {
@@ -97,7 +96,7 @@ const ImageCarousel = ({
                                 </svg>
                             </button>
                         </div>
-                        <div className="flex w-full h-full" style={{position: "relative",width: "500px", height: "500px"}}>
+                        <div className="flex w-full h-full" style={{position: "relative",width: "500px", height: "650px"}}>
                             {showLoader && <Loading />}
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
@@ -109,7 +108,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasPrev ? "absolute" : "hidden"
-                                            } top-0 bottom-20 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                                             onClick={customClickHandler}
                                         >
                                             <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
@@ -125,7 +124,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasNext ? "absolute" : "hidden"
-                                            } top-0 bottom-20 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
                                             onClick={customClickHandler}
                                         >
                                             <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
@@ -149,7 +148,7 @@ const ImageCarousel = ({
                                             <img src={getImage(img, ci !== img)} className="carousel-image"/>
                                             <div className="checkbox">
                                                 <CheckButton
-                                                    imageNameWithoutNewLines={getImageNameWithoutNewLines(img, minLevelName)}
+                                                    imageDescription={getImageDescription(img, minLevelName)}
                                                     unSignedUrl={img.url}
                                                     image_url={getImage(img)}
                                                     name={getImageName(img, minLevelName)}
@@ -166,14 +165,14 @@ const ImageCarousel = ({
                                             <div className="name-size">
                                                 <Button
                                                     className="text-sm m-lt-3 float-right mb-md-5 mr-md-5"
-                                                    style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"0px"}}
+                                                    style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"10px"}}
                                                     variant="text"
                                                     onClick={() => redirectToSubjectDashboardURL(getMetadata(img))}
                                                 >
                                                     More Info
                                                 </Button>
                                                 <p className="text-sm float-left"
-                                                   style={{ paddingLeft:"20px", paddingTop:"4px" }}
+                                                   style={{ paddingLeft:"20px", paddingTop:"10px" }}
                                                 >
                                                     Date:{" "}
                                                     {new Date(img.createdDateTime)
