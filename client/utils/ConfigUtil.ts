@@ -12,6 +12,6 @@ export function isDevMode() {
 }
 
 export function isDevModeWithoutIDP() {
-    console.log('isDevMode() && !!getUserName()', isDevMode() && !!getUserName());
-    return isDevMode() && !!getUserName();
+    console.log('isDevMode() && !!!getUserName()', isDevMode() && !!!getUserName());
+    return isDevMode() && !!!getUserName();
 }
