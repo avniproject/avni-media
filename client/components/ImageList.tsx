@@ -80,6 +80,8 @@ export default function ImageList() {
     const [selectAllInPage, setSelectAllInPage] = useState<any>({0: NONE_SELECTED});
     const [selectAllPages, setSelectAllPages] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(0);
+    const [showCount, setShowCount] = useState<boolean>(false);
+
     useEffect(() => {
         const userUUID = getUserUuidFromToken();
         setUserName(userUUID);
@@ -695,7 +697,8 @@ export default function ImageList() {
                     toDate: toDate,
                     addresses: add,
                     conceptFilters: conceptfilter,
-                    imageConcepts: selectedMediaConcepts
+                    imageConcepts: selectedMediaConcepts,
+                    includeTotalCount: showCount
                 }).filter(([_, value]) => {
                     if (Array.isArray(value)) {
                         return value.length > 0;
@@ -708,12 +711,13 @@ export default function ImageList() {
         }
         filtersData();
         resetSelections();
-    }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts]);
+    }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts, showCount]);
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
         setShowLoader(true);
-        const responseData = await MediaSearchService.searchMedia(dataBody, 0, showPerpage);
+        setCurrentPage(0);
+        const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
         setImageList(responseData);
         setShowLoader(false);
     };
@@ -857,6 +861,11 @@ export default function ImageList() {
                         getConcepts={getNoteConcept}
                         textConcept={noteConcept}/>
                 ) : null}
+                <FormControlLabel style={{paddingLeft: "20px"}} label={"Display Count"}
+                                  control={<Checkbox
+                                      onChange={(e) => setShowCount(e.target.checked)}
+                                      checked={showCount}
+                                  />}/>
             </div>
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-4 sm:py-4">
@@ -947,6 +956,9 @@ export default function ImageList() {
                             showperpage={showPerpage}
                             pagechange={pageChange}
                             enableNextPage={imageList.data.length === showPerpage}
+                            totalCount={imageList.count}
+                            currentPageLength={imageList.data.length}
+                            currentPage={currentPage}
                         />
                     </Fragment>}
             </div>

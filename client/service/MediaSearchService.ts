@@ -16,6 +16,6 @@ export class MediaSearchService {
             if (_.isNil(img.signedThumbnailUrl))
                 img.signedThumbnailUrl = img.signedUrl;
         }));
-        return {data: responseData, total: responseData.length};
+        return {data: responseData, total: responseData.length, count: response.data.count};
     }
 }
