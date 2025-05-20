@@ -44,6 +44,7 @@
   "devDependencies": {
     "@babel/core": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
     "@types/lodash": "^4.14.195",
     "@types/react-date-range": "^1.4.4",

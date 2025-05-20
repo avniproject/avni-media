@@ -1,6 +1,9 @@
 import {Styles} from 'react-modal';
-import Modal from "react-modal";
+import ReactModal from "react-modal";
 import {CircularProgress} from '@mui/material';
+
+// Fix for TypeScript error: 'Modal' cannot be used as a JSX component
+const Modal = ReactModal as any;
 
 const Loading = () => {
     const customStyles: Styles = {
