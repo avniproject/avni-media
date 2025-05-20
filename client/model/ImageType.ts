@@ -81,7 +81,9 @@ export const getImage = function (image: imageType, getThumbnail: boolean = fals
 export const getDownloadFileName = function (name: string, url: string) {
     let fileName = name;
     const fileExtension = url.substring(url.lastIndexOf('.'));
-    if (!_.isEmpty(fileExtension) && fileExtension.length <= 4)
+    if (!_.isEmpty(fileExtension) && fileExtension.length <= 5) {
         fileName += fileExtension;
+    }
+    
     return fileName;
 }
