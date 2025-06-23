@@ -7,12 +7,15 @@ const Modal = ReactModal as any;
 interface prop{
   subject: any[];
   date : any[]|null;
+  mediaMetadata?: string;
+  questionGroupConceptName?: string;
+  repeatableQuestionGroupIndex?: number;
   onSubmit:(inputValue:string)=>void;
   onClose: ()=>void;
   showModal: boolean;
 }
-const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) => {
-  const [inputValue, setInputValue] = useState(`Date: ${date} \nsubjectType : ${subject}`);
+const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, mediaMetadata, questionGroupConceptName, repeatableQuestionGroupIndex }:prop) => {
+  const [inputValue, setInputValue] = useState(`Date: ${date} \nsubjectType : ${subject}${questionGroupConceptName ? `\nQuestion Group: ${questionGroupConceptName}` : ''}${repeatableQuestionGroupIndex !== undefined ? `\nQuestion Group Index: ${repeatableQuestionGroupIndex}` : ''}${mediaMetadata ? `\nMedia Metadata: ${mediaMetadata}` : ''}`);
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 

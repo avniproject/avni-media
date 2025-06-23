@@ -1,5 +1,6 @@
 import {getImage, getImageDescription, getImageName, imageType} from '@/model/ImageType';
 import CheckButton from '@/components/CheckButton';
+import React from 'react';
 
 interface Props {
     image: imageType,
@@ -7,9 +8,10 @@ interface Props {
     minLevelName: string,
     onSelectImage: (value: string, checked: boolean) => void,
     checkedImage: string[],
+    onViewDetails?: (image: imageType) => void,
 }
 
-const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, checkedImage}: Props) => {
+const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, checkedImage, onViewDetails}: Props) => {
     return (
         <div key={`${image.uuid}-${Math.random()}`}>
             <div className="relative">
@@ -23,6 +25,14 @@ const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, ch
                             className="thumb"
                         />
                     </button>
+                    {onViewDetails && (
+                        <button 
+                            onClick={() => onViewDetails(image)}
+                            className="absolute bottom-2 right-2 bg-teal-500 hover:bg-teal-700 text-white py-1 px-2 rounded text-xs"
+                        >
+                            Details
+                        </button>
+                    )}
                 </div>
                 <CheckButton
                     imageDescription={getImageDescription(image, minLevelName)}
