@@ -19,9 +19,6 @@ export interface imageType {
     subjectMiddleName: string
     url: string
     entityId: number;
-    questionGroupConceptName?: string;
-    repeatableQuestionGroupIndex?: number;
-    mediaMetadata?: string;
 }
 
 export interface imageMetadata {
@@ -39,8 +36,6 @@ export const getImageName = function (image: imageType, minLevelName: string) {
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
               ${image.programEnrolment ? '_' + image.programEnrolment : ''}
-              ${image.questionGroupConceptName !== undefined ? '_' + image.questionGroupConceptName : ''}
-              ${image.repeatableQuestionGroupIndex !== undefined ? '_' + image.repeatableQuestionGroupIndex : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`;
 }
 
@@ -55,9 +50,6 @@ export const getImageDescription = function (image: imageType, minLevelName: str
     description.push(`${image.programEnrolment ? 'Program: ' + image.programEnrolment : ''}`);
     description.push(`${image.conceptName ? 'Field: ' + image.conceptName : ''}`);
     description.push(`${lowestLevelAddress ? 'Address: ' + lowestLevelAddress : ''}`);
-    description.push(`${image.questionGroupConceptName ? 'Question Group: ' + image.questionGroupConceptName : ''}`);
-    description.push(`${image.repeatableQuestionGroupIndex !== undefined ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
-    description.push(`${image.mediaMetadata ? 'Media Metadata: ' + image.mediaMetadata : ''}`);
     return description;
 }
 

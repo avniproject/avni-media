@@ -53,9 +53,6 @@ export default function ImageList() {
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
-    const [selectedMediaMetadata, setSelectedMediaMetadata] = useState<string | undefined>();
-    const [selectedQuestionGroupConceptName, setSelectedQuestionGroupConceptName] = useState<string | undefined>();
-    const [selectedRepeatableIndex, setSelectedRepeatableIndex] = useState<number | undefined>();
     const [subjectName, setSubjectName] = useState<any>();
     const [dataBody, setDataBody] = useState<any>();
     const [conceptData, setConceptData] = useState<any>([]);
@@ -410,12 +407,7 @@ export default function ImageList() {
         }
     };
 
-    const handleOpenModal = (image?: any) => {
-        if (image) {
-            setSelectedMediaMetadata(image.mediaMetadata);
-            setSelectedQuestionGroupConceptName(image.questionGroupConceptName || image.formElementId);
-            setSelectedRepeatableIndex(image.repeatableQuestionGroupIndex);
-        }
+    const handleOpenModal = () => {
         setShowModal(true);
     };
 
@@ -885,16 +877,13 @@ export default function ImageList() {
                             onSubmit={handleSubmit}
                             date={date}
                             subject={subject}
-                            mediaMetadata={selectedMediaMetadata}
-                            questionGroupConceptName={selectedQuestionGroupConceptName}
-                            repeatableQuestionGroupIndex={selectedRepeatableIndex}
                         />
                     )}
                     {showLoader && (
                         <Loading />
                     )}
                     <Button name="Apply Filter" onClick={handleApplyFilter}/>
-                    <Button onClick={() => handleOpenModal()} name=" Download"/>
+                    <Button onClick={handleOpenModal} name=" Download"/>
                     <Link href="./downloadList">
                         <Button
                             name='Available Downloads' onClick={function (): void {
@@ -943,8 +932,7 @@ export default function ImageList() {
                                         <MediaViewItem key={image.uuid} image={image}
                                                        setCarouselImage={setCarouselImage}
                                                        minLevelName={minLevelName} onSelectImage={onSelectImage}
-                                                       checkedImage={checkedImage}
-                                                       onViewDetails={handleOpenModal}/>
+                                                       checkedImage={checkedImage}/>
                                 )}
                             </div>
                         </div>
