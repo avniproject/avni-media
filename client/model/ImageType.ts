@@ -31,6 +31,14 @@ export interface imageMetadata {
     entityId: number;
 }
 
+function hasQuestionGroupConceptName(image: imageType) {
+    return image.questionGroupConceptName;
+}
+
+function hasRepeatableQuestionGroupIndex(image: imageType) {
+    return image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex !== null && image.repeatableQuestionGroupIndex > -1;
+}
+
 export const getImageName = function (image: imageType, minLevelName: string) {
     const lowestLevelAddress = getLowestLocation(image.address, minLevelName)
     return `${image.subjectFirstName ? image.subjectFirstName : ''}
@@ -39,8 +47,8 @@ export const getImageName = function (image: imageType, minLevelName: string) {
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
               ${image.programEnrolment ? '_' + image.programEnrolment : ''}
-              ${image.questionGroupConceptName !== undefined && image.questionGroupConceptName !== null ? '_' + image.questionGroupConceptName : ''}
-              ${image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex !== null && image.repeatableQuestionGroupIndex > -1 ? '_' + image.repeatableQuestionGroupIndex : ''}
+              ${hasQuestionGroupConceptName(image) ? '_' + image.questionGroupConceptName : ''}
+              ${hasRepeatableQuestionGroupIndex(image) ? '_' + image.repeatableQuestionGroupIndex : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`
         .replace(/\s+/g, '');
 }
@@ -56,8 +64,8 @@ export const getImageDescription = function (image: imageType, minLevelName: str
     description.push(`${image.programEnrolment ? 'Program: ' + image.programEnrolment : ''}`);
     description.push(`${image.conceptName ? 'Field: ' + image.conceptName : ''}`);
     description.push(`${lowestLevelAddress ? 'Address: ' + lowestLevelAddress : ''}`);
-    description.push(`${image.questionGroupConceptName ? 'Question Group: ' + image.questionGroupConceptName : ''}`);
-    description.push(`${image.repeatableQuestionGroupIndex !== null && image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex >= 0 ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
+    description.push(`${hasQuestionGroupConceptName(image) ? 'Question Group: ' + image.questionGroupConceptName : ''}`);
+    description.push(`${hasRepeatableQuestionGroupIndex(image) ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
     return description;
 }
 
