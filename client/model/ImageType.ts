@@ -40,7 +40,7 @@ export const getImageName = function (image: imageType, minLevelName: string) {
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
               ${image.programEnrolment ? '_' + image.programEnrolment : ''}
               ${image.questionGroupConceptName !== undefined && image.questionGroupConceptName !== null ? '_' + image.questionGroupConceptName : ''}
-              ${image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex !== null ? '_' + image.repeatableQuestionGroupIndex : ''}
+              ${image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex !== null && image.repeatableQuestionGroupIndex > -1 ? '_' + image.repeatableQuestionGroupIndex : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`
         .replace(/\s+/g, '');
 }
