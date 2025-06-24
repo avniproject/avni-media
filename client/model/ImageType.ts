@@ -62,10 +62,10 @@ export const getImageDescription = function (image: imageType, minLevelName: str
     description.push(`${image.subjectTypeName ? 'Type: ' + image.subjectTypeName : ''}`);
     description.push(`${image.encounterTypeName ? 'Encounter: ' + image.encounterTypeName : ''}`);
     description.push(`${image.programEnrolment ? 'Program: ' + image.programEnrolment : ''}`);
-    description.push(`${image.conceptName ? 'Field: ' + image.conceptName : ''}`);
-    description.push(`${lowestLevelAddress ? 'Address: ' + lowestLevelAddress : ''}`);
+    description.push(`${image.conceptName ? 'Question: ' + image.conceptName : ''}`);
     description.push(`${hasQuestionGroupConceptName(image) ? 'Question Group: ' + image.questionGroupConceptName : ''}`);
     description.push(`${hasRepeatableQuestionGroupIndex(image) ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
+    description.push(`${lowestLevelAddress ? 'Address: ' + lowestLevelAddress : ''}`);
     return description;
 }
 
