@@ -39,8 +39,8 @@ export const getImageName = function (image: imageType, minLevelName: string) {
               ${image.subjectTypeName ? '_' + image.subjectTypeName : ''}
               ${image.encounterTypeName ? '_' + image.encounterTypeName : ''}
               ${image.programEnrolment ? '_' + image.programEnrolment : ''}
-              ${image.questionGroupConceptName !== undefined ? '_' + image.questionGroupConceptName : ''}
-              ${image.repeatableQuestionGroupIndex !== undefined ? '_' + image.repeatableQuestionGroupIndex : ''}
+              ${image.questionGroupConceptName !== undefined && image.questionGroupConceptName !== null ? '_' + image.questionGroupConceptName : ''}
+              ${image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex !== null ? '_' + image.repeatableQuestionGroupIndex : ''}
               ${lowestLevelAddress ? '_' + lowestLevelAddress : ''}`
         .replace(/\s+/g, '');
 }
@@ -57,7 +57,7 @@ export const getImageDescription = function (image: imageType, minLevelName: str
     description.push(`${image.conceptName ? 'Field: ' + image.conceptName : ''}`);
     description.push(`${lowestLevelAddress ? 'Address: ' + lowestLevelAddress : ''}`);
     description.push(`${image.questionGroupConceptName ? 'Question Group: ' + image.questionGroupConceptName : ''}`);
-    description.push(`${image.repeatableQuestionGroupIndex !== undefined ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
+    description.push(`${image.repeatableQuestionGroupIndex !== null && image.repeatableQuestionGroupIndex !== undefined && image.repeatableQuestionGroupIndex >= 0 ? 'Question Group Index: ' + image.repeatableQuestionGroupIndex : ''}`);
     return description;
 }
 
