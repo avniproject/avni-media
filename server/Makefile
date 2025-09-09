@@ -15,6 +15,10 @@ start-local-staging:
 	cp ./env-templates/local-staging.template .env
 	npm run start:dev
 
+start-local-prerelease:
+	cp ./env-templates/local-prerelease.template .env
+	npm run start:dev
+
 start-prod:
 	cp ./env-templates/local-prod.template .env
 	npm run start:prod:dev
