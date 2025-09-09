@@ -924,7 +924,7 @@ export default function ImageList() {
                                                 className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
                                                 title="Remove field filter"
                                             >
-                                                ✕
+                                                Delete
                                             </button>
                                         )}
                                     </div>

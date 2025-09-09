@@ -55,7 +55,7 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
                 </Menu.Button>
             </div>
 
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                 <div className="py-1 w-full">
                     {searchable && <input
                         type="text"
