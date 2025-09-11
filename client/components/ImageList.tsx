@@ -888,7 +888,7 @@ export default function ImageList() {
                 )}
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && conceptData && (
-                    <div>
+                    <div className="mt-3">
                         {selectedFieldConcepts.map((selectedFieldConcept: any, index: number) => {
                             const selectedUuids = selectedFieldConcepts
                                 .map((field, idx) => idx !== index && field ? field.uuid : null)
@@ -898,9 +898,9 @@ export default function ImageList() {
                             );
                             
                             return (
-                                <div key={index}>
-                                    <div className="flex items-center gap-4 mt-5">
-                                        <div className="w-64">
+                                <div key={index} className="mb-3">
+                                    <div className="flex items-start gap-2">
+                                        <div className="w-64 shrink-0">
                                             <Concepts 
                                                 setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
                                                 concepts={availableFields}
@@ -910,7 +910,7 @@ export default function ImageList() {
                                             />
                                         </div>
 
-                                        <div className="flex-1">
+                                        <div className="min-w-0">
                                             {selectedFieldConcept && selectedFieldConcept.uuid ? (
                                                 renderFilterComponent(selectedFieldConcept)
                                             ) : (
@@ -919,13 +919,15 @@ export default function ImageList() {
                                         </div>
 
                                         {selectedFieldConcepts.length > 1 && (
-                                            <button
-                                                onClick={() => removeFieldFilter(index)}
-                                                className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
-                                                title="Remove field filter"
-                                            >
-                                                Delete
-                                            </button>
+                                            <div className="shrink-0">
+                                                <button
+                                                    onClick={() => removeFieldFilter(index)}
+                                                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                                    title="Remove field filter"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -933,7 +935,7 @@ export default function ImageList() {
                         })}
 
                         {selectedFieldConcepts.length > 0 && selectedFieldConcepts.some(field => field && field.uuid) && selectedFieldConcepts.length < conceptData.length && (
-                            <div className="mt-3">
+                            <div className="mb-3">
                                 <button
                                     onClick={addFieldFilter}
                                     className="inline-flex items-center gap-2 px-4 py-2 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-md border border-dashed border-teal-300 hover:border-teal-500"
