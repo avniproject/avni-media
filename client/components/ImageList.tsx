@@ -435,11 +435,13 @@ export default function ImageList() {
     };
 
     const removeFieldFilter = (index: number) => {
-        const removedField = selectedFieldConcepts[index];
-        if (removedField?.uuid) {
-            removeConceptFilter(removedField.uuid);
-        }
-        setSelectedFieldConcept(selectedFieldConcepts.filter((_, i) => i !== index));
+        setSelectedFieldConcept(prev => {
+            const removedField = prev[index];
+            if (removedField?.uuid) {
+                removeConceptFilter(removedField.uuid);
+            }
+            return prev.filter((_, i) => i !== index);
+        });
     };
 
     const updateFieldConcept = (index: number, newField: any) => {
