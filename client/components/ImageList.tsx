@@ -445,13 +445,15 @@ export default function ImageList() {
     };
 
     const updateFieldConcept = (index: number, newField: any) => {
-        const oldField = selectedFieldConcepts[index];
-        if (oldField && oldField.uuid) {
-            removeConceptFilter(oldField.uuid);
-        }
-        const updatedFields = [...selectedFieldConcepts];
-        updatedFields[index] = newField;
-        setSelectedFieldConcept(updatedFields);
+        setSelectedFieldConcept(prev => {
+            const oldField = prev[index];
+            if (oldField && oldField.uuid) {
+                removeConceptFilter(oldField.uuid);
+            }
+            const updatedFields = [...prev];
+            updatedFields[index] = newField;
+            return updatedFields;
+        });
     };
 
     const renderFilterComponent = (selectedFieldConcept: any) => {
@@ -901,7 +903,7 @@ export default function ImageList() {
                             
                             return (
                                 <div key={index} className="mb-3">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                         <div className="w-64 shrink-0">
                                             <Concepts 
                                                 setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
@@ -909,6 +911,7 @@ export default function ImageList() {
                                                 title={selectedFieldConcept?.name || "Fields"}
                                                 multiSelect={false}
                                                 searchable={true}
+                                                selectedValue={selectedFieldConcept}
                                             />
                                         </div>
 
@@ -921,10 +924,10 @@ export default function ImageList() {
                                         </div>
 
                                         {selectedFieldConcepts.length > 1 && (
-                                            <div className="shrink-0">
+                                            <div>
                                                 <button
                                                     onClick={() => removeFieldFilter(index)}
-                                                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
+                                                    className="mt-3 p-1 text-red-500 border border-dashed hover:text-red-700 border-red-700 hover:bg-red-50 rounded-md"
                                                     title="Remove field filter"
                                                 >
                                                     Delete

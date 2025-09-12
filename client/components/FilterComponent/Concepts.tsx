@@ -9,15 +9,24 @@ interface Prop {
     title: string;
     multiSelect: boolean;
     searchable: boolean;
+    selectedValue?: any;
 }
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
 }
 
-export default function Concepts({setConceptsFunction, concepts, title, multiSelect, searchable}: Prop) {
+export default function Concepts({setConceptsFunction, concepts, title, multiSelect, searchable, selectedValue}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        if (selectedValue?.uuid) {
+            setSelectedOptions([selectedValue]);
+        } else if (selectedValue === null || selectedValue === undefined) {
+            setSelectedOptions([]);
+        }
+    }, [selectedValue]);
 
     useEffect(() => {
         setConceptsFunction(selectedOptions);
