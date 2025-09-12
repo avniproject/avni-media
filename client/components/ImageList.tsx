@@ -48,7 +48,7 @@ export default function ImageList() {
     const [encounterFilter, setEncounterFilter] = useState<any>([]);
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
-    const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any[]>([]);
+    const [selectedFieldConcepts, setSelectedFieldConcepts] = useState<any[]>([]);
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
@@ -415,7 +415,7 @@ export default function ImageList() {
 
     useEffect(() => {
         if (conceptData && conceptData.length > 0 && selectedFieldConcepts.length === 0) {
-            setSelectedFieldConcept([null]);
+            setSelectedFieldConcepts([null]);
         }
     }, [conceptData]);
 
@@ -431,11 +431,11 @@ export default function ImageList() {
     };
 
     const addFieldFilter = () => {
-        setSelectedFieldConcept([...selectedFieldConcepts, null]);
+        setSelectedFieldConcepts([...selectedFieldConcepts, null]);
     };
 
     const removeFieldFilter = (index: number) => {
-        setSelectedFieldConcept(prev => {
+        setSelectedFieldConcepts(prev => {
             const removedField = prev[index];
             if (removedField?.uuid) {
                 removeConceptFilter(removedField.uuid);
@@ -445,7 +445,7 @@ export default function ImageList() {
     };
 
     const updateFieldConcept = (index: number, newField: any) => {
-        setSelectedFieldConcept(prev => {
+        setSelectedFieldConcepts(prev => {
             const oldField = prev[index];
             if (oldField && oldField.uuid) {
                 removeConceptFilter(oldField.uuid);
@@ -467,14 +467,14 @@ export default function ImageList() {
                 return (
                     <TexConceptFilter
                         getConcepts={(data: string) => getTextConcept(data, conceptUuid, formUuid)}
-                        textConcept={activeFilters}
+                        textConcepts={activeFilters}
                     />
                 );
             case "Notes":
                 return (
                     <TexConceptFilter
                         getConcepts={(data: string) => getNoteConcept(data, conceptUuid, formUuid)}
-                        textConcept={activeFilters}
+                        textConcepts={activeFilters}
                     />
                 );
             case "Coded":
