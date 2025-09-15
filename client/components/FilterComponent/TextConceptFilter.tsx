@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 interface Prop {
   getConcepts: (data: string) => void;
-  textConcept : string;
+  textConcepts : any[];
 }
 
-export default function TexConceptFilter({ getConcepts, textConcept }: Prop) {
+export default function TexConceptFilter({ getConcepts, textConcepts }: Prop) {
 
   const [inputValue, setInputValue] = useState("");
 
@@ -15,13 +15,16 @@ export default function TexConceptFilter({ getConcepts, textConcept }: Prop) {
     
   }, [inputValue]);
   
-  useEffect(()=>{
-
-  if(textConcept.length===0){
-    setInputValue('')
-   }
-
-  },[textConcept])
+  useEffect(() => {
+    if (textConcepts.length === 0) {
+      setInputValue('');
+    } else {
+      const currentFilter = textConcepts.length > 0 ? textConcepts[0] : null;
+      if (currentFilter && currentFilter.values) {
+        setInputValue(currentFilter.values.join(' '));
+      }
+    }
+  }, [textConcepts])
 
   return (
     <div className="inline-flex w-52 mt-5">
