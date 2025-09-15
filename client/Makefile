@@ -16,10 +16,6 @@ start-local-staging:
 	$(call _create_env,local.staging)
 	npm run dev
 
-start-local-prerelease:
-	$(call _create_env,local.prerelease)
-	npm run dev
-
 start-with-prod:
 	$(call _create_env,development.production)
 	npm run dev

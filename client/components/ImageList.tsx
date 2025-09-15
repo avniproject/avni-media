@@ -48,7 +48,7 @@ export default function ImageList() {
     const [encounterFilter, setEncounterFilter] = useState<any>([]);
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
-    const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any[]>([]);
+    const [selectedFieldConcepts, setSelectedFieldConcept] = useState<any>();
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
@@ -58,6 +58,12 @@ export default function ImageList() {
     const [conceptData, setConceptData] = useState<any>([]);
     const [mediaConcepts, setMediaConcepts] = useState<any>([]);
     const [formsData, setFormsData] = useState<any>([]);
+    const [textConcept, setTextConcept] = useState<any>([])
+    const [codedConcept, setCodedConcept] = useState<any>([])
+    const [noteConcept, setNoteConcept] = useState<any>([])
+    const [numericConcept, setToNumericConcept] = useState<any>([])
+    const [dateTimeConcept, setDateTimeConcept] = useState<any[] | null>([]);
+    const [conceptDates, setConceptDates] = useState<any[] | null>([]);
     const [typeId, setTypeId] = useState<any>([])
     const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
     const [selectedSubjectUUID, setSelectedSubjectUUID] = useState<any[]>([]);
@@ -69,7 +75,7 @@ export default function ImageList() {
     const [showAllEncounter, setShowAllEncounter] = useState<any[]>([]);
     const [selectedEncounterTypeUUID, setSelectedEncounterTypeUUID] = useState<any>([]);
     const [selectedMediaConcepts, setSelectedMediaConcepts] = useState<any>([]);
-    const [activeConceptFilters, setActiveConceptFilters] = useState<any[]>([]);
+    const selectedFieldConcept = selectedFieldConcepts && selectedFieldConcepts.length > 0 && selectedFieldConcepts[0];
     const ALL_SELECTED = "ALL", SOME_SELECTED = "SOME", NONE_SELECTED = "NONE";
     const [selectAllInPage, setSelectAllInPage] = useState<any>({0: NONE_SELECTED});
     const [selectAllPages, setSelectAllPages] = useState<boolean>(false);
@@ -413,171 +419,81 @@ export default function ImageList() {
         await handleSendSelectedImages(inputValue);
     };
 
-    useEffect(() => {
-        if (conceptData && conceptData.length > 0 && selectedFieldConcepts.length === 0) {
-            setSelectedFieldConcept([null]);
-        }
-    }, [conceptData]);
-
-    const updateConceptFilter = (conceptUuid: string, newFilter: any) => {
-        setActiveConceptFilters(prev => {
-            const filtered = prev.filter(f => f.conceptUuid !== conceptUuid);
-            return [...filtered, newFilter];
-        });
+    const setConcepts = (data: any[]) => {
+        setSelectedFieldConcept(data);
+        setDateTimeConcept([])
+        setTextConcept([])
+        setToNumericConcept([])
+        setConceptDates([])
+        setNoteConcept([])
+        setCodedConcept([])
     };
 
-    const removeConceptFilter = (conceptUuid: string) => {
-        setActiveConceptFilters(prev => prev.filter(f => f.conceptUuid !== conceptUuid));
-    };
-
-    const addFieldFilter = () => {
-        setSelectedFieldConcept([...selectedFieldConcepts, null]);
-    };
-
-    const removeFieldFilter = (index: number) => {
-        const removedField = selectedFieldConcepts[index];
-        if (removedField?.uuid) {
-            removeConceptFilter(removedField.uuid);
-        }
-        setSelectedFieldConcept(selectedFieldConcepts.filter((_, i) => i !== index));
-    };
-
-    const updateFieldConcept = (index: number, newField: any) => {
-        const oldField = selectedFieldConcepts[index];
-        if (oldField && oldField.uuid) {
-            removeConceptFilter(oldField.uuid);
-        }
-        const updatedFields = [...selectedFieldConcepts];
-        updatedFields[index] = newField;
-        setSelectedFieldConcept(updatedFields);
-    };
-
-    const renderFilterComponent = (selectedFieldConcept: any) => {
-        const conceptUuid = selectedFieldConcept.uuid;
-        const formUuid = selectedFieldConcept.formUuid;
-        const dataType = selectedFieldConcept.dataType;
-        const activeFilters = activeConceptFilters.filter(filter => filter.conceptUuid === conceptUuid);
-
-        switch(dataType) {
-            case "Text":
-                return (
-                    <TexConceptFilter
-                        getConcepts={(data: string) => getTextConcept(data, conceptUuid, formUuid)}
-                        textConcept={activeFilters}
-                    />
-                );
-            case "Notes":
-                return (
-                    <TexConceptFilter
-                        getConcepts={(data: string) => getNoteConcept(data, conceptUuid, formUuid)}
-                        textConcept={activeFilters}
-                    />
-                );
-            case "Coded":
-                return (
-                    <CodedConceptFilter
-                        conceptCoded={(data: any) => conceptCoded(data, conceptUuid, formUuid)}
-                        concepts={selectedFieldConcept.conceptAnswers || []}
-                    />
-                );
-            case "Numeric":
-                return (
-                    <NumericConceptFilter
-                        getNumericConcept={(fromNumber: number, toNumber: number) => getNumericConcept(fromNumber, toNumber, conceptUuid, formUuid)}
-                        numericConcept={activeFilters}
-                    />
-                );
-            case "Date":
-                return (
-                    <DateConceptFilter
-                        getDateConcept={(data: any[] | null) => getDateConcept(data, conceptUuid, formUuid)}
-                        conceptDates={activeFilters}
-                    />
-                );
-            case "DateTime":
-                return (
-                    <TimeStampConceptFilter
-                        getTimeStampConcept={(data: any[] | null) => getTimeStampConcept(data, conceptUuid, formUuid)}
-                        dateTimeConcept={activeFilters}
-                    />
-                );
-            default:
-                console.warn(`Unsupported dataType: ${dataType} for field: ${selectedFieldConcept.name}`);
-                return <div className="text-orange-600 italic">Unsupported field type: {dataType}</div>;
-        }
-    };
-
-    const getDateConcept = (data: any[] | null, conceptUuid: string, formUuid: string) => {
+    const getDateConcept = (data: any[] | null) => {
         if (data && data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
+            setConceptDates([{
+                "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "from": data[0],
                 "to": data[1]
-            };
-            updateConceptFilter(conceptUuid, newFilter);
+            }])
         }
     };
 
-    const getTimeStampConcept = (data: any[] | null, conceptUuid: string, formUuid: string) => {
+    const getTimeStampConcept = (data: any[] | null) => {
         if (data && data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
+            setDateTimeConcept([{
+                "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "from": data[0],
                 "to": data[1]
-            };
-            updateConceptFilter(conceptUuid, newFilter);
+            }])
         }
     };
 
-    const getNumericConcept = (fromNumber: number, toNumber: number, conceptUuid: string, formUuid: string) => {
-        const newFilter = {
-            "conceptUuid": conceptUuid,
-            "formUuid": formUuid,
+    const getNumericConcept = (fromNumber: number, toNumber: number) => {
+        setToNumericConcept([{
+            "conceptUuid": selectedFieldConcept.uuid,
+            "formUuid": selectedFieldConcept.formUuid,
             "from": fromNumber,
             "to": toNumber
-        };
-        updateConceptFilter(conceptUuid, newFilter);
+        }])
     }
 
-    const conceptCoded = (data: any, conceptUuid: string, formUuid: string) => {
+    const conceptCoded = (data: any) => {
         if (data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
+            setCodedConcept([{
+                "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data
-            };
-            updateConceptFilter(conceptUuid, newFilter);
+            }])
         } else {
-            removeConceptFilter(conceptUuid);
+            setCodedConcept([])
         }
     }
 
-    const getNoteConcept = (data: string, conceptUuid: string, formUuid: string) => {
+    const getNoteConcept = (data: string) => {
+
         if (data && data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
+            setNoteConcept([{
+                "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data.split(" ")
-            };
-            updateConceptFilter(conceptUuid, newFilter);
-        } else {
-            removeConceptFilter(conceptUuid);
+            }])
         }
+
     }
 
-    const getTextConcept = (data: string, conceptUuid: string, formUuid: string) => {
+    const getTextConcept = (data: string) => {
+
         if (data && data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
+            setTextConcept([{
+                "conceptUuid": selectedFieldConcept.uuid,
+                "formUuid": selectedFieldConcept.formUuid,
                 "values": data.split(" ")
-            };
-            updateConceptFilter(conceptUuid, newFilter);
-        } else {
-            removeConceptFilter(conceptUuid);
+            }])
         }
+
     }
 
     const programType = (data: any[], programUuid: string[]) => {
@@ -698,9 +614,14 @@ export default function ImageList() {
         setSelectedSubjectUUID(subjectUuid)
         setSubjectType(data);
         if (data.length === 0) {
-            setActiveConceptFilters([]);
-            setEncounterType([]);
-            setProgramType([]);
+            setCodedConcept([])
+            setEncounterType([])
+            setProgramType([])
+            setDateTimeConcept([])
+            setTextConcept([])
+            setToNumericConcept([])
+            setConceptDates([])
+            setNoteConcept([])
         }
     };
     useEffect(() => {
@@ -744,7 +665,28 @@ export default function ImageList() {
                 setFromDate(null);
             }
 
-            let conceptfilter = [...activeConceptFilters];
+            let conceptfilter = [];
+
+            if (codedConcept && codedConcept.length > 0) {
+                conceptfilter.push(codedConcept[0]);
+            }
+
+            if (numericConcept && numericConcept.length > 0) {
+                conceptfilter.push(numericConcept[0]);
+            }
+
+            if (textConcept && textConcept.length > 0) {
+                conceptfilter.push(textConcept[0]);
+            }
+            if (noteConcept && noteConcept.length > 0) {
+                conceptfilter.push(noteConcept[0]);
+            }
+            if (dateTimeConcept && dateTimeConcept.length > 0) {
+                conceptfilter.push(dateTimeConcept[0])
+            }
+            if (conceptDates && conceptDates.length > 0) {
+                conceptfilter.push(conceptDates[0])
+            }
             const body = Object.fromEntries(
                 Object.entries({
                     subjectName: subjectName,
@@ -769,7 +711,7 @@ export default function ImageList() {
         }
         filtersData();
         resetSelections();
-    }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, activeConceptFilters, selectedMediaConcepts, showCount]);
+    }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, codedConcept, numericConcept, dateTimeConcept, conceptDates, textConcept, noteConcept, selectedMediaConcepts, showCount]);
 
     const handleApplyFilter = async () => {
         redirectIfNotValid();
@@ -805,6 +747,7 @@ export default function ImageList() {
         setCheckedImage([]);
     }
 
+    const showCodedFilter = selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Coded";
     return (
         <>
             <div className="flex items-center justify-between">
@@ -887,64 +830,37 @@ export default function ImageList() {
                     />
                 )}
 
-                {selectedFormSubject && selectedFormSubject.length > 0 && conceptData && (
-                    <div>
-                        {selectedFieldConcepts.map((selectedFieldConcept: any, index: number) => {
-                            const selectedUuids = selectedFieldConcepts
-                                .map((field, idx) => idx !== index && field ? field.uuid : null)
-                                .filter(uuid => uuid !== null);
-                            const availableFields = conceptData.filter((field: any) => 
-                                !selectedUuids.includes(field.uuid)
-                            );
-                            
-                            return (
-                                <div key={index}>
-                                    <div className="flex items-center gap-4 mt-5">
-                                        <div className="w-64">
-                                            <Concepts 
-                                                setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
-                                                concepts={availableFields}
-                                                title={selectedFieldConcept?.name || "Fields"}
-                                                multiSelect={false}
-                                                searchable={true}
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            {selectedFieldConcept && selectedFieldConcept.uuid ? (
-                                                renderFilterComponent(selectedFieldConcept)
-                                            ) : (
-                                                <div className="text-gray-400 italic">Select a field to add filters</div>
-                                            )}
-                                        </div>
-
-                                        {selectedFieldConcepts.length > 1 && (
-                                            <button
-                                                onClick={() => removeFieldFilter(index)}
-                                                className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md"
-                                                title="Remove field filter"
-                                            >
-                                                ✕
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-
-                        {selectedFieldConcepts.length > 0 && selectedFieldConcepts.some(field => field && field.uuid) && selectedFieldConcepts.length < conceptData.length && (
-                            <div className="mt-3">
-                                <button
-                                    onClick={addFieldFilter}
-                                    className="inline-flex items-center gap-2 px-4 py-2 text-teal-600 hover:text-teal-800 hover:bg-teal-50 rounded-md border border-dashed border-teal-300 hover:border-teal-500"
-                                >
-                                    <span className="text-lg">+</span>
-                                    Add Field Filter
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
+                {selectedFormSubject && selectedFormSubject.length > 0 && conceptData &&
+                    <Concepts setConceptsFunction={setConcepts} concepts={conceptData} title="Fields" multiSelect={false} searchable={true}/>
+                }
+                {showCodedFilter ? (
+                    <CodedConceptFilter concepts={selectedFieldConcept.conceptAnswers}
+                                        conceptCoded={conceptCoded}
+                    />
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Date" ? (
+                    <DateConceptFilter
+                        getDateConcept={getDateConcept}
+                        conceptDates={conceptDates}
+                    />
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "DateTime" ? (
+                    <TimeStampConceptFilter
+                        getTimeStampConcept={getTimeStampConcept}
+                        dateTimeConcept={dateTimeConcept}/>
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Text" ? (
+                    <TexConceptFilter
+                        getConcepts={getTextConcept}
+                        textConcept={textConcept}
+                    />
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Numeric" ? (
+                    <NumericConceptFilter
+                        getNumericConcept={getNumericConcept}
+                        numericConcept={numericConcept}
+                    />
+                ) : selectedFormSubject && selectedFormSubject.length > 0 && selectedFieldConcept && selectedFieldConcept.dataType === "Notes" ? (
+                    <TexConceptFilter
+                        getConcepts={getNoteConcept}
+                        textConcept={noteConcept}/>
+                ) : null}
                 <FormControlLabel style={{paddingLeft: "20px"}} label={"Display Count"}
                                   control={<Checkbox
                                       onChange={(e) => setShowCount(e.target.checked)}
