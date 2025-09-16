@@ -36,7 +36,8 @@ const DateConceptFilter = ({ getDateConcept, conceptDates }: Props) => {
     <>
       <Menu
         as="div"
-        className=" inline-flex  text-left ml-0 mr-2 pr-0 mt-5 z-10 inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-0 py-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500"
+        className="inline-flex text-left ml-0 mr-2 pr-0 mt-5 inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-0 py-0 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500"
+        style={{position: 'relative', zIndex: 40}}
       >
         <RangePicker
           format={dateFormat}

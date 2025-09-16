@@ -23,7 +23,7 @@ const UserInputModal = ({ showModal, onClose, onSubmit, date, subject, }:prop) =
   const customStyles: Styles = {
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.75)",
-      zIndex:25,
+      zIndex: 300,
     },
     content: {
       width: "400px",

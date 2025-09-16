@@ -55,8 +55,7 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
     return (
         <Menu as="div" className="menu">
             <div>
-                <Menu.Button
-                    className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500">
+                <Menu.Button className="filter-dropdown">
           <span>
             {selectedOptions && selectedOptions.length > 0 ? selectedOptions.map(v => v.name).join(", ") : title}
           </span>
@@ -64,7 +63,7 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
                 </Menu.Button>
             </div>
 
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+            <Menu.Items className="filter-dropdown-menu">
                 <div className="py-1 w-full">
                     {searchable && <input
                         type="text"
@@ -81,8 +80,8 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
                                     {({active}) => (
                                         <button
                                             className={classNames(
-                                                active ? "justify-between bg-gray-100 text-gray-900" : "text-gray-700",
-                                                "justify-between flex text-start px-4 py-4 text-sm w-full"
+                                                active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                                                "filter-dropdown-item"
                                             )}
                                             onClick={() => handleOptionClick(option)}
                                         >

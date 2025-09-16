@@ -9,7 +9,7 @@ const Loading = () => {
     const customStyles: Styles = {
         overlay: {
             backgroundColor: "rgba(0, 0, 0, 0.75)",
-            zIndex: 26,
+            zIndex: 1000,
         },
         content: {
             top: "50%",

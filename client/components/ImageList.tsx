@@ -56,6 +56,7 @@ export default function ImageList() {
     const [subjectName, setSubjectName] = useState<any>();
     const [dataBody, setDataBody] = useState<any>();
     const [conceptData, setConceptData] = useState<any>([]);
+    const [conceptDataLoading, setConceptDataLoading] = useState<boolean>(false);
     const [mediaConcepts, setMediaConcepts] = useState<any>([]);
     const [formsData, setFormsData] = useState<any>([]);
     const [typeId, setTypeId] = useState<any>([])
@@ -161,6 +162,7 @@ export default function ImageList() {
     useEffect(() => {
         const formTypeArray = ["IndividualProfile", "ProgramEnrolment", "ProgramEncounter", "Encounter"]
         const data = async () => {
+            setConceptDataLoading(true);
             if (selectedProgramUUID.length > 0 && selectedSubjectUUID.length > 0 && selectedEncounterTypeUUID.length > 0) {
                 const filteredConcepts: any[] = [];
                 await Promise.all(
@@ -200,7 +202,6 @@ export default function ImageList() {
                                 )
                             ) {
                                 await getConceptData(element.formUUID, filteredConcepts)
-
                             }
                         }
                     }));
@@ -244,6 +245,7 @@ export default function ImageList() {
                     }));
                 setConceptData(filteredConcepts);
             }
+            setConceptDataLoading(false);
         };
         data();
     }, [formsData, selectedProgramUUID, selectedSubjectUUID, selectedEncounterTypeUUID]);
@@ -421,10 +423,10 @@ export default function ImageList() {
 
     const updateConceptFilter = (filterKey: string, newFilter: any) => {
         setActiveConceptFilters(prev => {
-            // Remove any existing filter with the same key
-            const filtered = prev.filter((f, index) => {
-                // For indexed keys, we need to track them separately
-                return !(f.conceptUuid === newFilter.conceptUuid && filterKey.includes('_'));
+            // Remove any existing filter with the same conceptUuid OR the same filterKey
+            const filtered = prev.filter((f) => {
+                // Remove if same conceptUuid (for regular filters) OR same filterKey (for indexed filters)
+                return !(f.conceptUuid === newFilter.conceptUuid || f._filterKey === filterKey);
             });
             return [...filtered, {...newFilter, _filterKey: filterKey}];
         });
@@ -553,21 +555,16 @@ export default function ImageList() {
     }
 
     const conceptCoded = (data: any, conceptUuid: string, formUuid: string) => {
-        // Remove existing filters for this concept first
-        removeConceptFilter(conceptUuid);
-        
         if (data.length > 0) {
-            // Send separate conceptFilter objects for each value to work around backend SQL bug
-            // This creates proper AND conditions without triggering the JOIN alias issue
-            data.forEach((value: any, index: number) => {
-                const newFilter = {
-                    "conceptUuid": conceptUuid,
-                    "formUuid": formUuid,
-                    "values": [value] // Single value per filter to avoid backend SQL generation bug
-                };
-                // Use unique key to store multiple filters for same concept
-                updateConceptFilter(`${conceptUuid}_${index}`, newFilter);
-            });
+            // For coded concepts, use a single filter with multiple values (IN clause)
+            const newFilter = {
+                "conceptUuid": conceptUuid,
+                "formUuid": formUuid,
+                "values": data // Multiple values for IN clause
+            };
+            updateConceptFilter(conceptUuid, newFilter);
+        } else {
+            removeConceptFilter(conceptUuid);
         }
     }
 
@@ -807,7 +804,28 @@ export default function ImageList() {
     };
 
     const restFilters = () => {
-        location.reload();
+        // Clear all filter states instead of reloading
+        setSubjectName("");
+        setDateRange([]);
+        setEncounterType([]);
+        setProgramType([]);
+        setSubjectType([]);
+        setSelectedProgramUUId([]);
+        setSelectedSubjectUUID([]);
+        setSelectedEncounterTypeUUID([]);
+        setSelectedFormSubject([]);
+        setSelectedFormProgram([]);
+        setSelectedFieldConcepts([]);
+        setActiveConceptFilters([]);
+        setSelectedMediaConcepts([]);
+        setCurrentPage(0);
+        setCheckedImage([]);
+        setSelectAllInPage({0: NONE_SELECTED});
+        setSelectAllPages(false);
+        
+        // Reset concept data
+        setConceptData([]);
+        setConceptDataLoading(false);
     };
 
     const toggleSelectAllPages = () => {
@@ -845,55 +863,64 @@ export default function ImageList() {
             </div>
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                <div className="inline-flex w-56 h-10 mt-5">
-                    <input
-                        type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
-                        value={subjectName}
-                        onChange={(e) => setSubjectName(e.target.value)}
-                        placeholder="Name"
-                    />
-                </div>
-                {locationFilter && (
-                    locationFilter.map(
-                        (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
-                            if (index === 0 || typeId.find(((item: number) => item === locationIndex.id))) {
-                                return (
-                                    <LocationHierarchy
-                                        key={index}
-                                        locationIndex={locationIndex}
-                                        index={index}
-                                        selectedParentId={selectedParentId}
-                                        locationFilter={locationFilter}
-                                        minLevel={minLevel}
-                                        maxLevel={maxLevel}
-                                        getLocation={getLocation}
-                                        location={distLoc}
-                                        getOtherLocation={getOtherLocation}
-                                        otherLocation={otherLocation}
-                                        getTopLevel={getTopLevel}
-                                        getSecondLevel={getSecondLevel}
-                                        getTypeId={getTypeId}
-                                        getDiffArray={getDiffArray}
-                                    />
-                                );
+                <div className="inline-flex flex-wrap items-center gap-4 mt-5">
+                    <div className="filter-item">
+                        <input
+                            type="text"
+                            className="filter-input"
+                            value={subjectName}
+                            onChange={(e) => setSubjectName(e.target.value)}
+                            placeholder="Name"
+                        />
+                    </div>
+                    {locationFilter && (
+                        locationFilter.map(
+                            (locationIndex: { name: string; id: number; level: number; parent: any }, index: Key) => {
+                                if (index === 0 || typeId.find(((item: number) => item === locationIndex.id))) {
+                                    return (
+                                        <div key={index} className="filter-item">
+                                            <LocationHierarchy
+                                                locationIndex={locationIndex}
+                                                index={index}
+                                                selectedParentId={selectedParentId}
+                                                locationFilter={locationFilter}
+                                                minLevel={minLevel}
+                                                maxLevel={maxLevel}
+                                                getLocation={getLocation}
+                                                location={distLoc}
+                                                getOtherLocation={getOtherLocation}
+                                                otherLocation={otherLocation}
+                                                getTopLevel={getTopLevel}
+                                                getSecondLevel={getSecondLevel}
+                                                getTypeId={getTypeId}
+                                                getDiffArray={getDiffArray}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                return null;
                             }
-                            return null;
-                        }
-                    )
-                )}
-                <Daterange dateRange={dateRange}/>
+                        )
+                    )}
+                    <div className="filter-item">
+                        <Daterange dateRange={dateRange}/>
+                    </div>
 
-                <Concepts setConceptsFunction={(x: string[]) => {
-                    setSelectedMediaConcepts(x)
-                }} concepts={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
+                    <div className="filter-item">
+                        <Concepts setConceptsFunction={(x: string[]) => {
+                            setSelectedMediaConcepts(x)
+                        }} concepts={mediaConcepts} title={"Media Types"} multiSelect={true} searchable={false}/>
+                    </div>
 
-                {subjectFilter && subjectFilter.length > 0 && (
-                    <SubjectType
-                        subjectType={subjectType}
-                        subjectFilter={subjectFilter}
-                    />
-                )}
+                    {subjectFilter && subjectFilter.length > 0 && (
+                        <div className="filter-item">
+                            <SubjectType
+                                subjectType={subjectType}
+                                subjectFilter={subjectFilter}
+                            />
+                        </div>
+                    )}
+                </div>
 
                 {showprogram && showprogram.length > 0 && (
                     <Program programType={programType}
@@ -909,9 +936,18 @@ export default function ImageList() {
                     />
                 )}
 
-                {selectedFormSubject && selectedFormSubject.length > 0 && conceptData && (
+                {selectedFormSubject && selectedFormSubject.length > 0 && (
                     <div className="mt-3">
-                        {selectedFieldConcepts.map((selectedFieldConcept: any, index: number) => {
+                        {conceptDataLoading ? (
+                            <div className="flex items-center justify-center py-8">
+                                <div className="flex items-center space-x-2 text-gray-600">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                                    <span className="text-sm">Loading filters...</span>
+                                </div>
+                            </div>
+                        ) : conceptData && conceptData.length > 0 ? (
+                            <>
+                            {selectedFieldConcepts.map((selectedFieldConcept: any, index: number) => {
                             const selectedUuids = selectedFieldConcepts
                                 .map((field, idx) => idx !== index && field ? field.uuid : null)
                                 .filter(uuid => uuid !== null);
@@ -941,11 +977,11 @@ export default function ImageList() {
                                             )}
                                         </div>
 
-                                        {selectedFieldConcepts.length > 1 && (
+                                        {selectedFieldConcepts.length > 0 && (
                                             <div>
                                                 <button
                                                     onClick={() => removeFieldFilter(index)}
-                                                    className="mt-3 p-1 text-red-500 border border-dashed hover:text-red-700 border-red-700 hover:bg-red-50 rounded-md"
+                                                    className="ml-2 px-2 py-1 text-red-500 border border-dashed hover:text-red-700 border-red-700 hover:bg-red-50 rounded-md text-sm"
                                                     title="Remove field filter"
                                                 >
                                                     Delete
@@ -967,7 +1003,9 @@ export default function ImageList() {
                                     Add Field Filter
                                 </button>
                             </div>
-                        )}
+                            )}
+                            </>
+                        ) : null}
                     </div>
                 )}
                 <FormControlLabel style={{paddingLeft: "20px"}} label={"Display Count"}
@@ -989,7 +1027,9 @@ export default function ImageList() {
                         />
                     )}
                     {showLoader && (
-                        <Loading />
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+                            <Loading />
+                        </div>
                     )}
                     <Button name="Apply Filter" onClick={handleApplyFilter}/>
                     <Button onClick={handleOpenModal} name=" Download"/>

@@ -2,13 +2,212 @@
 @tailwind components;
 @tailwind utilities;
 
-.active-page {
-  color: red;
+/* Design System Variables */
+:root {
+  --primary-50: #f0fdfa;
+  --primary-100: #ccfbf1;
+  --primary-500: #14b8a6;
+  --primary-600: #0d9488;
+  --primary-700: #0f766e;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+.navbg-color {
+  background: #4a90ee;
+}
+
+/* Z-Index Layer System */
+/* 
+  Layer 1 (z-1 to z-10): Base content, images, cards
+  Layer 2 (z-20 to z-50): Dropdowns, tooltips, form elements
+  Layer 3 (z-100 to z-500): Modals, overlays
+  Layer 4 (z-1000+): Loading screens, critical overlays
+*/
+
+/* Filter Components Base Styles */
+@layer components {
+  .filter-section {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .filter-group {
+    @apply mb-6 last:mb-0;
+  }
+  
+  .filter-group-title {
+    @apply text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide;
+  }
+  
+  .filter-item {
+    @apply min-w-0;
+  }
+  
+  .filter-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200;
+  }
+  
+  .filter-input-sm {
+    @apply filter-input w-20;
+  }
+  
+  .filter-dropdown {
+    @apply inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-3 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500 transition-colors duration-200;
+    position: relative;
+    z-index: 30;
+  }
+  
+  .filter-dropdown-menu {
+    @apply origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none;
+    z-index: 50;
+  }
+  
+  .filter-dropdown-item {
+    @apply justify-between flex text-start px-4 py-3 text-sm w-full text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150;
+  }
+  
+  .filter-label {
+    @apply text-sm font-medium text-gray-700 mb-1 block;
+  }
+  
+  .filter-label-inline {
+    @apply text-sm font-medium text-gray-700 mr-2 flex-shrink-0;
+  }
+  
+  /* Headless UI Menu z-index overrides */
+  .menu {
+    position: relative;
+    z-index: 40 !important;
+  }
+  
+  .menu_program_subject_encounter {
+    position: relative;
+    z-index: 40 !important;
+  }
+  
+  .location_menu {
+    position: relative;
+    z-index: 40 !important;
+  }
+  
+  .filter-error {
+    @apply text-red-500 text-xs mt-1;
+  }
+  
+  .filter-container {
+    @apply flex flex-wrap gap-4 items-start;
+  }
+  
+  .filter-item {
+    @apply flex flex-col;
+  }
+  
+  .filter-range {
+    @apply flex items-center gap-2;
+  }
 }
 
 .pagination {
-  margin-right: 10px;
-  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  margin: 0 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button:hover {
+  background-color: #e0e0e0;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination button:disabled {
+  background-color: #f9f9f9;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.carousel .control-dots {
+  bottom: -40px !important;
+}
+
+.carousel .control-dots .dot {
+  background: #ccc !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 4px !important;
+}
+
+.carousel .control-dots .dot.selected {
+  background: #007bff !important;
+}
+
+.check-button {
+  height: 20px;
+  width: 20px;
+  color: #14b8a6;
+}
+
+.menu {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+}
+
+.menu .menu-button {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 13rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 1rem;
+  background-color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.menu .menu-button:hover {
+  background-color: #f9fafb;
+}
+
+.menu .menu-button:focus {
+  outline: none;
+  ring: 2px;
+  ring-offset: 2px;
+  ring-offset-color: #f3f4f6;
+  ring-color: #14b8a6;
+}
+
+.active-page {
+  color: red;
 }
 
 .thumb {
@@ -16,56 +215,25 @@
   height: 200px;
 }
 
-.carousel {
-  width: 900px;
-  height: 700px;
-}
-.carousel-image{
-  width: 500px;
-  height: 400px;
-}
-.checkbox{
+.checkbox {
   margin-bottom: 10px;
   margin-left: 30px;
   background-color: white;
+  position: relative;
   z-index: 20;
 }
-.navbg-color{
-  background: #2196f3;
-;
+
+.carousel .control-dots {
+  bottom: -40px !important;
 }
-.menu{
-  position: relative;
-  display: inline-block;
-  text-align: left;
-  padding-right: 8px;
-  margin-top: 20px;
-  z-index: 10;
+
+.carousel .control-dots .dot {
+  background: #ccc !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 4px !important;
 }
-.menu_program_subject_encounter{
-  position: relative;
-  display: inline-block;
-  text-align: left;
-  padding-right: 8px;
-  margin-top: 20px;
-  z-index: 15;
-}
-.location_menu{
-  position: relative;
-  display: inline-block;
-  text-align: left;
-  padding-right: 8px;
-  padding-left: 8px;
-  margin-top: 20px;
-  z-index: 20;
-}
-.check-button {
-  height: 20px; 
-  width: 20px; 
-  color: #38b2ac; 
-}
-.image-description{
-  position: relative;
-  display: inline-block;
-  align-content: baseline;
+
+.carousel .control-dots .dot.selected {
+  background: #007bff !important;
 }

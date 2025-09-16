@@ -31,30 +31,30 @@ export default function NumericConceptFilter({ getNumericConcept, numericConcept
   },[numericConcept])
 
   return (
-    <>
-      <div className="mt-4 inline-block ml-2">
-        <label className="mr-2 flex-shrink-0">Between:</label>
+    <div className="filter-item">
+      <div className="filter-range">
+        <label className="filter-label-inline">Between:</label>
         <input
           type="number"
-          className="w-20 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+          className="filter-input-sm"
           value={frominputValue}
           onChange={(e) => setfromInputValue(e.target.value)}
-          placeholder="Min Value"
+          placeholder="Min"
           min="0"
         />
-        <label className="mx-2 flex-shrink-0">and</label>
+        <label className="filter-label-inline">and</label>
         <input
           type="number"
-          className="w-20 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+          className="filter-input-sm"
           value={toinputValue}
           onChange={(e) => settoInputValue(e.target.value)}
-          placeholder="Max Value"
+          placeholder="Max"
           min="0"
         />
-        {!isValidRange && (
-          <p className="text-red-500 text-sm ml-2">Invalid range</p>
-        )}
       </div>
-    </>
+      {!isValidRange && (
+        <p className="filter-error">Invalid range: minimum must be less than or equal to maximum</p>
+      )}
+    </div>
   );
 }

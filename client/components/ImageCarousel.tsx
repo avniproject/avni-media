@@ -63,7 +63,7 @@ const ImageCarousel = ({
 
     return (
         <>
-            <div className="fixed  inset-0 overflow-y-auto  " style={{zIndex: 21}}>
+            <div className="fixed  inset-0 overflow-y-auto  " style={{zIndex: 200}}>
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-0 text-center sm:block sm:p-0">
                     <div
                         className="fixed inset-0 transition-opacity"
@@ -78,7 +78,7 @@ const ImageCarousel = ({
                     <div
                         className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                         <div className="inline-block  bg-red rounded-lg">
-                            <button className="absolute top-0 right-1 z-50" onClick={onClose}>
+                            <button className="absolute top-0 right-1 z-[250]" onClick={onClose}>
                                 <svg
                                     className="h-6 w-6"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasPrev ? "absolute" : "hidden"
-                                            } top-40 bottom-80 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 left-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-[210]`}
                                             onClick={customClickHandler}
                                         >
                                             <NavigateBeforeIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
@@ -124,7 +124,7 @@ const ImageCarousel = ({
                                         <div
                                             className={`${
                                                 hasNext ? "absolute" : "hidden"
-                                            } top-40 bottom-80 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-20`}
+                                            } top-40 bottom-80 right-0 flex justify-center items-center p-3 opacity-30 hover:opacity-100 cursor-pointer z-[210]`}
                                             onClick={customClickHandler}
                                         >
                                             <NavigateNextIcon className="w-9 h-9 text-black rounded-md border border-gray-300 bg-white"/>
