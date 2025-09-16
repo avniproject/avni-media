@@ -419,15 +419,22 @@ export default function ImageList() {
         }
     }, [conceptData]);
 
-    const updateConceptFilter = (conceptUuid: string, newFilter: any) => {
+    const updateConceptFilter = (filterKey: string, newFilter: any) => {
         setActiveConceptFilters(prev => {
-            const filtered = prev.filter(f => f.conceptUuid !== conceptUuid);
-            return [...filtered, newFilter];
+            // Remove any existing filter with the same key
+            const filtered = prev.filter((f, index) => {
+                // For indexed keys, we need to track them separately
+                return !(f.conceptUuid === newFilter.conceptUuid && filterKey.includes('_'));
+            });
+            return [...filtered, {...newFilter, _filterKey: filterKey}];
         });
     };
 
     const removeConceptFilter = (conceptUuid: string) => {
-        setActiveConceptFilters(prev => prev.filter(f => f.conceptUuid !== conceptUuid));
+        setActiveConceptFilters(prev => {
+            // Remove all filters for this conceptUuid (including indexed ones)
+            return prev.filter(filter => filter.conceptUuid !== conceptUuid);
+        });
     };
 
     const addFieldFilter = () => {
@@ -546,15 +553,21 @@ export default function ImageList() {
     }
 
     const conceptCoded = (data: any, conceptUuid: string, formUuid: string) => {
+        // Remove existing filters for this concept first
+        removeConceptFilter(conceptUuid);
+        
         if (data.length > 0) {
-            const newFilter = {
-                "conceptUuid": conceptUuid,
-                "formUuid": formUuid,
-                "values": data
-            };
-            updateConceptFilter(conceptUuid, newFilter);
-        } else {
-            removeConceptFilter(conceptUuid);
+            // Send separate conceptFilter objects for each value to work around backend SQL bug
+            // This creates proper AND conditions without triggering the JOIN alias issue
+            data.forEach((value: any, index: number) => {
+                const newFilter = {
+                    "conceptUuid": conceptUuid,
+                    "formUuid": formUuid,
+                    "values": [value] // Single value per filter to avoid backend SQL generation bug
+                };
+                // Use unique key to store multiple filters for same concept
+                updateConceptFilter(`${conceptUuid}_${index}`, newFilter);
+            });
         }
     }
 
@@ -563,7 +576,7 @@ export default function ImageList() {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
-                "values": data.split(" ")
+                "values": [data] // Keep the entire text as a single value
             };
             updateConceptFilter(conceptUuid, newFilter);
         } else {
@@ -576,7 +589,7 @@ export default function ImageList() {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
-                "values": data.split(" ")
+                "values": [data] // Keep the entire text as a single value
             };
             updateConceptFilter(conceptUuid, newFilter);
         } else {
@@ -748,7 +761,12 @@ export default function ImageList() {
                 setFromDate(null);
             }
 
-            let conceptfilter = [...activeConceptFilters];
+            // Clean up conceptFilters by removing internal _filterKey property
+            let conceptfilter = activeConceptFilters.map(filter => {
+                const {_filterKey, ...cleanFilter} = filter;
+                return cleanFilter;
+            });
+            
             const body = Object.fromEntries(
                 Object.entries({
                     subjectName: subjectName,
