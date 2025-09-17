@@ -984,8 +984,8 @@ export default function ImageList() {
                             );
                             
                             return (
-                                <div key={index} className="mb-3" style={{ overflow: 'visible' }}>
-                                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors" style={{ overflow: 'visible' }}>
+                                <div key={index} className="mb-3 overflow-visible min-w-[40%] max-w-[60%]">
+                                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors overflow-visible">
                                         <div className="flex items-start gap-2">
                                             <div className="w-64 shrink-0">
                                                 <Concepts 
@@ -998,7 +998,7 @@ export default function ImageList() {
                                                 />
                                             </div>
 
-                                            <div className="flex-1 min-w-0">
+                                            <div className="flex-1 min-w-0 -ml-12">
                                                 {selectedFieldConcept && selectedFieldConcept.uuid ? (
                                                     renderFilterComponent(selectedFieldConcept)
                                                 ) : (
