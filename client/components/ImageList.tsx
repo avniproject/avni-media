@@ -886,8 +886,8 @@ export default function ImageList() {
                 </div>
             </div>
 
-            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                <div className="inline-flex flex-wrap items-center gap-4 mt-5">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8" style={{ overflow: 'visible' }}>
+                <div className="inline-flex flex-wrap items-center gap-4 mt-5" style={{ overflow: 'visible' }}>
                     <div className="filter-item">
                         <input
                             type="text"
@@ -984,8 +984,8 @@ export default function ImageList() {
                             );
                             
                             return (
-                                <div key={index} className="mb-3">
-                                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                <div key={index} className="mb-3" style={{ overflow: 'visible' }}>
+                                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors" style={{ overflow: 'visible' }}>
                                         <div className="flex items-start gap-2">
                                             <div className="w-64 shrink-0">
                                                 <Concepts 

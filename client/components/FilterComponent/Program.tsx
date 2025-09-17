@@ -74,7 +74,7 @@ export default function Program({ programType, programFilter }: Props) {
   }, []);
 
   return (
-    <Menu as="div" className="menu_program_subject_encounter">
+    <div className="relative menu_program_subject_encounter">
      <div ref={dropdownRef}>
         <div>
           <button
@@ -90,7 +90,7 @@ export default function Program({ programType, programFilter }: Props) {
           </button>
         </div>
         {isOpen && (
-          <div className="origin-top-left absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+          <div className="absolute left-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none program-dropdown">
             <div className="py-1">
               {programFilter &&
                 programFilter.map((option) => (
@@ -114,6 +114,6 @@ export default function Program({ programType, programFilter }: Props) {
           </div>
         )}
       </div>
-    </Menu>
+    </div>
   );
 }

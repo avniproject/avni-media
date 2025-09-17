@@ -53,7 +53,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
   }, []);
 
   return (
-    <Menu as="div" className="menu_program_subject_encounter">
+    <div className="relative menu_program_subject_encounter">
      <div ref={dropdownRef}>
       <div>
         <button
@@ -69,7 +69,7 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
         </button>
       </div>
       {isOpen && (
-        <div className="origin-top-left absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+        <div className="absolute left-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none subject-dropdown">
           <div className="py-1">
             {subjectFilter &&
               subjectFilter.map((option) => (
@@ -93,6 +93,6 @@ export default function SubjectType({ subjectType, subjectFilter }: Prop) {
         </div>
       )}
       </div>
-    </Menu>
+    </div>
   );
 }

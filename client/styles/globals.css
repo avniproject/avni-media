@@ -32,9 +32,11 @@
 /* Z-Index Layer System */
 /* 
   Layer 1 (z-1 to z-10): Base content, images, cards
-  Layer 2 (z-20 to z-50): Dropdowns, tooltips, form elements
-  Layer 3 (z-100 to z-500): Modals, overlays
-  Layer 4 (z-1000+): Loading screens, critical overlays
+  Layer 2 (z-20 to z-30): Form elements, inputs
+  Layer 3 (z-40 to z-50): Menu containers
+  Layer 4 (z-60 to z-90): Dropdown menu lists
+  Layer 5 (z-200 to z-500): Modals, overlays
+  Layer 6 (z-1000+): Loading screens, critical overlays
 */
 
 /* Filter Components Base Styles */
@@ -68,12 +70,12 @@
   .filter-dropdown {
     @apply inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-3 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500 transition-colors duration-200;
     position: relative;
-    z-index: 30;
+    z-index: 25;
   }
   
   .filter-dropdown-menu {
     @apply origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none;
-    z-index: 50;
+    z-index: 80;
   }
   
   .filter-dropdown-item {
@@ -88,20 +90,39 @@
     @apply text-sm font-medium text-gray-700 mr-2 flex-shrink-0;
   }
   
-  /* Headless UI Menu z-index overrides */
-  .menu {
-    position: relative;
-    z-index: 40 !important;
+  /* Menu and Dropdown Styles */
+  .menu-container {
+    z-index: 50;
+  }
+
+  .dropdown-menu {
+    z-index: 80;
+  }
+
+  .location-dropdown {
+    z-index: 80;
+  }
+
+  .program-dropdown {
+    z-index: 80;
+  }
+
+  .subject-dropdown {
+    z-index: 80;
+  }
+
+  .encounter-dropdown {
+    z-index: 80;
+  }
+
+  .concept-dropdown {
+    z-index: 80;
   }
   
-  .menu_program_subject_encounter {
-    position: relative;
-    z-index: 40 !important;
-  }
-  
-  .location_menu {
-    position: relative;
-    z-index: 40 !important;
+  /* Dropdown menu lists - highest priority */
+  .z-50,
+  div[class*="absolute"][class*="shadow-lg"][class*="bg-white"] {
+    z-index: 90 !important;
   }
   
   .filter-error {

@@ -74,8 +74,7 @@ export default function EncounterType({
     };
   }, []);
   return (
-    <Menu as="div" className="menu_program_subject_encounter
-      ">
+    <div className="relative menu_program_subject_encounter">
        <div ref={dropdownRef}>
         <div>
           <button className="inline-flex justify-between w-52 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-teal-500" onClick={() => setIsOpen(!isOpen)}
@@ -89,15 +88,15 @@ export default function EncounterType({
           </button>
         </div>
         
-        { showUniqueEncounter.length > 0 && isOpen && (
-          <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+        {showUniqueEncounter.length > 0 && isOpen && (
+          <div className="absolute left-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none encounter-dropdown">
             <div className="py-1">
               {showUniqueEncounter &&
                 showUniqueEncounter.map((option) => (
                   <div key={option.id}>
                     <button
                       className={`flex justify-between w-full px-4 py-2 text-sm ${
-                        selectedOptions.includes(option)
+                        selectedOptions.includes(option.name)
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-700"
                       }`}
@@ -114,7 +113,7 @@ export default function EncounterType({
           </div>
         )}
       </div>
-    </Menu>
+    </div>
   );
 }
 
