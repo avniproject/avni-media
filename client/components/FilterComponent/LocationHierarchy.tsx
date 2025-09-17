@@ -136,7 +136,9 @@ export default function LocationHierarchy({
               );
             const distJsonData = response.data;
             const distData = distJsonData.content;
-            getTypeId(distJsonData.content[0].typeId);
+            if (distData && distData.length > 0 && distData[0].typeId) {
+              getTypeId(distData[0].typeId);
+            }
             getLocation(distData, selectedOption);
             })
           } catch (Error) {

@@ -44,10 +44,15 @@ export const redirectIfNotValid = function() {
 }
 
 export function fetchAuthHeaders() {
-    if (isDevModeWithoutIDP()) {
+    // Check if we have a stored token first (for IDP mode)
+    const token = localStorage.getItem("authToken");
+    
+    if (token) {
+        return {"AUTH-TOKEN": token};
+    } else if (isDevModeWithoutIDP()) {
         return {"USER-NAME": getUserName()};
     } else {
-        return {"AUTH-TOKEN": localStorage.getItem("authToken")};
+        return {"AUTH-TOKEN": null};
     }
 }
 
