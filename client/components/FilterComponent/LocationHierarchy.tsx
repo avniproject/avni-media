@@ -239,7 +239,7 @@ export default function LocationHierarchy({
             </button>
           </div>
           {locationIndex.level === maxLevel && isOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
               <div className="py-1">
                 {toplevelData &&
                   toplevelData.map((option: Option) => (
@@ -266,7 +266,7 @@ export default function LocationHierarchy({
             </div>
           )}
           {isOpen && locationIndex.level === (maxLevel ?? 0) - 1 && (
-            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
               <div className="py-1">
                 {location.map((option) => (
                   <div key={option.uuid}>
@@ -306,7 +306,7 @@ export default function LocationHierarchy({
                 return (
                   isOpen && (
                     <div
-                      className="origin-top-right absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                      className="origin-top-left absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                       key={locationData.level}
                     >
                       <div className="py-1">

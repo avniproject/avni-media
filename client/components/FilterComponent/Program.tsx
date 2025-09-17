@@ -90,14 +90,14 @@ export default function Program({ programType, programFilter }: Props) {
           </button>
         </div>
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="origin-top-left absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
             <div className="py-1">
               {programFilter &&
                 programFilter.map((option) => (
                   <div key={option.id}>
                     <button
                       className={`flex justify-between w-full px-4 py-2 text-sm ${
-                        selectedOptions.includes(option)
+                        selectedOptions.includes(option.name)
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-700"
                       }`}

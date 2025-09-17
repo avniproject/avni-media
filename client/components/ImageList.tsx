@@ -17,7 +17,7 @@ import {imageType} from '../model/ImageType';
 import CodedConceptFilter from "./FilterComponent/CodedConceptFilter";
 import DateConceptFilter from "./FilterComponent/DateConceptFilter";
 import TimeStampConceptFilter from "./FilterComponent/TimeStampConceptFilter";
-import TexConceptFilter from "./FilterComponent/TextConceptFilter";
+import TextConceptFilter from "./FilterComponent/TextConceptFilter";
 import NumericConceptFilter from "./FilterComponent/NumericConceptFilter";
 import {Checkbox, Divider, FormControlLabel, Button as MUIButton} from "@mui/material";
 import _ from 'lodash';
@@ -449,7 +449,9 @@ export default function ImageList() {
             if (removedField?.uuid) {
                 removeConceptFilter(removedField.uuid);
             }
-            return prev.filter((_, i) => i !== index);
+            const newFilters = prev.filter((_, i) => i !== index);
+            // Ensure at least one empty filter remains for future reuse
+            return newFilters.length === 0 ? [null] : newFilters;
         });
     };
 
@@ -474,14 +476,14 @@ export default function ImageList() {
         switch(dataType) {
             case "Text":
                 return (
-                    <TexConceptFilter
+                    <TextConceptFilter
                         getConcepts={(data: string) => getTextConcept(data, conceptUuid, formUuid)}
                         textConcepts={activeFilters}
                     />
                 );
             case "Notes":
                 return (
-                    <TexConceptFilter
+                    <TextConceptFilter
                         getConcepts={(data: string) => getNoteConcept(data, conceptUuid, formUuid)}
                         textConcepts={activeFilters}
                     />
@@ -815,9 +817,31 @@ export default function ImageList() {
         setSelectedEncounterTypeUUID([]);
         setSelectedFormSubject([]);
         setSelectedFormProgram([]);
-        setSelectedFieldConcepts([]);
+        setSelectedFieldConcepts([null]); // Keep one empty filter
         setActiveConceptFilters([]);
         setSelectedMediaConcepts([]);
+        
+        // Clear location-related filters
+        setParentId([]);
+        setDistLoc([]);
+        setAdd([]);
+        setAddress([]);
+        setSecondAddress([]);
+        setSelectedParentId([]);
+        setLocations([]);
+        setOtherLocation([]);
+        setTypeId([]);
+        
+        // Clear date filters
+        setFromDate(null);
+        setToDate(null);
+        
+        // Clear program/encounter display states
+        setShowProgram([]);
+        setShowEncounter([]);
+        setShowAllEncounter([]);
+        
+        // Reset pagination and selection
         setCurrentPage(0);
         setCheckedImage([]);
         setSelectAllInPage({0: NONE_SELECTED});
@@ -920,21 +944,25 @@ export default function ImageList() {
                             />
                         </div>
                     )}
+
+                    {showprogram && showprogram.length > 0 && (
+                        <div className="filter-item">
+                            <Program programType={programType}
+                                     programFilter={showprogram}
+                            />
+                        </div>
+                    )}
+
+                    {(showAllEncounter.length > 0 || showEncounter.length > 0) && (
+                        <div className="filter-item">
+                            <EncounterType
+                                encounterType={encounterType}
+                                showAllEncounter={showAllEncounter}
+                                showEncounter={showEncounter}
+                            />
+                        </div>
+                    )}
                 </div>
-
-                {showprogram && showprogram.length > 0 && (
-                    <Program programType={programType}
-                             programFilter={showprogram}
-                    />
-                )}
-
-                {(showAllEncounter.length > 0 || showEncounter.length > 0) && (
-                    <EncounterType
-                        encounterType={encounterType}
-                        showAllEncounter={showAllEncounter}
-                        showEncounter={showEncounter}
-                    />
-                )}
 
                 {selectedFormSubject && selectedFormSubject.length > 0 && (
                     <div className="mt-3">
@@ -957,37 +985,39 @@ export default function ImageList() {
                             
                             return (
                                 <div key={index} className="mb-3">
-                                    <div className="flex items-center gap-1">
-                                        <div className="w-64 shrink-0">
-                                            <Concepts 
-                                                setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
-                                                concepts={availableFields}
-                                                title={selectedFieldConcept?.name || "Fields"}
-                                                multiSelect={false}
-                                                searchable={true}
-                                                selectedValue={selectedFieldConcept}
-                                            />
-                                        </div>
+                                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-start gap-2">
+                                            <div className="w-64 shrink-0">
+                                                <Concepts 
+                                                    setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
+                                                    concepts={availableFields}
+                                                    title={selectedFieldConcept?.name || "Fields"}
+                                                    multiSelect={false}
+                                                    searchable={true}
+                                                    selectedValue={selectedFieldConcept}
+                                                />
+                                            </div>
 
-                                        <div className="min-w-0">
-                                            {selectedFieldConcept && selectedFieldConcept.uuid ? (
-                                                renderFilterComponent(selectedFieldConcept)
-                                            ) : (
-                                                <div className="text-gray-400 italic">Select a field to add filters</div>
+                                            <div className="flex-1 min-w-0">
+                                                {selectedFieldConcept && selectedFieldConcept.uuid ? (
+                                                    renderFilterComponent(selectedFieldConcept)
+                                                ) : (
+                                                    <div className="text-gray-400 italic py-2">Select a field to add filters</div>
+                                                )}
+                                            </div>
+
+                                            {selectedFieldConcepts.length > 1 && (
+                                                <div className="flex-shrink-0">
+                                                    <button
+                                                        onClick={() => removeFieldFilter(index)}
+                                                        className="px-2 py-1 text-red-500 border border-dashed hover:text-red-700 border-red-700 hover:bg-red-50 rounded-md text-sm"
+                                                        title="Remove field filter"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
-
-                                        {selectedFieldConcepts.length > 0 && (
-                                            <div>
-                                                <button
-                                                    onClick={() => removeFieldFilter(index)}
-                                                    className="ml-2 px-2 py-1 text-red-500 border border-dashed hover:text-red-700 border-red-700 hover:bg-red-50 rounded-md text-sm"
-                                                    title="Remove field filter"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             );

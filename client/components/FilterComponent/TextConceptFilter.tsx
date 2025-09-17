@@ -5,10 +5,11 @@ interface Prop {
   textConcepts : any[];
 }
 
-export default function TexConceptFilter({ getConcepts, textConcepts }: Prop) {
+export default function TextConceptFilter({ getConcepts, textConcepts }: Prop) {
 
   const [inputValue, setInputValue] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const previousTextConceptsLength = useRef(textConcepts.length);
 
   useEffect(() => {
     // Clear previous timeout
@@ -30,10 +31,14 @@ export default function TexConceptFilter({ getConcepts, textConcepts }: Prop) {
   }, [inputValue, getConcepts]);
   
   // Only clear input when textConcepts is explicitly cleared (e.g., reset filters)
+  // Don't clear during normal filtering operations
   useEffect(() => {
-    if (textConcepts.length === 0) {
+    // Only clear if we had concepts before and now we don't (explicit clear)
+    // Don't clear if it starts empty or during normal state updates
+    if (previousTextConceptsLength.current > 0 && textConcepts.length === 0) {
       setInputValue('');
     }
+    previousTextConceptsLength.current = textConcepts.length;
   }, [textConcepts])
 
   return (
