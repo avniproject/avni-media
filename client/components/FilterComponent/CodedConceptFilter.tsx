@@ -1,56 +1,52 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
+import _ from 'lodash';
 
 interface Prop {
   concepts: any;
   conceptCoded: (data: any) => void;
-
 }
 
 export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
-
   const [codedData, setCodedData] = useState<any>([]);
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
+  const lastSelectedOptionsRef = useRef<any[]>([]);
 
   function handleOptionClick(option: any) {
-
     if (selectedOptions.includes(option.name)) {
-
       setSelectedOptions(selectedOptions.filter((o) => o !== option.name));
-
     } else {
-
       setSelectedOptions([...selectedOptions, option.name]);
-
     }
   }
+
   useEffect(() => {
-
     const answerConceptData = async () => {
-
       const newData = await Promise.all(
         concepts.map(async (element: any) => {
-
           return element.answerConcept;
-
         })
       );
-
       setCodedData(newData);
     };
 
     answerConceptData();
-    setSelectedOptions([])
+    setSelectedOptions([]);
   }, [concepts]);
 
+  // Memoized callback to prevent infinite loops
+  const memoizedConceptCoded = useCallback(conceptCoded, [conceptCoded]);
+
   useEffect(() => {
-
-    conceptCoded(selectedOptions);
-
-  }, [selectedOptions]);
+    // Only call if selectedOptions actually changed
+    if (!_.isEqual(selectedOptions, lastSelectedOptionsRef.current)) {
+      lastSelectedOptionsRef.current = selectedOptions;
+      memoizedConceptCoded(selectedOptions);
+    }
+  }, [selectedOptions, memoizedConceptCoded]);
 
   const handleClickOutside = (event: { target: any }) => {
 
@@ -87,11 +83,11 @@ export default function CodedConceptFilter({ concepts, conceptCoded }: Prop) {
           <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
               {codedData &&
-                codedData.filter((x:any) => !x.voided).map((option: { id:  null | undefined; name: string  }) => (
-                  <div key={option.id}>
+                codedData.filter((x:any) => !x.voided).map((option: { id:  null | undefined; name: string; uuid?: string }, index: number) => (
+                  <div key={option.uuid || option.id || index}>
                     <button
                       className={`flex text-start px-4 py-2 text-sm w-full ${
-                        selectedOptions.includes(option)
+                        selectedOptions.includes(option.name)
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-700"
                       }`}

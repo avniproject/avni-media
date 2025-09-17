@@ -1,28 +1,36 @@
 import { DatePicker } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu } from "@headlessui/react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import dayjs, {Dayjs} from "dayjs";
+import _ from 'lodash';
+
 const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
+
 interface Props {
   getTimeStampConcept: (data: any[] | null) => void;
   dateTimeConcept: any[] | null;
 }
 
 const TimeStampConceptFilter = ({ getTimeStampConcept, dateTimeConcept }: Props) => {
- 
   const [date, setDate] = useState<null | string[]>(null);
   const [value, setValue] = useState<[Dayjs, Dayjs] | null>(null);
+  const lastDateRef = useRef<null | string[]>(null);
+
+  // Memoized callback to prevent infinite loops
+  const memoizedGetTimeStampConcept = useCallback(getTimeStampConcept, [getTimeStampConcept]);
 
   useEffect(() => {
-
-    getTimeStampConcept(date);
-    
-  }, [date]);
+    // Only call if date actually changed
+    if (!_.isEqual(date, lastDateRef.current)) {
+      lastDateRef.current = date;
+      memoizedGetTimeStampConcept(date);
+    }
+  }, [date, memoizedGetTimeStampConcept]);
 
   useEffect(()=>{
     if (dateTimeConcept === null || dateTimeConcept.length === 0) {

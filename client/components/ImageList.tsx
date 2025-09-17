@@ -1,4 +1,4 @@
-import {Fragment, Key, useEffect, useState} from "react";
+import {Fragment, Key, useEffect, useState, useCallback} from "react";
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -49,17 +49,20 @@ export default function ImageList() {
     const [locations, setLocations] = useState<any>([]);
     const [otherLocation, setOtherLocation] = useState<any[]>([]);
     const [selectedFieldConcepts, setSelectedFieldConcepts] = useState<any[]>([]);
+    
     const [date, setDateRange] = useState<any[] | null>([]);
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
     const [subjectName, setSubjectName] = useState<any>();
     const [dataBody, setDataBody] = useState<any>();
-    const [conceptData, setConceptData] = useState<any>([]);
+    const [conceptData, setConceptData] = useState<any[]>([]);
+    
     const [conceptDataLoading, setConceptDataLoading] = useState<boolean>(false);
     const [mediaConcepts, setMediaConcepts] = useState<any>([]);
     const [formsData, setFormsData] = useState<any>([]);
     const [typeId, setTypeId] = useState<any>([])
+    const [error, setError] = useState<string | null>(null);
     const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
     const [selectedSubjectUUID, setSelectedSubjectUUID] = useState<any[]>([]);
     const [nextPageData, setNextPageData] = useState<any>({page: 0, data: []});
@@ -71,6 +74,7 @@ export default function ImageList() {
     const [selectedEncounterTypeUUID, setSelectedEncounterTypeUUID] = useState<any>([]);
     const [selectedMediaConcepts, setSelectedMediaConcepts] = useState<any>([]);
     const [activeConceptFilters, setActiveConceptFilters] = useState<any[]>([]);
+    
     const ALL_SELECTED = "ALL", SOME_SELECTED = "SOME", NONE_SELECTED = "NONE";
     const [selectAllInPage, setSelectAllInPage] = useState<any>({0: NONE_SELECTED});
     const [selectAllPages, setSelectAllPages] = useState<boolean>(false);
@@ -297,10 +301,18 @@ export default function ImageList() {
     useEffect(() => {
         redirectIfNotValid();
         const fetchImages = async () => {
-            setShowLoader(true);
-            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
-            setImageList(responseData);
-            setShowLoader(false);
+            try {
+                setShowLoader(true);
+                setError(null);
+                const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
+                setImageList(responseData);
+            } catch (error: any) {
+                console.error('Error fetching images:', error);
+                setError(error?.response?.data?.message || error?.message || 'Failed to load images. Please try again.');
+                setImageList({data: [], total: 0, count: 0});
+            } finally {
+                setShowLoader(false);
+            }
         };
 
         fetchImages();
@@ -428,16 +440,27 @@ export default function ImageList() {
                 // Remove if same conceptUuid (for regular filters) OR same filterKey (for indexed filters)
                 return !(f.conceptUuid === newFilter.conceptUuid || f._filterKey === filterKey);
             });
+            
+            // Check if the new filter is actually different from existing ones
+            const existingFilter = prev.find(f => f.conceptUuid === newFilter.conceptUuid);
+            if (existingFilter) {
+                // Compare filter contents to avoid unnecessary updates
+                const isIdentical = JSON.stringify(existingFilter) === JSON.stringify({...newFilter, _filterKey: filterKey});
+                if (isIdentical) {
+                        return prev; // No change needed
+                }
+            }
+            
             return [...filtered, {...newFilter, _filterKey: filterKey}];
         });
     };
 
-    const removeConceptFilter = (conceptUuid: string) => {
+    const removeConceptFilter = useCallback((conceptUuid: string) => {
         setActiveConceptFilters(prev => {
             // Remove all filters for this conceptUuid (including indexed ones)
             return prev.filter(filter => filter.conceptUuid !== conceptUuid);
         });
-    };
+    }, []);
 
     const addFieldFilter = () => {
         setSelectedFieldConcepts([...selectedFieldConcepts, null]);
@@ -455,23 +478,37 @@ export default function ImageList() {
         });
     };
 
-    const updateFieldConcept = (index: number, newField: any) => {
+    const updateFieldConcept = useCallback((index: number, newField: any) => {
+        // Prevent infinite loops by checking if the field is actually changing
+        const currentField = selectedFieldConcepts[index];
+        
+        // Don't update if:
+        // 1. newField is undefined/null and current is already null
+        // 2. newField is the same as current field
+        if ((!newField && !currentField) || 
+            (newField?.uuid && currentField?.uuid === newField.uuid)) {
+            return;
+        }
+        
+        
         setSelectedFieldConcepts(prev => {
             const oldField = prev[index];
             if (oldField && oldField.uuid) {
                 removeConceptFilter(oldField.uuid);
             }
             const updatedFields = [...prev];
-            updatedFields[index] = newField;
+            updatedFields[index] = newField || null; // Ensure we set null instead of undefined
             return updatedFields;
         });
-    };
+    }, [removeConceptFilter]);
 
     const renderFilterComponent = (selectedFieldConcept: any) => {
+        
         const conceptUuid = selectedFieldConcept.uuid;
         const formUuid = selectedFieldConcept.formUuid;
         const dataType = selectedFieldConcept.dataType;
         const activeFilters = activeConceptFilters.filter(filter => filter.conceptUuid === conceptUuid);
+        
 
         switch(dataType) {
             case "Text":
@@ -498,7 +535,7 @@ export default function ImageList() {
             case "Numeric":
                 return (
                     <NumericConceptFilter
-                        getNumericConcept={(fromNumber: number, toNumber: number) => getNumericConcept(fromNumber, toNumber, conceptUuid, formUuid)}
+                        getNumericConcept={(fromNumber: number | null, toNumber: number | null) => getNumericConcept(fromNumber, toNumber, conceptUuid, formUuid)}
                         numericConcept={activeFilters}
                     />
                 );
@@ -517,13 +554,12 @@ export default function ImageList() {
                     />
                 );
             default:
-                console.warn(`Unsupported dataType: ${dataType} for field: ${selectedFieldConcept.name}`);
                 return <div className="text-orange-600 italic">Unsupported field type: {dataType}</div>;
         }
     };
 
     const getDateConcept = (data: any[] | null, conceptUuid: string, formUuid: string) => {
-        if (data && data.length > 0) {
+        if (data && data.length > 0 && data.some((val: any) => val !== null && val !== undefined && val !== "")) {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
@@ -531,11 +567,13 @@ export default function ImageList() {
                 "to": data[1]
             };
             updateConceptFilter(conceptUuid, newFilter);
+        } else {
+            removeConceptFilter(conceptUuid);
         }
     };
 
     const getTimeStampConcept = (data: any[] | null, conceptUuid: string, formUuid: string) => {
-        if (data && data.length > 0) {
+        if (data && data.length > 0 && data.some((val: any) => val !== null && val !== undefined && val !== "")) {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
@@ -543,10 +581,18 @@ export default function ImageList() {
                 "to": data[1]
             };
             updateConceptFilter(conceptUuid, newFilter);
+        } else {
+            removeConceptFilter(conceptUuid);
         }
     };
 
-    const getNumericConcept = (fromNumber: number, toNumber: number, conceptUuid: string, formUuid: string) => {
+    const getNumericConcept = (fromNumber: number | null, toNumber: number | null, conceptUuid: string, formUuid: string) => {
+        // Don't create filter if both values are null/empty
+        if (fromNumber === null && toNumber === null) {
+            removeConceptFilter(conceptUuid);
+            return;
+        }
+        
         const newFilter = {
             "conceptUuid": conceptUuid,
             "formUuid": formUuid,
@@ -571,11 +617,11 @@ export default function ImageList() {
     }
 
     const getNoteConcept = (data: string, conceptUuid: string, formUuid: string) => {
-        if (data && data.length > 0) {
+        if (data && data.trim().length > 0) {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
-                "values": [data] // Keep the entire text as a single value
+                "values": [data.trim()] // Keep the entire text as a single value, trimmed
             };
             updateConceptFilter(conceptUuid, newFilter);
         } else {
@@ -584,11 +630,11 @@ export default function ImageList() {
     }
 
     const getTextConcept = (data: string, conceptUuid: string, formUuid: string) => {
-        if (data && data.length > 0) {
+        if (data && data.trim().length > 0) {
             const newFilter = {
                 "conceptUuid": conceptUuid,
                 "formUuid": formUuid,
-                "values": [data] // Keep the entire text as a single value
+                "values": [data.trim()] // Keep the entire text as a single value, trimmed
             };
             updateConceptFilter(conceptUuid, newFilter);
         } else {
@@ -760,11 +806,25 @@ export default function ImageList() {
                 setFromDate(null);
             }
 
-            // Clean up conceptFilters by removing internal _filterKey property
-            let conceptfilter = activeConceptFilters.map(filter => {
-                const {_filterKey, ...cleanFilter} = filter;
-                return cleanFilter;
-            });
+            // Clean up conceptFilters by removing internal _filterKey property and filtering out empty values
+            let conceptfilter = activeConceptFilters
+                .map(filter => {
+                    const {_filterKey, ...cleanFilter} = filter;
+                    return cleanFilter;
+                })
+                .filter(filter => {
+                    // Remove filters with empty values
+                    if (filter.values) {
+                        // For array values (Text, Notes, Coded)
+                        return Array.isArray(filter.values) && filter.values.length > 0 && 
+                               filter.values.some((val: any) => val !== null && val !== undefined && val !== "");
+                    } else if (filter.from !== undefined || filter.to !== undefined) {
+                        // For numeric/date range filters
+                        return (filter.from !== null && filter.from !== undefined && filter.from !== "") ||
+                               (filter.to !== null && filter.to !== undefined && filter.to !== "");
+                    }
+                    return true; // Keep other filter types
+                });
             
             const body = Object.fromEntries(
                 Object.entries({
@@ -778,10 +838,22 @@ export default function ImageList() {
                     conceptFilters: conceptfilter,
                     imageConcepts: selectedMediaConcepts,
                     includeTotalCount: showCount
-                }).filter(([_, value]) => {
+                }).filter(([key, value]) => {
+                    // Enhanced empty value filtering for all filter types
                     if (Array.isArray(value)) {
-                        return value.length > 0;
+                        // For arrays (subject, program, encounter, addresses, etc.)
+                        return value.length > 0 && value.some(item => 
+                            item !== null && item !== undefined && item !== "" && 
+                            (typeof item === 'object' ? Object.keys(item).length > 0 : true)
+                        );
+                    } else if (typeof value === 'object' && value !== null) {
+                        // For objects (like conceptFilters)
+                        if (key === 'conceptFilters') {
+                            return value.length > 0; // Already filtered above
+                        }
+                        return Object.keys(value).length > 0;
                     } else {
+                        // For primitive values (strings, numbers, booleans)
                         return value !== null && value !== undefined && value !== "";
                     }
                 })
@@ -793,12 +865,20 @@ export default function ImageList() {
     }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, activeConceptFilters, selectedMediaConcepts, showCount]);
 
     const handleApplyFilter = async () => {
-        redirectIfNotValid();
-        setShowLoader(true);
-        setCurrentPage(0);
-        const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
-        setImageList(responseData);
-        setShowLoader(false);
+        try {
+            redirectIfNotValid();
+            setShowLoader(true);
+            setError(null);
+            setCurrentPage(0);
+            const responseData = await MediaSearchService.searchMedia(dataBody, currentPage, showPerpage);
+            setImageList(responseData);
+        } catch (error: any) {
+            console.error('Error applying filter:', error);
+            setError(error?.response?.data?.message || error?.message || 'Failed to apply filter. Please check your filter criteria and try again.');
+            setImageList({data: [], total: 0, count: 0});
+        } finally {
+            setShowLoader(false);
+        }
     };
 
     const handleNumberChange = (value: number) => {
@@ -976,12 +1056,19 @@ export default function ImageList() {
                         ) : conceptData && conceptData.length > 0 ? (
                             <>
                             {selectedFieldConcepts.map((selectedFieldConcept: any, index: number) => {
+                            
+                            const startTime = performance.now();
                             const selectedUuids = selectedFieldConcepts
                                 .map((field, idx) => idx !== index && field ? field.uuid : null)
                                 .filter(uuid => uuid !== null);
+                            const uuidCalcTime = performance.now() - startTime;
+                            
+                            const filterStartTime = performance.now();
                             const availableFields = conceptData.filter((field: any) => 
                                 !selectedUuids.includes(field.uuid)
                             );
+                            const filterCalcTime = performance.now() - filterStartTime;
+                            
                             
                             return (
                                 <div key={index} className="mb-3 overflow-visible min-w-[40%] max-w-[60%]">
@@ -989,7 +1076,17 @@ export default function ImageList() {
                                         <div className="flex items-start gap-2">
                                             <div className="w-64 shrink-0">
                                                 <Concepts 
-                                                    setConceptsFunction={(data: any[]) => updateFieldConcept(index, data[0])}
+                                                    setConceptsFunction={(data: any[]) => {
+                                                        
+                                                        // Only update if we have valid data or if we're clearing a selection
+                                                        if (data && data.length > 0 && data[0]) {
+                                                            updateFieldConcept(index, data[0]);
+                                                        } else if (selectedFieldConcepts[index] && selectedFieldConcepts[index].uuid) {
+                                                            // Only clear if there was actually a selection before
+                                                            updateFieldConcept(index, null);
+                                                        }
+                                                        // Otherwise, ignore empty/undefined data to prevent loops
+                                                    }}
                                                     concepts={availableFields}
                                                     title={selectedFieldConcept?.name || "Fields"}
                                                     multiSelect={false}
@@ -1059,6 +1156,25 @@ export default function ImageList() {
                     {showLoader && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
                             <Loading />
+                        </div>
+                    )}
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                            <div className="flex items-center">
+                                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                                <span className="font-medium">Error:</span>
+                                <span className="ml-1">{error}</span>
+                                <button 
+                                    onClick={() => setError(null)}
+                                    className="ml-auto text-red-500 hover:text-red-700"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     )}
                     <Button name="Apply Filter" onClick={handleApplyFilter}/>

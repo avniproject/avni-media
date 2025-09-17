@@ -1,24 +1,34 @@
 import { DatePicker } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu } from "@headlessui/react";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import dayjs from "dayjs";
+import _ from 'lodash';
+
 const { RangePicker } = DatePicker;
 dayjs.extend(customParseFormat);
 const dateFormat = "DD/MM/YYYY";
+
 interface Props {
   dateRange: (data: any[] | null) => void;
-  
 }
 
 const DateRangeComp = ({ dateRange }: Props) => {
   const [date, setDate] = useState<null | string[]>(null);
+  const lastDateRef = useRef<null | string[]>(null);
+
+  // Memoized callback to prevent infinite loops
+  const memoizedDateRange = useCallback(dateRange, [dateRange]);
 
   useEffect(() => {
-    dateRange(date);
-  }, [date]);
+    // Only call if date actually changed
+    if (!_.isEqual(date, lastDateRef.current)) {
+      lastDateRef.current = date;
+      memoizedDateRange(date);
+    }
+  }, [date, memoizedDateRange]);
 
   return (
     <>

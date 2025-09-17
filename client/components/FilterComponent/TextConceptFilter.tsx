@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 interface Prop {
   getConcepts: (data: string) => void;
@@ -11,6 +11,9 @@ export default function TextConceptFilter({ getConcepts, textConcepts }: Prop) {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const previousTextConceptsLength = useRef(textConcepts.length);
 
+  // Memoized callback to prevent infinite loops
+  const memoizedGetConcepts = useCallback(getConcepts, [getConcepts]);
+
   useEffect(() => {
     // Clear previous timeout
     if (timeoutRef.current) {
@@ -19,7 +22,7 @@ export default function TextConceptFilter({ getConcepts, textConcepts }: Prop) {
 
     // Set new timeout to debounce the getConcepts call
     timeoutRef.current = setTimeout(() => {
-      getConcepts(inputValue);
+      memoizedGetConcepts(inputValue);
     }, 500); // 500ms delay
 
     // Cleanup timeout on unmount
@@ -28,7 +31,7 @@ export default function TextConceptFilter({ getConcepts, textConcepts }: Prop) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [inputValue, getConcepts]);
+  }, [inputValue, memoizedGetConcepts]);
   
   // Only clear input when textConcepts is explicitly cleared (e.g., reset filters)
   // Don't clear during normal filtering operations

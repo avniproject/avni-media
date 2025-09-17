@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useCallback, useRef} from "react";
 import {Menu} from "@headlessui/react";
 import {CheckIcon, ChevronDownIcon} from "@heroicons/react/solid";
 import _ from 'lodash';
@@ -19,6 +19,7 @@ function classNames(...classes: string[]) {
 export default function Concepts({setConceptsFunction, concepts, title, multiSelect, searchable, selectedValue}: Prop) {
     const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const lastSelectedOptionsRef = useRef<any[]>([]);
 
     useEffect(() => {
         if (selectedValue?.uuid) {
@@ -28,9 +29,16 @@ export default function Concepts({setConceptsFunction, concepts, title, multiSel
         }
     }, [selectedValue]);
 
+    // Memoized callback to prevent infinite loops
+    const memoizedSetConceptsFunction = useCallback(setConceptsFunction, [setConceptsFunction]);
+
     useEffect(() => {
-        setConceptsFunction(selectedOptions);
-    }, [selectedOptions]);
+        // Only call if selectedOptions actually changed
+        if (!_.isEqual(selectedOptions, lastSelectedOptionsRef.current)) {
+            lastSelectedOptionsRef.current = selectedOptions;
+            memoizedSetConceptsFunction(selectedOptions);
+        }
+    }, [selectedOptions, memoizedSetConceptsFunction]);
 
     function handleOptionClick(option: any) {
         if (multiSelect) {

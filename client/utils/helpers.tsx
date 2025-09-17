@@ -17,10 +17,8 @@ export const validateAccessToken = () => {
         const tokenData: any = jwt(token);
         const timeNowInSeconds = Math.floor(Date.now() / 1000);
         const tokenValid = tokenData.exp >= timeNowInSeconds;
-        console.log("Token expires in :", tokenData.exp - timeNowInSeconds)
         return tokenValid;
     } catch (err) {
-        console.log('Error occurred--', err);
         return false;
     }
 }
