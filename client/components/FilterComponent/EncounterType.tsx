@@ -13,12 +13,14 @@ interface Prop {
   encounterType: (data: any[], encounterTypeUUID: any[]) => void;
   showAllEncounter: any[];
   showEncounter: any[];
+  selectedEncounters?: any[]; // Add prop to receive current selection from parent
 }
 
 export default function EncounterType({
   encounterType,
   showAllEncounter,
-  showEncounter
+  showEncounter,
+  selectedEncounters = []
 }: Prop) {
   
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
@@ -28,6 +30,14 @@ export default function EncounterType({
   
   const newData = [...showAllEncounter, ...showEncounter];
   const showUniqueEncounter = Array.from(new Set(newData));
+
+  // Reset internal state when parent resets
+  useEffect(() => {
+    if (selectedEncounters.length === 0 && selectedOptions.length > 0) {
+      setSelectedOptions([]);
+      setEncounterTypeUUID([]);
+    }
+  }, [selectedEncounters]);
   useEffect(()=>{
     if(showEncounter.length === 0){
       setSelectedOptions([]);
@@ -44,7 +54,7 @@ export default function EncounterType({
     .filter(encounterType => selectedOptions.includes(encounterType.name))
     .map(encounterType => encounterType.name);
     setSelectedOptions(updatedOptionsArray)
-  },[showEncounter, showAllEncounter])
+  },[showEncounter, showAllEncounter, selectedOptions, showUniqueEncounter])
   
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {

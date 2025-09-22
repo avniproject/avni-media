@@ -11,14 +11,22 @@ interface Option {
 interface Prop {
   subjectType: (data: any[], subjectUuid: any[]) => void;
   subjectFilter: any[];
-  
+  selectedSubjects?: any[]; // Add prop to receive current selection from parent
 }
 
-export default function SubjectType({ subjectType, subjectFilter }: Prop) {
+export default function SubjectType({ subjectType, subjectFilter, selectedSubjects = [] }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [subjectTypeUUID, setSubjectUUID] = useState<any[]>([]);
   const dropdownRef = useRef<any>(null);
+
+  // Reset internal state when parent resets
+  useEffect(() => {
+    if (selectedSubjects.length === 0 && selectedOptions.length > 0) {
+      setSelectedOptions([]);
+      setSubjectUUID([]);
+    }
+  }, [selectedSubjects]);
 
   useEffect(() => {
     subjectType(selectedOptions, subjectTypeUUID);

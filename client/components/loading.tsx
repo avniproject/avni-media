@@ -26,7 +26,7 @@ const Loading = () => {
     return <Modal
         isOpen={true}
         style={customStyles}
-        ariaHideApp={true}
+        ariaHideApp={false}
     >
         <CircularProgress size="5rem" />
     </Modal>

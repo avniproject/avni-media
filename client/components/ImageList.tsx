@@ -54,7 +54,7 @@ export default function ImageList() {
     const [encounter, setEncounterType] = useState<any[]>([]);
     const [program, setProgramType] = useState<any[]>([]);
     const [subject, setSubjectType] = useState<any[]>([]);
-    const [subjectName, setSubjectName] = useState<any>();
+    const [subjectName, setSubjectName] = useState<string>("");
     const [dataBody, setDataBody] = useState<any>();
     const [conceptData, setConceptData] = useState<any[]>([]);
     
@@ -1021,6 +1021,7 @@ export default function ImageList() {
                             <SubjectType
                                 subjectType={subjectType}
                                 subjectFilter={subjectFilter}
+                                selectedSubjects={subject}
                             />
                         </div>
                     )}
@@ -1029,6 +1030,7 @@ export default function ImageList() {
                         <div className="filter-item">
                             <Program programType={programType}
                                      programFilter={showprogram}
+                                     selectedPrograms={program}
                             />
                         </div>
                     )}
@@ -1039,6 +1041,7 @@ export default function ImageList() {
                                 encounterType={encounterType}
                                 showAllEncounter={showAllEncounter}
                                 showEncounter={showEncounter}
+                                selectedEncounters={encounter}
                             />
                         </div>
                     )}

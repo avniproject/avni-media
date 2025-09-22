@@ -10,18 +10,26 @@ interface Option {
 interface Props {
   programType: (data: any[], programUuid: any[]) => void;
   programFilter: any[];
- 
+  selectedPrograms?: any[]; // Add prop to receive current selection from parent
 }
 
-export default function Program({ programType, programFilter }: Props) {
+export default function Program({ programType, programFilter, selectedPrograms = [] }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [programUUID, setProgramUUID]         = useState<Option[]>([])
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<any>(null);
   
+  // Reset internal state when parent resets
+  useEffect(() => {
+    if (selectedPrograms.length === 0 && selectedOptions.length > 0) {
+      setSelectedOptions([]);
+      setProgramUUID([]);
+    }
+  }, [selectedPrograms]);
+  
   useEffect(() => {
     programType(selectedOptions, programUUID);
-  }, [ selectedOptions, programUUID]);
+  }, [selectedOptions, programUUID]);
  
   useEffect(() => {
    
@@ -39,7 +47,7 @@ export default function Program({ programType, programFilter }: Props) {
       setProgramUUID(uuidArray);
     }
    
-  }, [programFilter]);
+  }, [programFilter, programUUID, selectedOptions]);
   
   function handleOptionClick(option: {
     uuid: Option; name: Option; 
