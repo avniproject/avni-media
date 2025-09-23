@@ -1,4 +1,4 @@
-import {Fragment, Key, useEffect, useState, useCallback} from "react";
+import React, {useEffect, useState, useRef, useCallback, Fragment, Key} from 'react';
 import Pagination from "@/components/Pagination";
 import ImageCarousel from "./ImageCarousel";
 import axios from "axios";
@@ -63,6 +63,7 @@ export default function ImageList() {
     const [formsData, setFormsData] = useState<any>([]);
     const [typeId, setTypeId] = useState<any>([])
     const [error, setError] = useState<string | null>(null);
+    const [shouldReloadAfterReset, setShouldReloadAfterReset] = useState<boolean>(false);
     const [selectedProgramUUID, setSelectedProgramUUId] = useState<any[]>([]);
     const [selectedSubjectUUID, setSelectedSubjectUUID] = useState<any[]>([]);
     const [nextPageData, setNextPageData] = useState<any>({page: 0, data: []});
@@ -864,7 +865,7 @@ export default function ImageList() {
         resetSelections();
     }, [date, subject, subjectName, encounter, program, toDate, fromDate, add, activeConceptFilters, selectedMediaConcepts, showCount]);
 
-    const handleApplyFilter = async () => {
+    const handleApplyFilter = useCallback(async () => {
         try {
             redirectIfNotValid();
             setShowLoader(true);
@@ -879,13 +880,33 @@ export default function ImageList() {
         } finally {
             setShowLoader(false);
         }
-    };
+    }, [dataBody, currentPage, showPerpage]);
+
+    // Handle reload after reset when dataBody has been updated
+    useEffect(() => {
+        if (shouldReloadAfterReset && dataBody !== undefined) {
+            // Check if dataBody is effectively empty (only has includeTotalCount or is empty)
+            const isDataBodyEmpty = !dataBody || Object.keys(dataBody).length === 0 || 
+                (Object.keys(dataBody).length === 1 && dataBody.hasOwnProperty('includeTotalCount'));
+            
+            if (isDataBodyEmpty || Object.keys(dataBody).every(key => 
+                key === 'includeTotalCount' || 
+                !dataBody[key] || 
+                (Array.isArray(dataBody[key]) && dataBody[key].length === 0) ||
+                dataBody[key] === "" || 
+                dataBody[key] === null
+            )) {
+                setShouldReloadAfterReset(false);
+                handleApplyFilter();
+            }
+        }
+    }, [dataBody, shouldReloadAfterReset, handleApplyFilter]);
 
     const handleNumberChange = (value: number) => {
         setShowperpage(value);
     };
 
-    const restFilters = () => {
+    const resetFilters = () => {
         // Clear all filter states instead of reloading
         setSubjectName("");
         setDateRange([]);
@@ -930,6 +951,9 @@ export default function ImageList() {
         // Reset concept data
         setConceptData([]);
         setConceptDataLoading(false);
+        
+        // Set flag to trigger reload after dataBody is updated
+        setShouldReloadAfterReset(true);
     };
 
     const toggleSelectAllPages = () => {
@@ -1189,7 +1213,7 @@ export default function ImageList() {
                         />
                     </Link>
                     <Button
-                        onClick={restFilters}
+                        onClick={resetFilters}
                         name="Reset Filters"
                     />
                     <FormControlLabel style={{paddingLeft: "48px"}} label={"Select All"}
