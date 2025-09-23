@@ -21,6 +21,10 @@ import { FileUtility } from 'src/utils/file-utility';
       database: process.env.AVNI_MEDIA_DB_DATABASE,
       entities: [DownloadJobs],
       synchronize: true,
+      ssl:
+        process.env.AVNI_MEDIA_DB_HOST !== 'localhost'
+          ? { rejectUnauthorized: false } // Use SSL for remote databases
+          : false, // No SSL for localhost
     }),
     TypeOrmModule.forFeature([DownloadJobs]),
   ],
