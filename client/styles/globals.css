@@ -236,12 +236,52 @@
   height: 200px;
 }
 
-.checkbox {
-  margin-bottom: 10px;
-  margin-left: 30px;
+.name-size {
   background-color: white;
+  padding: 15px;
+  margin-top: 10px;
   position: relative;
   z-index: 20;
+  clear: both;
+  border-top: 1px solid #e5e5e5;
+  min-height: 60px;
+}
+
+.name-size p {
+  color: #333 !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  margin: 0 !important;
+}
+
+.name-size .MuiButton-root {
+  color: #007bff !important;
+  font-weight: 600 !important;
+  background-color: #f8f9fa;
+  border: 1px solid #007bff;
+  padding: 8px 16px;
+}
+
+.name-size .MuiButton-root:hover {
+  background-color: #007bff;
+  color: white !important;
+}
+
+.carousel-image {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.checkbox {
+  background-color: white;
+  padding: 10px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 20;
+  border-top: 1px solid #e5e5e5;
 }
 
 .carousel .control-dots {
@@ -255,6 +295,11 @@
   margin: 0 4px !important;
 }
 
-.carousel .control-dots .dot.selected {
-  background: #007bff !important;
+@media (max-width: 768px) {
+  .carousel-image {
+    max-height: 300px;
+  }
+  .name-size {
+    padding: 10px;
+  }
 }

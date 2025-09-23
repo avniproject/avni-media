@@ -96,7 +96,7 @@ const ImageCarousel = ({
                                 </svg>
                             </button>
                         </div>
-                        <div className="flex w-full h-full" style={{position: "relative",width: "500px", height: "650px"}}>
+                        <div className="flex w-full h-full" style={{position: "relative", minWidth: "800px", height: "750px"}}>
                             {showLoader && <Loading />}
                             <Carousel
                                 renderArrowPrev={(clickHandler, hasPrev) => {
@@ -162,7 +162,7 @@ const ImageCarousel = ({
                                                     imageDetail={undefined}
                                                 />
                                             </div>
-                                            <div className="name-size">
+                                            <div className="name-size" style={{backgroundColor: "white", padding: "10px", marginTop: "10px", position: "relative", zIndex: 20}}>
                                                 <Button
                                                     className="text-sm m-lt-3 float-right mb-md-5 mr-md-5"
                                                     style={{textTransform:"capitalize", fontSize: "1rem", paddingTop:"10px"}}
