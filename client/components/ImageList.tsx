@@ -473,9 +473,10 @@ export default function ImageList() {
             if (removedField?.uuid) {
                 removeConceptFilter(removedField.uuid);
             }
-            const newFilters = prev.filter((_, i) => i !== index);
-            // Ensure at least one empty filter remains for future reuse
-            return newFilters.length === 0 ? [null] : newFilters;
+            // Set to null to preserve other filter positions
+            const newFilters = [...prev];
+            newFilters[index] = null;
+            return newFilters;
         });
     };
 
