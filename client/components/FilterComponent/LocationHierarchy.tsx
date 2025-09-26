@@ -76,20 +76,30 @@ export default function LocationHierarchy({
     } else {
       setSelectLevelName(null);
     }
-    if (optionSelected !== undefined && selectLevelName !== null) {
-      getTopLevel(selectedOption, selectLevelName);
-    }
-  }, [optionSelected, selectedOptions, selectedOption, selectLevelName]);
+  }, [optionSelected]);
 
   useEffect(() => {
+    console.log('🔵 LocationHierarchy: useEffect[getTopLevel] triggered', { optionSelected, selectLevelName, selectedOption });
+    if (optionSelected !== undefined && selectLevelName !== null) {
+      console.log('🟢 LocationHierarchy: Calling getTopLevel', { selectedOption, selectLevelName });
+      getTopLevel(selectedOption, selectLevelName);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optionSelected, selectLevelName, selectedOption]); // Removed getTopLevel to prevent infinite loops
+
+  useEffect(() => {
+    console.log('🔵 LocationHierarchy: useEffect[location] triggered', { locationCount: location.length, selectedOptionsCount: selectedOptions.length });
         const newLocation = location.filter((items:any)=>selectedOptions.includes(items.id))
         const uuidArray = newLocation.map((option) => option.id);
         if (!isEqual(selectedOptions, uuidArray)) {
+          console.log('🟡 LocationHierarchy: Updating selectedOptions from location', { from: selectedOptions, to: uuidArray });
           setSelectedOptions(uuidArray);
         }
-  }, [location]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]); // Intentionally excluding selectedOptions to prevent circular updates
 
   useEffect(()=>{
+    console.log('🔵 LocationHierarchy: useEffect[otherLocation] triggered', { otherLocationCount: otherLocation.length, maxLevel, locationLevel: locationIndex.level });
 
     if( maxLevel && locationIndex.level < maxLevel-1){
     const extractedData = otherLocation.reduce((result, locations) => {
@@ -108,16 +118,21 @@ export default function LocationHierarchy({
     const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
 
     if (!isEqual(selectedOptions, updatedSelectedOptions)) {
+      console.log('🟡 LocationHierarchy: Updating selectedOptions from otherLocation', { from: selectedOptions, to: updatedSelectedOptions });
       setSelectedOptions(updatedSelectedOptions);
     }
    }
-},[otherLocation])
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+},[otherLocation, maxLevel, locationIndex.level]) // Added missing data dependencies, excluded selectedOptions to prevent circular updates
 
   useEffect(() => {
+    console.log('🔵 LocationHierarchy: useEffect[MAIN] triggered', { selectedOptionsCount: selectedOptions.length, selectedOptionCount: selectedOption.length, locationLevel: locationIndex.level, maxLevel });
     const typeIdData = async () => {
       const typeId = locationIndex.id;
+      console.log('🟠 LocationHierarchy: Starting typeIdData', { typeId, level: locationIndex.level, maxLevel });
 
       if (locationIndex.level === maxLevel) {
+        console.log('🌐 LocationHierarchy: Making API call (maxLevel)', { typeId, url: `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?typeId=${typeId}&page=0&size=1000&sort=id,DESC` });
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
@@ -131,8 +146,9 @@ export default function LocationHierarchy({
           const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
           try {
             parentsJson.map(async (item)=>{
+              console.log('🌐 LocationHierarchy: Making API call (maxLevel with parent)', { parentId: parentsId, typeId: item.id });
               const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page0&size=1000&sort=id,DESC&typeId=${item.id}`
+                `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
               );
             const distJsonData = response.data;
             const distData = distJsonData.content;
@@ -141,9 +157,9 @@ export default function LocationHierarchy({
             }
             getLocation(distData, selectedOption);
             })
-          } catch (Error) {
+          } catch (error) {
             console.error(
-              `error found at ${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}`
+              `Error fetching location data:`, error
             );
           }
         } else {
@@ -160,6 +176,7 @@ export default function LocationHierarchy({
             if (selectedOptions.length > 0 ) {
               const parentsId = selectedOptions.slice(-1)[0];
                 parentsJson.map(async (item)=>{
+                  console.log('🌐 LocationHierarchy: Making API call (sub-level)', { parentId: parentsId, typeId: item.id });
                   const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
                   );
@@ -174,9 +191,9 @@ export default function LocationHierarchy({
               const diffArray = preserverSelectedOption.filter((item)=> !selectedOptions.includes(item))
               getDiffArray(diffArray)
             }
-          } catch (Error) {
+          } catch (error) {
             console.error(
-              `error at ${process.env.NEXT_PUBLIC_WEB}/locations/search/find`
+              `Error fetching location data:`, error
             );
           }
         }
@@ -184,7 +201,8 @@ export default function LocationHierarchy({
     };
     typeIdData();
     setPreseveSelectedOption(selectedOptions)
-  }, [selectedOptions, selectedOption, locationIndex, maxLevel, minLevel]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptions, selectedOption, locationIndex, maxLevel, minLevel, locationFilter, index, preserverSelectedOption]); // Removed all function dependencies to prevent infinite loops
   function handleOptionClick(option: Option) {
     setSecondTypeName(option);
     if (selectedOptions.includes(option.id)) {
@@ -195,10 +213,13 @@ export default function LocationHierarchy({
   }
 
   useEffect(() => {
+    console.log('🔵 LocationHierarchy: useEffect[getSecondLevel] triggered', { selectedOptionsCount: selectedOptions.length, secondTypeName });
     if (selectedOptions !== undefined && secondTypeName !== undefined) {
+      console.log('🟢 LocationHierarchy: Calling getSecondLevel', { selectedOptions, typeString: secondTypeName.typeString });
       getSecondLevel(selectedOptions, secondTypeName.typeString);
     }
-  }, [selectedOptions, secondTypeName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptions, secondTypeName]); // Removed getSecondLevel to prevent infinite loops
 
   const handleClickOutside = (event: { target: any }) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -243,7 +264,7 @@ export default function LocationHierarchy({
               <div className="py-1">
                 {toplevelData &&
                   toplevelData.map((option: Option) => (
-                    <div key={option.id}>
+                    <div key={`toplevel-${option.id || option.uuid}`}>
                       <button
                         className={`flex justify-between w-full px-4 py-2 text-sm ${
                           selectedOption.includes(option.id)
@@ -269,7 +290,7 @@ export default function LocationHierarchy({
             <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none location-dropdown">
               <div className="py-1">
                 {location.map((option) => (
-                  <div key={option.uuid}>
+                  <div key={`location-${option.uuid || option.id}`}>
                     <button
                       className={classNames(
                         selectedOptions.includes(option.id)
@@ -295,7 +316,7 @@ export default function LocationHierarchy({
             </div>
           )}
           {otherLocation && maxLevel !== undefined &&
-            otherLocation.map((locationData) => {
+            otherLocation.map((locationData, mapIndex) => {
             for(let i=2 ; i<= maxLevel ; i++)
             {
               if (
@@ -305,13 +326,14 @@ export default function LocationHierarchy({
               ) {
                 return (
                   isOpen && (
-                    <Menu.Items
+                    <div
+                      key={`location-${locationData.level}-${mapIndex}`}
                       className="absolute left-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none location-dropdown"
                     >
                       <div className="py-1">
                         {locationData.data &&
                           locationData.data.map((option: Option) => (
-                            <div key={option.uuid}>
+                            <div key={`option-${option.uuid || option.id}`}>
                               <button
                                 className={classNames(
                                   selectedOptions.includes(option.id)
@@ -334,7 +356,7 @@ export default function LocationHierarchy({
                             </div>
                           ))}
                       </div>
-                    </Menu.Items>
+                    </div>
                   )
                 );
               }

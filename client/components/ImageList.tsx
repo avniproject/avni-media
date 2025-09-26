@@ -652,6 +652,8 @@ export default function ImageList() {
     const dateRange = (data: any[] | null) => {
         if (data !== null) {
             setDateRange(data);
+        } else {
+            setDateRange([]);
         }
     };
 
@@ -666,7 +668,8 @@ export default function ImageList() {
         setDistLoc(filteredLoc)
     }, [parentId])
 
-    const getLocation = async (data: any[], parentsIdArray: any[]) => {
+    const getLocation = useCallback(async (data: any[], parentsIdArray: any[]) => {
+        console.log('🟢 ImageList: getLocation called', { dataLength: data.length, parentsIdArrayLength: parentsIdArray.length });
 
         setParentId(parentsIdArray)
         if (data.length === 0) {
@@ -687,9 +690,10 @@ export default function ImageList() {
                 setLocations([...locations]);
             }
         }
-    };
+    }, [locations]);
 
-    const getDiffArray = (diffArray: any[]) => {
+    const getDiffArray = useCallback((diffArray: any[]) => {
+        console.log('🟢 ImageList: getDiffArray called', { diffArrayLength: diffArray.length });
         if (diffArray.length > 0) {
             const filteredData = otherLocation.map((loc) => {
                 return {
@@ -704,9 +708,10 @@ export default function ImageList() {
             });
             setOtherLocation(filteredData)
         }
-    }
+    }, [otherLocation]);
 
-    const getOtherLocation = (data: any[], level: any) => {
+    const getOtherLocation = useCallback((data: any[], level: any) => {
+        console.log('🟢 ImageList: getOtherLocation called', { dataLength: data.length, level });
         const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
         if (existingLocation) {
             const newData = data.filter((item) => {
@@ -719,17 +724,19 @@ export default function ImageList() {
             const newLocation = {level, data};
             setOtherLocation([...otherLocation, newLocation]);
         }
-    };
+    }, [otherLocation]);
 
-    const getTypeId = (data: any) => {
+    const getTypeId = useCallback((data: any) => {
+        console.log('🟢 ImageList: getTypeId called', { data, currentTypeIds: typeId });
         if (typeId.includes(data)) {
             setTypeId(typeId.filter((o: any) => o !== typeId));
         } else {
             setTypeId([...typeId, data]);
         }
-    }
+    }, [typeId]);
 
-    const getTopLevel = (data: any[], levelname: string) => {
+    const getTopLevel = useCallback((data: any[], levelname: string) => {
+        console.log('🟢 ImageList: getTopLevel called', { dataLength: data.length, levelname });
 
         setSelectedParentId(data)
         if (data.length > 0 && levelname !== null) {
@@ -742,9 +749,10 @@ export default function ImageList() {
 
             setAddress([])
         }
-    };
+    }, []);
 
-    const getSecondLevel = (data: any[], levelname: string) => {
+    const getSecondLevel = useCallback((data: any[], levelname: string) => {
+        console.log('🟢 ImageList: getSecondLevel called', { dataLength: data.length, levelname });
         if (data.length > 0 && levelname != undefined) {
 
             setSecondAddress([{
@@ -756,7 +764,7 @@ export default function ImageList() {
             setSecondAddress([])
         }
 
-    };
+    }, []);
 
     const subjectType = (data: any[], subjectUuid: string[]) => {
         setSelectedSubjectUUID(subjectUuid)
