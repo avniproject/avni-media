@@ -79,27 +79,22 @@ export default function LocationHierarchy({
   }, [optionSelected]);
 
   useEffect(() => {
-    console.log('🔵 LocationHierarchy: useEffect[getTopLevel] triggered', { optionSelected, selectLevelName, selectedOption });
     if (optionSelected !== undefined && selectLevelName !== null) {
-      console.log('🟢 LocationHierarchy: Calling getTopLevel', { selectedOption, selectLevelName });
       getTopLevel(selectedOption, selectLevelName);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [optionSelected, selectLevelName, selectedOption]); // Removed getTopLevel to prevent infinite loops
 
   useEffect(() => {
-    console.log('🔵 LocationHierarchy: useEffect[location] triggered', { locationCount: location.length, selectedOptionsCount: selectedOptions.length });
         const newLocation = location.filter((items:any)=>selectedOptions.includes(items.id))
         const uuidArray = newLocation.map((option) => option.id);
         if (!isEqual(selectedOptions, uuidArray)) {
-          console.log('🟡 LocationHierarchy: Updating selectedOptions from location', { from: selectedOptions, to: uuidArray });
           setSelectedOptions(uuidArray);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]); // Intentionally excluding selectedOptions to prevent circular updates
 
   useEffect(()=>{
-    console.log('🔵 LocationHierarchy: useEffect[otherLocation] triggered', { otherLocationCount: otherLocation.length, maxLevel, locationLevel: locationIndex.level });
 
     if( maxLevel && locationIndex.level < maxLevel-1){
     const extractedData = otherLocation.reduce((result, locations) => {
@@ -118,7 +113,6 @@ export default function LocationHierarchy({
     const updatedSelectedOptions = extractedData.flatMap((item: { data: any[]; }) => item.data.map((data) => data.id));
 
     if (!isEqual(selectedOptions, updatedSelectedOptions)) {
-      console.log('🟡 LocationHierarchy: Updating selectedOptions from otherLocation', { from: selectedOptions, to: updatedSelectedOptions });
       setSelectedOptions(updatedSelectedOptions);
     }
    }
@@ -126,13 +120,10 @@ export default function LocationHierarchy({
 },[otherLocation, maxLevel, locationIndex.level]) // Added missing data dependencies, excluded selectedOptions to prevent circular updates
 
   useEffect(() => {
-    console.log('🔵 LocationHierarchy: useEffect[MAIN] triggered', { selectedOptionsCount: selectedOptions.length, selectedOptionCount: selectedOption.length, locationLevel: locationIndex.level, maxLevel });
     const typeIdData = async () => {
       const typeId = locationIndex.id;
-      console.log('🟠 LocationHierarchy: Starting typeIdData', { typeId, level: locationIndex.level, maxLevel });
 
       if (locationIndex.level === maxLevel) {
-        console.log('🌐 LocationHierarchy: Making API call (maxLevel)', { typeId, url: `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?typeId=${typeId}&page=0&size=1000&sort=id,DESC` });
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?typeId=${typeId}&page=0&size=1000&sort=id,DESC`
         );
@@ -146,7 +137,6 @@ export default function LocationHierarchy({
           const parentsJson = locationFilter.filter((item)=> item.parent!== undefined && item.parent.uuid === parentsUUID)
           try {
             parentsJson.map(async (item)=>{
-              console.log('🌐 LocationHierarchy: Making API call (maxLevel with parent)', { parentId: parentsId, typeId: item.id });
               const response = await axios.get(
                 `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
               );
@@ -176,7 +166,6 @@ export default function LocationHierarchy({
             if (selectedOptions.length > 0 ) {
               const parentsId = selectedOptions.slice(-1)[0];
                 parentsJson.map(async (item)=>{
-                  console.log('🌐 LocationHierarchy: Making API call (sub-level)', { parentId: parentsId, typeId: item.id });
                   const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_WEB}/locations/search/find?parentId=${parentsId}&page=0&size=1000&sort=id,DESC&typeId=${item.id}`
                   );
@@ -213,9 +202,7 @@ export default function LocationHierarchy({
   }
 
   useEffect(() => {
-    console.log('🔵 LocationHierarchy: useEffect[getSecondLevel] triggered', { selectedOptionsCount: selectedOptions.length, secondTypeName });
     if (selectedOptions !== undefined && secondTypeName !== undefined) {
-      console.log('🟢 LocationHierarchy: Calling getSecondLevel', { selectedOptions, typeString: secondTypeName.typeString });
       getSecondLevel(selectedOptions, secondTypeName.typeString);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -669,7 +669,6 @@ export default function ImageList() {
     }, [parentId])
 
     const getLocation = useCallback(async (data: any[], parentsIdArray: any[]) => {
-        console.log('🟢 ImageList: getLocation called', { dataLength: data.length, parentsIdArrayLength: parentsIdArray.length });
 
         setParentId(parentsIdArray)
         if (data.length === 0) {
@@ -693,7 +692,6 @@ export default function ImageList() {
     }, [locations]);
 
     const getDiffArray = useCallback((diffArray: any[]) => {
-        console.log('🟢 ImageList: getDiffArray called', { diffArrayLength: diffArray.length });
         if (diffArray.length > 0) {
             const filteredData = otherLocation.map((loc) => {
                 return {
@@ -711,7 +709,6 @@ export default function ImageList() {
     }, [otherLocation]);
 
     const getOtherLocation = useCallback((data: any[], level: any) => {
-        console.log('🟢 ImageList: getOtherLocation called', { dataLength: data.length, level });
         const existingLocation = otherLocation.find((loc: { level: any; }) => loc.level === level);
         if (existingLocation) {
             const newData = data.filter((item) => {
@@ -727,7 +724,6 @@ export default function ImageList() {
     }, [otherLocation]);
 
     const getTypeId = useCallback((data: any) => {
-        console.log('🟢 ImageList: getTypeId called', { data, currentTypeIds: typeId });
         if (typeId.includes(data)) {
             setTypeId(typeId.filter((o: any) => o !== typeId));
         } else {
@@ -736,7 +732,6 @@ export default function ImageList() {
     }, [typeId]);
 
     const getTopLevel = useCallback((data: any[], levelname: string) => {
-        console.log('🟢 ImageList: getTopLevel called', { dataLength: data.length, levelname });
 
         setSelectedParentId(data)
         if (data.length > 0 && levelname !== null) {
@@ -752,7 +747,6 @@ export default function ImageList() {
     }, []);
 
     const getSecondLevel = useCallback((data: any[], levelname: string) => {
-        console.log('🟢 ImageList: getSecondLevel called', { dataLength: data.length, levelname });
         if (data.length > 0 && levelname != undefined) {
 
             setSecondAddress([{
