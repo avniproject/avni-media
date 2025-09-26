@@ -30,6 +30,7 @@ interface Prop {
   location: any[];
   otherLocation: any[];
   locationFilter: any[];
+  locationReset?: boolean;
 }
 
 function classNames(...classes: string[]) {
@@ -49,7 +50,8 @@ export default function LocationHierarchy({
   index,
   getTypeId,
   locationFilter,
-  getDiffArray
+  getDiffArray,
+  locationReset
 }: Prop) {
   const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [optionSelected, setOptionSelected] = useState<any>();
@@ -60,6 +62,18 @@ export default function LocationHierarchy({
   const [toplevelData, setTopLevelData] = useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<any[]>([]);
   const [preserverSelectedOption, setPreseveSelectedOption] = useState<any[]>([]);
+
+  // Reset internal state when locationResetTimestamp changes
+  useEffect(() => {
+    setSelectedOptions([]);
+    setOptionSelected(undefined);
+    setSecondTypeName(undefined);
+    setSelectLevelName(null);
+    setIsOpen(false);
+    setTopLevelData([]);
+    setSelectedOption([]);
+    setPreseveSelectedOption([]);
+  }, [locationReset]);
 
   function handleOptionSelect(option: Option) {
     setOptionSelected(option);

@@ -760,6 +760,8 @@ export default function ImageList() {
 
     }, []);
 
+    const [locationReset, setLocationReset] = useState(false);
+    
     const subjectType = (data: any[], subjectUuid: string[]) => {
         setSelectedSubjectUUID(subjectUuid)
         setSubjectType(data);
@@ -957,6 +959,8 @@ export default function ImageList() {
         
         // Set flag to trigger reload after dataBody is updated
         setShouldReloadAfterReset(true);
+        
+        setLocationReset(prev => !prev);
     };
 
     const toggleSelectAllPages = () => {
@@ -1025,6 +1029,7 @@ export default function ImageList() {
                                                 getSecondLevel={getSecondLevel}
                                                 getTypeId={getTypeId}
                                                 getDiffArray={getDiffArray}
+                                                locationReset={locationReset}
                                             />
                                         </div>
                                     );
