@@ -26,10 +26,23 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
+
 # vercel
 .vercel
-.env
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDEs and editors
+/.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.sublime-workspace
+
+# yarn (package-lock.json is the primary lockfile)
+# yarn.lock

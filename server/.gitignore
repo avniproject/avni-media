@@ -33,5 +33,11 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Environment files
 .env
-.DS_Store
+.env.*
+!.env.example
+
+# TypeScript build info
+*.tsbuildinfo

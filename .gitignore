@@ -1,9 +1,26 @@
-# ignore node_modules
+# dependencies
 node_modules/
 
-# ignore generated zip files
+# generated zip files
 *.zip
-.idea/
+
+# OS
 .DS_Store
+
+# IDEs
+.idea/
+
+# environment files
 .env
+.env.*
+!.env.example
 /server/makefiles/local.env
+
+# Next.js build output
+.next
+
+# logs
+*.log
+
+# TypeScript build info
+*.tsbuildinfo
