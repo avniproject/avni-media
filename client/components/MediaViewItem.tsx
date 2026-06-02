@@ -11,34 +11,32 @@ interface Props {
 
 const MediaViewItem = ({image, setCarouselImage, minLevelName, onSelectImage, checkedImage}: Props) => {
     return (
-        <div key={`${image.uuid}-${Math.random()}`}>
-            <div className="relative">
-                <div className="relative w-full h-50 rounded-lg overflow-hidden"
-                     style={{ padding:"2px"}}>
-                    <button>
-                        <img
-                            src={getImage(image, true)}
-                            alt={image?.subjectTypeName}
-                            onClick={() => setCarouselImage(image)}
-                            className="thumb"
-                        />
-                    </button>
-                </div>
-                <CheckButton
-                    imageDescription={getImageDescription(image, minLevelName)}
-                    unSignedUrl={image.url}
-                    name={getImageName(image, minLevelName)}
-                    id={image.uuid}
-                    onSelectImage={onSelectImage}
-                    checkedImage={checkedImage}
-                    imageDetail={image}
-                    image_url={image.signedUrl}
-                    flag="list"
-                    onSelectImageCarousel={function (): void {
-                        throw new Error("Function not implemented.");
-                    }}
-                />
+        <div className="relative">
+            <div className="relative w-full h-50 rounded-lg overflow-hidden"
+                 style={{ padding:"2px"}}>
+                <button>
+                    <img
+                        src={getImage(image, true)}
+                        alt={image?.subjectTypeName}
+                        onClick={() => setCarouselImage(image)}
+                        className="thumb"
+                    />
+                </button>
             </div>
+            <CheckButton
+                imageDescription={getImageDescription(image, minLevelName)}
+                unSignedUrl={image.url}
+                name={getImageName(image, minLevelName)}
+                id={image.uuid}
+                onSelectImage={onSelectImage}
+                checkedImage={checkedImage}
+                imageDetail={image}
+                image_url={image.signedUrl}
+                flag="list"
+                onSelectImageCarousel={function (): void {
+                    throw new Error("Function not implemented.");
+                }}
+            />
         </div>
     );
 }
