@@ -21,9 +21,9 @@ export default function Program({ programType, programFilter, selectedPrograms =
   
   // Reset internal state when parent resets
   useEffect(() => {
-    if (selectedPrograms.length === 0 && selectedOptions.length > 0) {
-      setSelectedOptions([]);
-      setProgramUUID([]);
+    if (selectedPrograms.length === 0) {
+      setSelectedOptions(prev => (prev.length ? [] : prev));
+      setProgramUUID(prev => (prev.length ? [] : prev));
     }
   }, [selectedPrograms]);
   
