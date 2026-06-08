@@ -1258,8 +1258,8 @@ export default function ImageList() {
                             <div
                                 className="-mt-16 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-5 xl:gap-x-8">
                                 {imageList.data.map(
-                                    (image: imageType, index: number) =>
-                                        <MediaViewItem key={`${image.uuid}-${index}`} image={image}
+                                    (image: imageType) =>
+                                        <MediaViewItem key={image.uuid} image={image}
                                                        setCarouselImage={setCarouselImage}
                                                        minLevelName={minLevelName} onSelectImage={onSelectImage}
                                                        checkedImage={checkedImage}/>
