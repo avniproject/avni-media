@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 import { Option } from "rc-select";
+import { isEqual } from 'lodash';
 
 interface Option {
   uuid: any;
@@ -40,8 +41,8 @@ export default function EncounterType({
   }, [selectedEncounters]);
   useEffect(()=>{
     if(showEncounter.length === 0){
-      setSelectedOptions([]);
-      setEncounterTypeUUID([]);
+      setSelectedOptions(prev => (prev.length ? [] : prev));
+      setEncounterTypeUUID(prev => (prev.length ? [] : prev));
     }
   },[showEncounter])
 
@@ -51,10 +52,16 @@ export default function EncounterType({
 
   useEffect(()=>{
     const updatedOptionsArray = showUniqueEncounter
-    .filter(encounterType => selectedOptions.includes(encounterType.name))
-    .map(encounterType => encounterType.name);
-    setSelectedOptions(updatedOptionsArray)
-  },[showEncounter, showAllEncounter, selectedOptions, showUniqueEncounter])
+    .filter(encounter => selectedOptions.includes(encounter.name))
+    .map(encounter => encounter.name);
+    // Only update when the pruned list actually differs in content.
+    // setSelectedOptions with a fresh array on every render (showUniqueEncounter
+    // is rebuilt each render) caused an infinite render loop via the parent's
+    // encounter dependency.
+    if (!isEqual(selectedOptions, updatedOptionsArray)) {
+      setSelectedOptions(updatedOptionsArray);
+    }
+  },[showEncounter, showAllEncounter, selectedOptions])
   
   function handleOptionClick(option: Option) {
     if (selectedOptions.includes(option.name)) {
