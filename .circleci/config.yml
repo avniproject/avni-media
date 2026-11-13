@@ -20,6 +20,10 @@ commands:
       availability-zone:
         type: string
         default: ap-south-1a
+      via-session-manager:
+        description: Reach the server through AWS Session Manager (main account only; RWB's role has no such permission)
+        type: boolean
+        default: false
     steps:
       - attach_workspace:
           at: ~/artifacts
@@ -42,21 +46,24 @@ commands:
             sudo apt-get -y -qq update
             sudo apt-get -y -qq install python3-pip
 
-      - run:
-          name: Reach the server over AWS Session Manager (no inbound SSH from the internet; task 74)
-          command: |
-            # The same proxy the avni-infra deploys use. It pushes /tmp/temp_rsa_key.pub on every connection.
-            curl -fsSL -o ~/ssm-ssh-proxy.sh "https://raw.githubusercontent.com/avniproject/avni-infra/${AVNI_INFRA_REF:-master}/configure/scripts/ssm-ssh-proxy.sh"
-            chmod +x ~/ssm-ssh-proxy.sh
-            mkdir -p ~/.ssh
-            cat >> ~/.ssh/config \<<SSHCFG
-            Host << parameters.hostname >>
-              ProxyCommand ~/ssm-ssh-proxy.sh << parameters.instance-id >>
-              User << parameters.os-user >>
-              IdentityFile /tmp/temp_rsa_key
-              StrictHostKeyChecking no
-              ServerAliveInterval 30
-            SSHCFG
+      - when:
+          condition: << parameters.via-session-manager >>
+          steps:
+          - run:
+              name: Reach the server over AWS Session Manager (no inbound SSH from the internet; task 74)
+              command: |
+                # The same proxy the avni-infra deploys use. It pushes /tmp/temp_rsa_key.pub on every connection.
+                curl -fsSL -o ~/ssm-ssh-proxy.sh "https://raw.githubusercontent.com/avniproject/avni-infra/${AVNI_INFRA_REF:-master}/configure/scripts/ssm-ssh-proxy.sh"
+                chmod +x ~/ssm-ssh-proxy.sh
+                mkdir -p ~/.ssh
+                cat >> ~/.ssh/config \<<SSHCFG
+                Host << parameters.hostname >>
+                  ProxyCommand ~/ssm-ssh-proxy.sh << parameters.instance-id >>
+                  User << parameters.os-user >>
+                  IdentityFile /tmp/temp_rsa_key
+                  StrictHostKeyChecking no
+                  ServerAliveInterval 30
+                SSHCFG
 
       - run:
           name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
@@ -251,6 +258,7 @@ jobs:
           availability-zone: "ap-south-1a"
           hostname: "int-staging.avniproject.org"
           env: "staging"
+          via-session-manager: true
   PRERELEASE_deploy:
     docker:
       - image: cimg/node:19.8.1
@@ -267,6 +275,7 @@ jobs:
           availability-zone: "ap-south-1b"
           hostname: "int-prerelease.avniproject.org"
           env: "prerelease"
+          via-session-manager: true
   PRODUCTION_deploy:
     docker:
       - image: cimg/node:19.8.1
@@ -283,6 +292,7 @@ jobs:
           availability-zone: "ap-south-1a"
           hostname: "int-prod.avniproject.org"
           env: "prod"
+          via-session-manager: true
   RWB_STAGING_deploy:
     docker:
       - image: cimg/node:19.8.1
