@@ -43,6 +43,22 @@ commands:
             sudo apt-get -y -qq install python3-pip
 
       - run:
+          name: Reach the server over AWS Session Manager (no inbound SSH from the internet; task 74)
+          command: |
+            # The same proxy the avni-infra deploys use. It pushes /tmp/temp_rsa_key.pub on every connection.
+            curl -fsSL -o ~/ssm-ssh-proxy.sh "https://raw.githubusercontent.com/avniproject/avni-infra/${AVNI_INFRA_REF:-master}/configure/scripts/ssm-ssh-proxy.sh"
+            chmod +x ~/ssm-ssh-proxy.sh
+            mkdir -p ~/.ssh
+            cat >> ~/.ssh/config \<<SSHCFG
+            Host << parameters.hostname >>
+              ProxyCommand ~/ssm-ssh-proxy.sh << parameters.instance-id >>
+              User << parameters.os-user >>
+              IdentityFile /tmp/temp_rsa_key
+              StrictHostKeyChecking no
+              ServerAliveInterval 30
+            SSHCFG
+
+      - run:
           name: Re-apply temp ssh key as it is removed after 60 sec by aws ec2-instance-connect
           command: |
             aws ec2-instance-connect send-ssh-public-key --instance-id << parameters.instance-id >> --availability-zone << parameters.availability-zone >> --instance-os-user << parameters.os-user >> --no-paginate --ssh-public-key file:///tmp/temp_rsa_key.pub --output text | head -1
